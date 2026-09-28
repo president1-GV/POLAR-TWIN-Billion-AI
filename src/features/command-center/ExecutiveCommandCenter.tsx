@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
+import { AntarcticGISMap } from './AntarcticGISMap';
 
 interface Props {
   onNavigate: (screen: any) => void;
@@ -22,6 +23,7 @@ interface Props {
 
 export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectStation }) => {
   const [stations, setStations] = useState<any[]>([]);
+  const [activeStationId, setActiveStationId] = useState<string>('station_bharati');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -137,6 +139,19 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
           </div>
         </div>
       </div>
+
+      {/* Geospatial GIS Operations Map */}
+      <AntarcticGISMap
+        selectedStationId={activeStationId}
+        onSelectStation={(id) => {
+          setActiveStationId(id);
+          onSelectStation(id);
+        }}
+        onNavigateToTwin={(id) => {
+          onSelectStation(id);
+          onNavigate('digital-twin');
+        }}
+      />
 
       {/* Dual Station Cards: Maitri & Bharati */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

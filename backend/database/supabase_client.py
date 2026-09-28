@@ -4,9 +4,19 @@ import urllib.request
 import urllib.parse
 from typing import Dict, Any, List, Optional
 
+# Auto-load .env if available
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
+if os.path.exists(env_path):
+    with open(env_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://fpoxnocbznagepusczkk.supabase.co")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
-SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwb3hub2Niem5hZ2VwdXNjemtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1NTMyNTMsImV4cCI6MjEwNjEyOTI1M30.Np8y0hopJxoTHHY587rKDhKB0Jk6m95SxoS8owCL6qY")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", SUPABASE_ANON_KEY)
 SUPABASE_TOKEN = os.getenv("SUPABASE_ACCESS_TOKEN", "")
 PROJECT_REF = os.getenv("SUPABASE_PROJECT_REF", "fpoxnocbznagepusczkk")
 QUERY_URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
