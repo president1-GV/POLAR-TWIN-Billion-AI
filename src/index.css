@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-polar-950 text-slate-100 font-sans;
+  }
+}
+
+/* Custom Polar Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080E1A;
+}
+::-webkit-scrollbar-thumb {
+  background: #1F3258;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00E5FF;
+}
+
+/* Mission Control HUD Grids */
+.polar-grid {
+  background-image: linear-gradient(to right, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.polar-panel {
+  @apply bg-polar-900/90 border border-polar-750/70 rounded-lg backdrop-blur-md shadow-lg shadow-polar-950/50;
+}
+
+.polar-panel-header {
+  @apply px-4 py-3 border-b border-polar-750/70 flex items-center justify-between text-xs font-mono tracking-wider uppercase text-polar-cyan font-semibold;
+}
