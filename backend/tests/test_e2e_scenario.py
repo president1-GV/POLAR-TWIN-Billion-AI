@@ -15,12 +15,21 @@ def test_full_operational_e2e_scenario():
     print("✓ [Step 1] Gateway Online & Verified")
 
     # 2. Login & RBAC
-    r = client.post("/api/auth/login", json={"username": "operator.sharma"})
+    r = client.post("/api/auth/login", json={"username": "operator.sharma", "password": "PolarOps@2026!"})
     assert r.status_code == 200
     auth_data = r.json()
     assert auth_data["authenticated"] is True
     assert auth_data["user"]["role"] == "OPERATOR"
+    op_token = auth_data["token"]
+    op_headers = {"Authorization": f"Bearer {op_token}"}
     print("✓ [Step 2] Authenticated Duty Operator (RBAC: OPERATOR)")
+
+    # Authenticate Station Engineer for Telemetry Calibration / Injection
+    r_eng = client.post("/api/auth/login", json={"username": "engineer.deshmukh", "password": "AntarcticEng#1"})
+    assert r_eng.status_code == 200
+    eng_token = r_eng.json()["token"]
+    eng_headers = {"Authorization": f"Bearer {eng_token}"}
+    print("✓ [Step 2b] Authenticated Station Engineer (RBAC: ENGINEER)")
 
     # 3. Command Center - List Stations
     r = client.get("/api/stations")
@@ -44,8 +53,8 @@ def test_full_operational_e2e_scenario():
     gen = r.json()
     print(f"✓ [Step 5] Generator State Monitored: {gen['name']}, Health: {gen['health_score']}%")
 
-    # 6. Simulate Satellite Link Loss -> EDGE MODE
-    r = client.post("/api/edge/link-status", json={"status": "OFFLINE"})
+    # 6. Simulate Satellite Link Loss -> EDGE MODE (Operator authorized)
+    r = client.post("/api/edge/link-status", json={"status": "OFFLINE"}, headers=op_headers)
     assert r.status_code == 200
     assert r.json()["current_status"] == "OFFLINE"
     print("✓ [Step 6] Satellite Link Failure Simulated -> Switched to EDGE OFFLINE MODE")
@@ -58,14 +67,14 @@ def test_full_operational_e2e_scenario():
     assert edge_status["buffer_queue_size"] >= 2
     print(f"✓ [Step 7] Local Telemetry Buffered on Edge Industrial PC (Buffer: {edge_status['buffer_queue_size']} pkts, Local Alerts: {edge_status['local_alerts_count']})")
 
-    # 8. Anomaly Detection & State Escalation
+    # 8. Anomaly Detection & State Escalation (Engineer authorized to inject telemetry)
     r = client.post("/api/assets/bh_gen_01/telemetry", json={
         "exhaust_temp_c": 472.0,
         "vibration_mms": 4.95,
         "load_pct": 88.0,
         "oil_pressure_bar": 3.2,
         "fuel_flow_lph": 44.0
-    })
+    }, headers=eng_headers)
     assert r.status_code == 200
     diag = r.json()
     assert diag["anomaly_result"]["is_anomaly"] is True
@@ -78,8 +87,8 @@ def test_full_operational_e2e_scenario():
     assert len(alerts) > 0
     print(f"✓ [Step 9] Critical Alert Broadcast to Base: '{alerts[0]['title']}'")
 
-    # 10. Run What-If Emergency Simulation (Generator Failure)
-    r = client.post("/api/simulation/run", json={"scenario_key": "GENERATOR_FAILURE", "station_id": "station_bharati", "ambient_temp_c": -35.0})
+    # 10. Run What-If Emergency Simulation (Generator Failure) - Operator authorized
+    r = client.post("/api/simulation/run", json={"scenario_key": "GENERATOR_FAILURE", "station_id": "station_bharati", "ambient_temp_c": -35.0}, headers=op_headers)
     assert r.status_code == 200
     sim = r.json()
     c = sim["consequences"]
@@ -88,9 +97,11 @@ def test_full_operational_e2e_scenario():
 
     # 11. Human-in-the-Loop Operator Reviews & Approves Mitigation
     sim_id = sim["simulation_id"]
-    r = client.post(f"/api/simulation/{sim_id}/review", json={"action": "APPROVED", "operator_id": "operator.sharma", "notes": "Engage Aux Genset 02 and shed lab"})
+    r = client.post(f"/api/simulation/{sim_id}/review", json={"action": "APPROVED", "notes": "Engage Aux Genset 02 and shed lab"}, headers=op_headers)
     assert r.status_code == 200
-    assert r.json()["stabilization_status"] == "EXECUTED_SIMULATED"
+    review_res = r.json()
+    assert review_res["status"] == "MITIGATION_ENACTED"
+    assert review_res["reviewed_by"] == "operator.sharma"
     print("✓ [Step 11] Operator Reviewed and APPROVED Mitigation -> Simulated Stabilization Executed")
 
     # 12. Verify Station Digital Twin Stabilized
@@ -98,9 +109,9 @@ def test_full_operational_e2e_scenario():
     assert twin["overall_health_score"] >= 88.0
     print(f"✓ [Step 12] Digital Twin Microgrid Stabilized (Overall Base Health: {twin['overall_health_score']}%)")
 
-    # 13. Reconnect Edge & Store-and-Forward Replay Sync
-    client.post("/api/edge/link-status", json={"status": "ONLINE"})
-    r_sync = client.post("/api/edge/sync")
+    # 13. Reconnect Edge & Store-and-Forward Replay Sync (Operator authorized)
+    client.post("/api/edge/link-status", json={"status": "ONLINE"}, headers=op_headers)
+    r_sync = client.post("/api/edge/sync", headers=op_headers)
     assert r_sync.status_code == 200
     sync_data = r_sync.json()
     assert sync_data["status"] == "COMPLETED"

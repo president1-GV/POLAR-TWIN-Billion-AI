@@ -1,25 +1,34 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Request, status
 from typing import Dict, Any, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, timezone
 import json
+
 from backend.simulation.scenario_engine import simulation_engine
 from backend.database.supabase_client import supabase_client
 from backend.digital_twin.state_engine import digital_twin_engine
+from backend.security.rbac import (
+    get_current_user,
+    require_permission,
+    require_station_access
+)
+from backend.security.rate_limiter import check_simulation_rate_limit
+from backend.security.audit_service import security_audit_logger
 
 router = APIRouter(prefix="/simulation", tags=["Simulation"])
 
 class RunSimulationPayload(BaseModel):
-    scenario_key: str
-    station_id: str = "station_bharati"
-    ambient_temp_c: Optional[float] = None
-    wind_speed_ms: Optional[float] = None
+    model_config = ConfigDict(extra="forbid")
+    scenario_key: str = Field(..., min_length=2, max_length=64)
+    station_id: str = Field(default="station_bharati", min_length=2, max_length=32)
+    ambient_temp_c: Optional[float] = Field(default=None, ge=-80.0, le=40.0)
+    wind_speed_ms: Optional[float] = Field(default=None, ge=0.0, le=100.0)
     custom_params: Optional[Dict[str, Any]] = None
 
 class ReviewActionPayload(BaseModel):
-    action: str  # APPROVED, REJECTED, EXECUTED_SIMULATED
-    operator_id: str = "operator.current"
-    notes: Optional[str] = None
+    model_config = ConfigDict(extra="forbid")
+    action: str = Field(..., pattern="^(APPROVED|REJECTED|EXECUTED_SIMULATED)$")
+    notes: Optional[str] = Field(default=None, max_length=500)
 
 @router.get("/scenarios")
 def list_scenarios():
@@ -28,9 +37,18 @@ def list_scenarios():
         {"key": k, **v} for k, v in simulation_engine.SCENARIOS.items()
     ]
 
-@router.post("/run")
-def execute_simulation(payload: RunSimulationPayload):
-    """Execute what-if simulation and compute quantitative downstream impact."""
+@router.post("/run", dependencies=[Depends(check_simulation_rate_limit)])
+def execute_simulation(
+    payload: RunSimulationPayload,
+    current_user: Dict[str, Any] = Depends(require_permission("run_simulations"))
+):
+    """
+    Execute what-if simulation and compute quantitative downstream impact.
+    Enforces RBAC ('run_simulations') and BOLA/IDOR station scope validation.
+    """
+    # BOLA / IDOR Verification: ensure user is authorized for target station
+    require_station_access(payload.station_id, current_user)
+
     temp = payload.ambient_temp_c if payload.ambient_temp_c is not None else -22.0
     wind = payload.wind_speed_ms if payload.wind_speed_ms is not None else 12.0
     
@@ -41,6 +59,8 @@ def execute_simulation(payload: RunSimulationPayload):
         wind_speed_ms=wind,
         custom_params=payload.custom_params
     )
+
+    actor_username = current_user.get("username", "operator")
 
     # Persist simulation run
     try:
@@ -58,55 +78,67 @@ def execute_simulation(payload: RunSimulationPayload):
     except Exception as e:
         print(f"[SimulationAPI] Note on persistence: {e}")
 
+    # Security Audit log
+    security_audit_logger.log_event(
+        action="SIMULATION_EXECUTED",
+        actor_id=actor_username,
+        role=current_user.get("role", "OPERATOR"),
+        station_id=payload.station_id,
+        details={"scenario": payload.scenario_key, "simulation_id": res["simulation_id"]}
+    )
+
     return res
 
 @router.post("/{simulation_id}/review")
-def review_simulation_mitigation(simulation_id: str, payload: ReviewActionPayload):
+def review_mitigation(
+    simulation_id: str,
+    payload: ReviewActionPayload,
+    current_user: Dict[str, Any] = Depends(require_permission("approve_mitigations"))
+):
     """
-    Human-in-the-Loop decision: Approve or Reject mitigation recommendation.
-    If APPROVED: Applies simulated stabilization to Digital Twin and writes audit record.
+    Operator review of AI-recommended mitigation plan.
+    Strictly derives operator identity from verified server-side session token.
+    Enforces 'approve_mitigations' RBAC permission.
     """
-    now_iso = datetime.now(timezone.utc).isoformat()
-    if payload.action not in ["APPROVED", "REJECTED", "EXECUTED_SIMULATED"]:
-        raise HTTPException(status_code=400, detail="Invalid action")
+    actor_username = current_user.get("username", "operator")
+    actor_role = current_user.get("role", "OPERATOR")
+    user_station = current_user.get("station", "GLOBAL")
 
-    # If approved, perform simulated stabilization
-    if payload.action in ["APPROVED", "EXECUTED_SIMULATED"]:
-        # 1. Isolate failed Gen 01 for bearing overhaul
-        supabase_client.update_row("station_assets", "id", "bh_gen_01", {
-            "status": "OFFLINE",
-            "health_score": 50.0,
-            "current_state": {"status": "ISOLATED_FOR_BEARING_OVERHAUL"}
-        })
-        # 2. Stabilize genset 02 and life support
-        supabase_client.update_row("station_assets", "id", "bh_gen_02", {
-            "status": "NORMAL",
-            "health_score": 98.0,
-            "current_state": {"load_pct": 72.0, "status": "SYNCHRONIZED_ACTIVE"}
-        })
-        supabase_client.update_row("station_assets", "id", "bh_hvac_01", {
-            "status": "NORMAL",
-            "health_score": 96.0,
-            "current_state": {"indoor_temp_c": 21.5}
-        })
-        supabase_client.update_row("station_assets", "id", "bh_lab_01", {
-            "status": "OFFLINE",
-            "current_state": {"state": "LOAD_SHED_TO_CONSERVE_POWER"}
-        })
-        # Clear critical alerts
-        supabase_client.query_sql("UPDATE alerts SET status = 'RESOLVED' WHERE station_id = 'station_bharati' AND severity = 'CRITICAL';")
+    action_status = "MITIGATION_ENACTED" if payload.action == "APPROVED" else "MITIGATION_REJECTED"
+    
+    # If approved, mutate the simulated digital twin state safely
+    if payload.action == "APPROVED":
+        target_station = user_station if user_station != "GLOBAL" else "station_bharati"
+        digital_twin_engine.apply_mitigation(
+            station_id=target_station,
+            mitigation_type="AUTO_RECOVERY"
+        )
 
-    # Audit log
-    supabase_client.insert_row("audit_logs", {
-        "user_id": payload.operator_id,
-        "role": "OPERATOR",
-        "action": f"SIMULATION_{payload.action}",
-        "details": json.dumps({"simulation_id": simulation_id, "notes": payload.notes})
-    })
+    # Record security audit event
+    audit_record = security_audit_logger.log_event(
+        action=f"SIMULATION_{payload.action}",
+        actor_id=actor_username,
+        role=actor_role,
+        station_id=user_station,
+        details={
+            "simulation_id": simulation_id,
+            "notes": payload.notes,
+            "action_status": action_status
+        }
+    )
 
     return {
         "simulation_id": simulation_id,
-        "operator_action": payload.action,
-        "reviewed_at": now_iso,
-        "stabilization_status": "EXECUTED_SIMULATED" if payload.action in ["APPROVED", "EXECUTED_SIMULATED"] else "DISCARDED"
+        "reviewed_by": actor_username,
+        "role": actor_role,
+        "action": payload.action,
+        "status": action_status,
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+        "audit_event_id": audit_record["id"],
+        "notes": payload.notes
     }
+
+@router.get("/runs")
+def list_simulation_runs(limit: int = 10):
+    """List recent scenario execution runs."""
+    return supabase_client.get_table("simulation_runs", {"order": "created_at.desc", "limit": str(limit)})

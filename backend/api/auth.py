@@ -1,70 +1,184 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Request, Header, status
 from typing import Dict, Any, List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, ConfigDict
+from backend.security.auth_service import auth_service, USER_DATABASE, ACTIVE_SESSIONS
+from backend.security.rbac import (
+    get_current_user,
+    require_permission,
+    PERMISSIONS_MAP
+)
+from backend.security.rate_limiter import check_login_rate_limit, rate_limiter
+from backend.security.audit_service import security_audit_logger
 
 router = APIRouter(prefix="/auth", tags=["Authentication & RBAC"])
 
-ROLES_DEFINITION = {
-    "VIEWER": {
-        "title": "Operational Viewer",
-        "permissions": ["view_stations", "view_telemetry", "view_3d", "view_weather"]
-    },
-    "OPERATOR": {
-        "title": "Station Duty Operator",
-        "permissions": ["view_stations", "view_telemetry", "view_3d", "view_weather", "acknowledge_alerts", "run_simulations", "review_mitigations", "approve_mitigations"]
-    },
-    "ENGINEER": {
-        "title": "Electrical & Mechanical Engineer",
-        "permissions": ["view_stations", "view_telemetry", "view_3d", "view_weather", "acknowledge_alerts", "run_simulations", "review_mitigations", "inject_telemetry", "diagnose_assets", "view_model_parameters"]
-    },
-    "ANALYST": {
-        "title": "Scientific & Energy Analyst",
-        "permissions": ["view_stations", "view_telemetry", "view_3d", "view_weather", "view_analytics", "view_forecasts", "run_simulations", "export_reports"]
-    },
-    "SUPERVISOR": {
-        "title": "Antarctic Base Commander / Supervisor",
-        "permissions": ["*"]
-    },
-    "ADMIN": {
-        "title": "System Administrator",
-        "permissions": ["*"]
-    }
-}
-
-DEFAULT_USERS = [
-    {"username": "operator.sharma", "name": "V. Sharma", "role": "OPERATOR", "station": "station_bharati"},
-    {"username": "engineer.deshmukh", "name": "A. Deshmukh", "role": "ENGINEER", "station": "station_bharati"},
-    {"username": "commander.nair", "name": "Col. R. Nair", "role": "SUPERVISOR", "station": "station_bharati"},
-    {"username": "analyst.patel", "name": "Dr. K. Patel", "role": "ANALYST", "station": "station_maitri"},
-    {"username": "admin.ncpor", "name": "NCPOR Mission Control Admin", "role": "ADMIN", "station": "GLOBAL"}
-]
-
 class LoginPayload(BaseModel):
-    username: str
-    password: Optional[str] = None
+    model_config = ConfigDict(extra="forbid")
+    username: str = Field(..., min_length=3, max_length=64)
+    password: Optional[str] = Field(None, max_length=128)
+    mfa_code: Optional[str] = Field(None, max_length=16)
+
+class SessionRevocationPayload(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    session_id: str
 
 @router.get("/roles")
 def get_roles():
     """Retrieve RBAC role capabilities and hierarchy."""
-    return ROLES_DEFINITION
+    return {
+        role: {
+            "title": role.capitalize(),
+            "permissions": perms
+        }
+        for role, perms in PERMISSIONS_MAP.items()
+    }
 
 @router.get("/users")
 def list_available_demo_users():
-    """List preset duty personnel for instant role switching."""
-    return DEFAULT_USERS
+    """List preset duty personnel for operator reference (passwords redacted)."""
+    return [
+        {
+            "username": u["username"],
+            "name": u["name"],
+            "role": u["role"],
+            "station": u["station"],
+            "mfa_enabled": u.get("mfa_enabled", False)
+        }
+        for u in USER_DATABASE.values()
+    ]
 
-@router.post("/login")
-def login(payload: LoginPayload):
-    """Authenticate and issue session context."""
-    user = next((u for u in DEFAULT_USERS if u["username"] == payload.username), None)
+@router.post("/login", dependencies=[Depends(check_login_rate_limit)])
+def login(payload: LoginPayload, request: Request):
+    """
+    Authenticate user and issue cryptographically signed session token.
+    Protected by sliding-window rate limiting against brute-force credential stuffing.
+    """
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    user_agent = request.headers.get("user-agent", "unknown")
+
+    user = auth_service.authenticate(
+        username=payload.username,
+        password=payload.password,
+        mfa_code=payload.mfa_code
+    )
+
     if not user:
-        # Default to Operator role for unknown demo usernames
-        user = {"username": payload.username, "name": payload.username.capitalize(), "role": "OPERATOR", "station": "station_bharati"}
+        # Rate limit failure counter
+        is_locked, lockout_sec = rate_limiter.record_failed_login(client_ip)
+        security_audit_logger.log_event(
+            action="LOGIN_FAILURE",
+            actor_id=payload.username,
+            client_ip=client_ip,
+            status="FAILURE",
+            details={"reason": "Invalid credentials", "lockout_sec": lockout_sec}
+        )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid username or credentials",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
-    role_info = ROLES_DEFINITION.get(user["role"], ROLES_DEFINITION["OPERATOR"])
+    # Reset failure counters
+    rate_limiter.record_successful_login(client_ip)
+
+    # Issue session & signed token
+    session_ctx = auth_service.create_session(
+        user=user,
+        client_ip=client_ip,
+        user_agent=user_agent
+    )
+
+    security_audit_logger.log_event(
+        action="LOGIN_SUCCESS",
+        actor_id=user["username"],
+        role=user["role"],
+        station_id=user["station"],
+        client_ip=client_ip,
+        status="SUCCESS",
+        details={"session_id": session_ctx["session_id"]}
+    )
+
     return {
         "authenticated": True,
-        "token": f"polar_twin_token_{user['username']}",
-        "user": user,
-        "role_definition": role_info
+        "token": session_ctx["token"],
+        "session_id": session_ctx["session_id"],
+        "expires_at": session_ctx["expires_at"],
+        "user": session_ctx["user"],
+        "role_definition": {
+            "role": user["role"],
+            "permissions": PERMISSIONS_MAP.get(user["role"], [])
+        }
     }
+
+@router.get("/me")
+def get_current_user_profile(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """Retrieve verified profile of the active session."""
+    return {
+        "user_id": current_user.get("sub"),
+        "username": current_user.get("username"),
+        "role": current_user.get("role"),
+        "station": current_user.get("station"),
+        "session_id": current_user.get("sid"),
+        "expires_at": current_user.get("exp")
+    }
+
+@router.post("/logout")
+def logout(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """
+    Invalidate active session server-side.
+    Revokes token immediately from future requests.
+    """
+    sid = current_user.get("sid")
+    if sid:
+        auth_service.revoke_session(sid)
+        security_audit_logger.log_event(
+            action="LOGOUT",
+            actor_id=current_user.get("username", "unknown"),
+            role=current_user.get("role", "UNKNOWN"),
+            station_id=current_user.get("station"),
+            details={"session_id": sid}
+        )
+
+    return {"status": "REVOKED", "message": "Session invalidated successfully"}
+
+@router.post("/revoke-all")
+def revoke_all_sessions(current_user: Dict[str, Any] = Depends(get_current_user)):
+    """
+    Emergency session revocation: invalidates all active sessions for the current user.
+    """
+    username = current_user.get("username", "")
+    revoked_count = auth_service.revoke_all_user_sessions(username)
+
+    security_audit_logger.log_event(
+        action="ALL_SESSIONS_REVOKED",
+        actor_id=username,
+        role=current_user.get("role", "UNKNOWN"),
+        details={"revoked_count": revoked_count}
+    )
+
+    return {
+        "status": "ALL_REVOKED",
+        "revoked_count": revoked_count,
+        "message": f"All active sessions for {username} have been invalidated."
+    }
+
+@router.get("/active-sessions")
+def list_active_sessions(current_user: Dict[str, Any] = Depends(require_permission("*"))):
+    """
+    Administrative inspection of all active server-managed sessions.
+    Requires ADMIN or SUPERVISOR role.
+    """
+    return [
+        {
+            "session_id": sid,
+            "username": s.get("username"),
+            "role": s.get("role"),
+            "station": s.get("station"),
+            "client_ip": s.get("client_ip"),
+            "created_at": s.get("created_at"),
+            "last_active": s.get("last_active"),
+            "is_active": s.get("is_active")
+        }
+        for sid, s in ACTIVE_SESSIONS.items()
+        if s.get("is_active")
+    ]

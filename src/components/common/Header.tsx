@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Radio, Bell, User, Clock, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Shield, Radio, Bell, User, Clock, AlertTriangle, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
 import { LinkStatus } from '../../types';
 import { api } from '../../services/api';
+import { SecurityModal } from './SecurityModal';
 
 interface HeaderProps {
   currentStationId: string;
@@ -25,6 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
   onRoleChange,
 }) => {
   const [utcTime, setUtcTime] = useState('');
+  const [isSecurityOpen, setIsSecurityOpen] = useState(false);
 
   useEffect(() => {
     const update = () => {
@@ -129,6 +131,17 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </button>
 
+        {/* Zero-Trust Security Pill */}
+        <button
+          onClick={() => setIsSecurityOpen(true)}
+          title="Inspect Zero-Trust Identity, Bearer Token, and RBAC / ABAC Permissions"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/60 text-xs font-mono transition-all"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="font-semibold hidden md:inline">ZERO-TRUST</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        </button>
+
         {/* RBAC Role Switcher */}
         <div className="flex items-center gap-2 bg-polar-950 border border-polar-750 px-2.5 py-1 rounded-lg">
           <User className="w-3.5 h-3.5 text-polar-cyan" />
@@ -152,6 +165,14 @@ export const Header: React.FC<HeaderProps> = ({
           <span>{utcTime}</span>
         </div>
       </div>
+
+      {/* Zero-Trust Security & Identity Modal */}
+      <SecurityModal
+        isOpen={isSecurityOpen}
+        onClose={() => setIsSecurityOpen(false)}
+        activeRole={activeRole}
+        onRoleChange={onRoleChange}
+      />
     </header>
   );
 };

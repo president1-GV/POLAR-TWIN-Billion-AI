@@ -28,11 +28,125 @@ let edgeLinkStatus: 'ONLINE' | 'DEGRADED' | 'OFFLINE' | 'SYNCING' = 'ONLINE';
 let edgeBufferQueue: any[] = [];
 let edgeSequenceCounter = 1420;
 
+// Zero-Trust Session Storage & Active Personnel Credentials
+export const ROLE_CREDENTIALS: Record<string, { username: string; password?: string; mfa_code?: string; name: string; station: string }> = {
+  OPERATOR: { username: 'operator.sharma', password: 'PolarOps@2026!', name: 'V. Sharma', station: 'station_bharati' },
+  ENGINEER: { username: 'engineer.deshmukh', password: 'AntarcticEng#1', name: 'A. Deshmukh', station: 'station_bharati' },
+  SUPERVISOR: { username: 'commander.nair', password: 'BaseCommander$9', mfa_code: '123456', name: 'Col. R. Nair', station: 'station_bharati' },
+  ANALYST: { username: 'analyst.patel', password: 'PolarData*2026', name: 'Dr. K. Patel', station: 'station_maitri' },
+  VIEWER: { username: 'viewer.guest', password: 'PolarGuest@View1', name: 'Scientific Guest', station: 'GLOBAL' },
+  ADMIN: { username: 'admin.ncpor', password: 'NcporMissionControl!2026', mfa_code: '123456', name: 'NCPOR Mission Control Admin', station: 'GLOBAL' },
+};
+
+let activeSessionToken: string | null = typeof window !== 'undefined' ? localStorage.getItem('polar_twin_token') : null;
+let activeSessionUser: any = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('polar_twin_user') || 'null') : null;
+
+export function setSessionAuth(token: string | null, user: any = null) {
+  activeSessionToken = token;
+  activeSessionUser = user;
+  if (typeof window !== 'undefined') {
+    if (token) {
+      localStorage.setItem('polar_twin_token', token);
+      localStorage.setItem('polar_twin_user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('polar_twin_token');
+      localStorage.removeItem('polar_twin_user');
+    }
+  }
+}
+
+export function getSessionAuth() {
+  return { token: activeSessionToken, user: activeSessionUser };
+}
+
+// Zero-Trust backend fetch helper injecting Bearer session token
+async function backendFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string> || {}),
+  };
+  if (activeSessionToken && !headers['Authorization']) {
+    headers['Authorization'] = `Bearer ${activeSessionToken}`;
+  }
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  return fetch(`${API_BASE}${cleanEndpoint}`, {
+    ...options,
+    headers,
+  });
+}
+
 export const api = {
+  // 0. Zero-Trust Identity & Session Management
+  async login(username: string, password?: string, mfa_code?: string): Promise<any> {
+    const res = await backendFetch('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password, mfa_code }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Authentication failed' }));
+      throw new Error(err.detail || 'Authentication failed');
+    }
+    const data = await res.json();
+    setSessionAuth(data.token, data.user);
+    return data;
+  },
+
+  async logout(): Promise<void> {
+    try {
+      await backendFetch('/auth/logout', { method: 'POST' });
+    } catch (_) {}
+    setSessionAuth(null, null);
+  },
+
+  async revokeAllSessions(): Promise<any> {
+    const res = await backendFetch('/auth/revoke-all', { method: 'POST' });
+    if (res.ok) {
+      setSessionAuth(null, null);
+      return res.json();
+    }
+  },
+
+  async getCurrentSessionProfile(): Promise<any> {
+    const res = await backendFetch('/auth/me');
+    if (res.ok) return res.json();
+    return null;
+  },
+
+  async getActiveSessions(): Promise<any[]> {
+    const res = await backendFetch('/auth/active-sessions');
+    if (res.ok) return res.json();
+    return [];
+  },
+
+  async switchRole(role: string): Promise<any> {
+    const creds = ROLE_CREDENTIALS[role] || ROLE_CREDENTIALS.OPERATOR;
+    try {
+      const res = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: creds.username,
+          password: creds.password,
+          mfa_code: creds.mfa_code,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSessionAuth(data.token, data.user);
+        return data;
+      }
+    } catch (e) {
+      console.warn('Backend login fallback; keeping offline role context', e);
+    }
+    const fallbackUser = { id: `usr_${creds.username}`, username: creds.username, role, station: creds.station, name: creds.name };
+    setSessionAuth(`mock_offline_${role.toLowerCase()}`, fallbackUser);
+    return { authenticated: true, user: fallbackUser };
+  },
+
   // 1. Stations & Digital Twin
   async getStations(): Promise<Station[]> {
     try {
-      const res = await fetch(`${API_BASE}/stations`);
+      const res = await backendFetch('/stations');
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -110,7 +224,7 @@ export const api = {
 
   async getStationTwin(stationId: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/stations/${stationId}/digital-twin`);
+      const res = await backendFetch(`/stations/${stationId}/digital-twin`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -134,7 +248,7 @@ export const api = {
   // 2. Assets
   async getStationAssets(stationId: string): Promise<StationAsset[]> {
     try {
-      const res = await fetch(`${API_BASE}/assets/station/${stationId}`);
+      const res = await backendFetch(`/assets/station/${stationId}`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -241,7 +355,7 @@ export const api = {
 
   async getAssetDetail(assetId: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/assets/${assetId}`);
+      const res = await backendFetch(`/assets/${assetId}`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -266,7 +380,7 @@ export const api = {
 
   async getAssetConsequences(assetId: string, ambientTempC: number = -20): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/assets/${assetId}/consequences?ambient_temp_c=${ambientTempC}`);
+      const res = await backendFetch(`/assets/${assetId}/consequences?ambient_temp_c=${ambientTempC}`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -292,9 +406,8 @@ export const api = {
 
   async updateAssetTelemetry(assetId: string, data: any): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/assets/${assetId}/telemetry`, {
+      const res = await backendFetch(`/assets/${assetId}/telemetry`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
       if (res.ok) return await res.json();
@@ -318,7 +431,7 @@ export const api = {
   // 3. Environment (NCPOR Adapter)
   async getEnvironment(stationId: string): Promise<EnvironmentObservation> {
     try {
-      const res = await fetch(`${API_BASE}/environment/${stationId}`);
+      const res = await backendFetch(`/environment/${stationId}`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -353,7 +466,7 @@ export const api = {
   // 4. Energy
   async getEnergyStatus(stationId: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/energy/${stationId}`);
+      const res = await backendFetch(`/energy/${stationId}`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -398,7 +511,7 @@ export const api = {
 
   async getEnergyForecast(stationId: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/energy/${stationId}/forecast`);
+      const res = await backendFetch(`/energy/${stationId}/forecast`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -429,7 +542,7 @@ export const api = {
   // 5. Logistics
   async getInventory(stationId: string): Promise<LogisticsItem[]> {
     try {
-      const res = await fetch(`${API_BASE}/logistics/${stationId}/inventory`);
+      const res = await backendFetch(`/logistics/${stationId}/inventory`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -514,7 +627,7 @@ export const api = {
 
   async getShipments(stationId: string): Promise<Shipment[]> {
     try {
-      const res = await fetch(`${API_BASE}/logistics/${stationId}/shipments`);
+      const res = await backendFetch(`/logistics/${stationId}/shipments`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -550,9 +663,8 @@ export const api = {
 
   async simulateLogisticsDelay(stationId: string, delayDays: number): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/logistics/simulate-delay`, {
+      const res = await backendFetch('/logistics/simulate-delay', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ station_id: stationId, delay_days: delayDays }),
       });
       if (res.ok) return await res.json();
@@ -590,7 +702,7 @@ export const api = {
       const params = new URLSearchParams();
       if (stationId) params.append('station_id', stationId);
       if (status) params.append('status', status);
-      const res = await fetch(`${API_BASE}/alerts?${params.toString()}`);
+      const res = await backendFetch(`/alerts?${params.toString()}`);
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -624,12 +736,11 @@ export const api = {
     ];
   },
 
-  async acknowledgeAlert(alertId: string, userId: string = 'operator.current'): Promise<any> {
+  async acknowledgeAlert(alertId: string, notes: string = 'Acknowledged via command center'): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/alerts/${alertId}/acknowledge`, {
+      const res = await backendFetch(`/alerts/${alertId}/acknowledge`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ notes }),
       });
       if (res.ok) return await res.json();
     } catch (_) {}
@@ -641,15 +752,14 @@ export const api = {
       });
     } catch (_) {}
 
-    return { status: 'ACKNOWLEDGED', alert_id: alertId, acknowledged_by: userId };
+    return { status: 'ACKNOWLEDGED', alert_id: alertId, notes };
   },
 
-  async resolveAlert(alertId: string, userId: string = 'operator.current'): Promise<any> {
+  async resolveAlert(alertId: string, notes: string = 'Resolved via command center'): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/alerts/${alertId}/resolve`, {
+      const res = await backendFetch(`/alerts/${alertId}/resolve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId }),
+        body: JSON.stringify({ notes }),
       });
       if (res.ok) return await res.json();
     } catch (_) {}
@@ -661,13 +771,13 @@ export const api = {
       });
     } catch (_) {}
 
-    return { status: 'RESOLVED', alert_id: alertId, resolved_by: userId };
+    return { status: 'RESOLVED', alert_id: alertId, notes };
   },
 
   // 7. Emergency Simulations
   async getScenarios(): Promise<any[]> {
     try {
-      const res = await fetch(`${API_BASE}/simulation/scenarios`);
+      const res = await backendFetch('/simulation/scenarios');
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -725,9 +835,8 @@ export const api = {
 
   async runSimulation(scenarioKey: string, stationId: string = 'station_bharati', customParams?: any): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/simulation/run`, {
+      const res = await backendFetch('/simulation/run', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           scenario_key: scenarioKey,
           station_id: stationId,
@@ -784,9 +893,8 @@ export const api = {
 
   async reviewSimulation(simulationId: string, action: string, notes?: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/simulation/${simulationId}/review`, {
+      const res = await backendFetch(`/simulation/${simulationId}/review`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action, notes }),
       });
       if (res.ok) return await res.json();
@@ -804,7 +912,7 @@ export const api = {
   // 8. Edge & Store-and-Forward
   async getEdgeStatus(): Promise<EdgeStatus> {
     try {
-      const res = await fetch(`${API_BASE}/edge/status`);
+      const res = await backendFetch('/edge/status');
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -829,9 +937,8 @@ export const api = {
 
   async toggleEdgeLink(status: string): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/edge/link-status`, {
+      const res = await backendFetch('/edge/link-status', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       });
       if (res.ok) return await res.json();
@@ -843,7 +950,7 @@ export const api = {
 
   async triggerEdgeSync(): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/edge/sync`, { method: 'POST' });
+      const res = await backendFetch('/edge/sync', { method: 'POST' });
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -867,7 +974,7 @@ export const api = {
   // 9. Killer Demo Runner (8 Steps)
   async getDemoSteps(): Promise<any[]> {
     try {
-      const res = await fetch(`${API_BASE}/demo/steps`);
+      const res = await backendFetch('/demo/steps');
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -925,7 +1032,7 @@ export const api = {
 
   async executeDemoStep(stepNumber: number): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/demo/step/${stepNumber}`, { method: 'POST' });
+      const res = await backendFetch(`/demo/step/${stepNumber}`, { method: 'POST' });
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -1170,7 +1277,7 @@ export const api = {
 
   async resetDemo(): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/demo/reset`, { method: 'POST' });
+      const res = await backendFetch('/demo/reset', { method: 'POST' });
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -1181,7 +1288,7 @@ export const api = {
   // 10. Analytics & Health
   async getSystemHealth(): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/analytics/system-health`);
+      const res = await backendFetch('/analytics/system-health');
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -1207,7 +1314,7 @@ export const api = {
 
   async getProvenanceRegistry(): Promise<any> {
     try {
-      const res = await fetch(`${API_BASE}/analytics/provenance-registry`);
+      const res = await backendFetch('/analytics/provenance-registry');
       if (res.ok) return await res.json();
     } catch (_) {}
 
@@ -1270,7 +1377,7 @@ export const api = {
 
   async getAuditLogs(): Promise<any[]> {
     try {
-      const res = await fetch(`${API_BASE}/audit`);
+      const res = await backendFetch('/audit');
       if (res.ok) return await res.json();
     } catch (_) {}
 

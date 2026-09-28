@@ -23,6 +23,11 @@ export const App: React.FC = () => {
   const [isAlertsOpen, setIsAlertsOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    // Initialize authenticated Zero-Trust session for initial duty role
+    api.switchRole(activeRole).catch(console.error);
+  }, []);
+
+  useEffect(() => {
     loadAlerts();
     loadEdgeStatus();
     const interval = setInterval(() => {
@@ -31,6 +36,15 @@ export const App: React.FC = () => {
     }, 5000);
     return () => clearInterval(interval);
   }, [currentStationId]);
+
+  const handleRoleChange = async (newRole: string) => {
+    setActiveRole(newRole);
+    try {
+      await api.switchRole(newRole);
+    } catch (e) {
+      console.error('Failed to switch role authentication:', e);
+    }
+  };
 
   const loadAlerts = async () => {
     try {
@@ -72,7 +86,7 @@ export const App: React.FC = () => {
 
   const handleAcknowledgeAlert = async (alertId: string) => {
     try {
-      await api.acknowledgeAlert(alertId, activeRole);
+      await api.acknowledgeAlert(alertId, `Acknowledged by ${activeRole}`);
       loadAlerts();
     } catch (e) {
       console.error('Failed to acknowledge alert:', e);
@@ -81,7 +95,7 @@ export const App: React.FC = () => {
 
   const handleResolveAlert = async (alertId: string) => {
     try {
-      await api.resolveAlert(alertId, activeRole);
+      await api.resolveAlert(alertId, `Resolved by ${activeRole}`);
       loadAlerts();
     } catch (e) {
       console.error('Failed to resolve alert:', e);
@@ -101,7 +115,7 @@ export const App: React.FC = () => {
         unreadAlertsCount={unreadCount}
         onOpenAlerts={() => setIsAlertsOpen(true)}
         activeRole={activeRole}
-        onRoleChange={setActiveRole}
+        onRoleChange={handleRoleChange}
       />
 
       {/* Main Body */}
