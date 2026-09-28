@@ -4,6 +4,14 @@
 *Smart India Hackathon (SIH) Problem Statement: SIH 26060 — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations*  
 *Target Stations: Maitri & Bharati (National Centre for Polar and Ocean Research — NCPOR / Ministry of Earth Sciences)*
 
+[![Live Deployment](https://img.shields.io/badge/Live_Deployment-GitHub_Pages-00E5FF?style=for-the-badge&logo=github)](https://president1-gv.github.io/POLAR-TWIN-Billion-AI/)
+[![Backend](https://img.shields.io/badge/Backend-Supabase_Cloud-3ECF8E?style=for-the-badge&logo=supabase)](https://fpoxnocbznagepusczkk.supabase.co)
+[![Repository](https://img.shields.io/badge/GitHub-POLAR--TWIN-181717?style=for-the-badge&logo=github)](https://github.com/president1-GV/POLAR-TWIN-Billion-AI)
+
+- **🌐 Live Production Website**: [https://president1-gv.github.io/POLAR-TWIN-Billion-AI/](https://president1-gv.github.io/POLAR-TWIN-Billion-AI/)
+- **📦 GitHub Repository**: [https://github.com/president1-GV/POLAR-TWIN-Billion-AI](https://github.com/president1-GV/POLAR-TWIN-Billion-AI)
+- **⚡ Supabase Project Ref**: `fpoxnocbznagepusczkk` (PostgreSQL 17.6 + PostGIS 3.3)
+
 ---
 
 ## 1. Operating Model
@@ -197,8 +205,40 @@ npm run dev
 ```
 Open `http://localhost:5173` in your browser.
 
+### 4. Docker Containerized Startup
+```bash
+docker compose up --build
+```
+- Backend accessible at: `http://localhost:8000`
+- Frontend accessible at: `http://localhost:5173`
+
 ---
 
-## 11. Prototype Limitations Disclaimer
+## 11. Geospatial GIS Architecture (PostGIS EPSG:3031)
+
+POLAR-TWIN incorporates real geospatial coordinates and spatial boundaries in PostgreSQL 17.6 with PostGIS:
+- **Bharati Station**: Larsemann Hills, Princess Elizabeth Land ($-69.4072^\circ\text{S}, 76.1950^\circ\text{E}$, Elev 35m)
+- **Maitri Station**: Schirmacher Oasis, Queen Maud Land ($-70.7670^\circ\text{S}, 11.7330^\circ\text{E}$, Elev 117m)
+- **Dakshin Gangotri**: Historic First Station / Storage Depot ($-70.0900^\circ\text{S}, 12.0000^\circ\text{E}$, Elev 15m)
+- **Maritime Supply Corridors**: Modeled transit tracks from Cape Town, South Africa through the Southern Ocean into Prydz Bay and India Bay.
+- **Atmospheric Overlays**: Katabatic wind streamlines, sea-ice maximum/minimum extent contours, and isotherm bands.
+
+---
+
+## 12. Adversarial Evaluator Defense (SIH 26060 Architectural FAQ)
+
+| Evaluator Question | POLAR-TWIN Architectural Answer |
+| :--- | :--- |
+| **"Where does your data come from?"** | Public meteorological observations are ingested in real-time from NCPOR / Open-Meteo Antarctic Grid (`REAL_PUBLIC`). Machinery telemetry is generated using first-principles thermodynamic and electrical differential equations (`PHYSICS_SYNTHETIC`). Every metric carries explicit provenance. |
+| **"Is this really a Digital Twin or just a 3D dashboard?"** | It is a stateful domain twin. If the 3D viewer is completely removed, all physics equations, multivariate anomaly detection, energy forecasting, dependency cascade graphs, and what-if simulations continue running uninterrupted in the backend and database. |
+| **"What happens if the satellite link fails?"** | The station does not stop. The on-station rugged edge computer switches to **Edge Offline Mode**, continues local rules and alerts, buffers telemetry in a FIFO queue with CRC32 checksums, and replays idempotently upon carrier recovery. |
+| **"How does the AI work?"** | Multivariate Mahalanobis distance metric ($D_M > 3.0$) computed over a 5D machinery feature vector ($\text{vibration}, T_{\text{exhaust}}, \text{load}\%, P_{\text{oil}}, F_{\text{fuel}}$) with exact feature attribution z-scores. No black-box or fabricated LLM claims. |
+| **"Can you reproduce your simulations?"** | Yes. All simulations operate on immutable cloned state snapshots with deterministic initial boundary conditions, preserving exact step-by-step audit records. |
+| **"Are you controlling real physical equipment?"** | No. POLAR-TWIN is a human-in-the-loop decision support system. Operator approvals mutate the *simulated digital twin state* and record audit logs; it never claims autonomous physical actuation over real life-safety station machinery. |
+
+---
+
+## 13. Prototype Limitations Disclaimer
 
 > **Official Notice**: This system is a high-fidelity operational prototype designed for evaluation under SIH 26060. Meteorological observations use public scientific feeds (NCPOR / Open-Meteo Antarctic Grid). Machinery telemetry, internal SCADA states, and satellite link carrier losses are simulated using calibrated Antarctic thermodynamic and electrical models. This prototype does not claim access to classified or restricted Indian Antarctic infrastructure.
+

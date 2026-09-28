@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.frontend
     container_name: polar_twin_frontend
     ports:
-      - "5173:5173"
+      - "5173:80"
     depends_on:
       - backend
     restart: unless-stopped
