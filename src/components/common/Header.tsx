@@ -85,39 +85,41 @@ export const Header: React.FC<HeaderProps> = ({
   const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-polar-surface border-b border-polar-border px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors">
+    <header className="h-16 bg-polar-surface border-b border-polar-border px-3 sm:px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors overflow-hidden">
       {/* LEFT: Branding & First-Class Station Context */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4 shrink-0">
         {/* Brand Identity */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-10 h-10 rounded-lg bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-lg ring-2 ring-polar-cyan/25 shrink-0 overflow-hidden">
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-md ring-1 ring-polar-cyan/30 shrink-0 overflow-hidden">
             <img 
               src={polarTwinIcon} 
               alt="POLAR-TWIN Mission Logo" 
               className="w-full h-full object-contain" 
             />
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm tracking-wider text-polar-text-primary">POLAR-TWIN</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-polar-elevated text-polar-text-muted border border-polar-border">
+          <div className="flex flex-col justify-center shrink-0 min-w-0">
+            <div className="flex items-center gap-1.5 whitespace-nowrap leading-tight">
+              <span className="font-extrabold text-sm tracking-wider text-polar-text-primary whitespace-nowrap inline-block">
+                POLAR<span className="text-polar-cyan">-TWIN</span>
+              </span>
+              <span className="text-[9px] px-1 py-0.5 rounded bg-polar-elevated text-polar-text-muted border border-polar-border font-mono font-semibold shrink-0">
                 SIH 26060
               </span>
             </div>
-            <p className="text-[10px] text-polar-text-muted tracking-tight font-sans">
-              Indian Antarctic Research Operations • NCPOR
+            <p className="text-[10px] text-polar-text-muted tracking-tight font-sans whitespace-nowrap mt-0.5 hidden sm:block">
+              Indian Antarctic Operations <span className="text-polar-text-muted/60">•</span> NCPOR
             </p>
           </div>
         </div>
 
         {/* Vertical Divider */}
-        <div className="h-7 border-l border-polar-border hidden sm:block" />
+        <div className="h-6 border-l border-polar-border hidden sm:block" />
 
         {/* First-Class Station Selector */}
-        <div className="hidden sm:flex items-center bg-polar-base rounded-lg p-1 border border-polar-border">
+        <div className="hidden sm:flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
           <button
             onClick={() => onStationChange('station_bharati')}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
               isBharati
                 ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
                 : 'text-polar-text-muted hover:text-polar-text-primary'
@@ -125,11 +127,11 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-polar-cyan' : 'bg-slate-400 dark:bg-slate-600'}`} />
             <span>BHARATI</span>
-            <span className="text-[10px] text-polar-text-muted hidden md:inline">• Larsemann Hills</span>
+            <span className="text-[10px] text-polar-text-muted hidden 2xl:inline">• Larsemann Hills</span>
           </button>
           <button
             onClick={() => onStationChange('station_maitri')}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
               !isBharati
                 ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
                 : 'text-polar-text-muted hover:text-polar-text-primary'
@@ -137,14 +139,14 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-polar-cyan' : 'bg-slate-400 dark:bg-slate-600'}`} />
             <span>MAITRI</span>
-            <span className="text-[10px] text-polar-text-muted hidden md:inline">• Schirmacher Oasis</span>
+            <span className="text-[10px] text-polar-text-muted hidden 2xl:inline">• Schirmacher Oasis</span>
           </button>
         </div>
       </div>
 
-      {/* CENTER: Primary Operational State */}
-      <div className="hidden xl:flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-polar-base border border-polar-border text-xs">
+      {/* CENTER: Primary Operational State (Shown on wide monitors) */}
+      <div className="hidden 2xl:flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-polar-base border border-polar-border text-xs whitespace-nowrap">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span className="text-polar-text-secondary font-medium">OPERATIONAL STATE:</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
@@ -158,15 +160,15 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* RIGHT: System Health, Satellite Link, Alerts, Theme, RBAC, Clock */}
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-2 shrink-0">
         {/* System Health / Zero-Trust Security */}
         <button
           onClick={() => setIsSecurityOpen(true)}
           title="System Health & Zero-Trust Access Controls"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-polar-base border border-polar-border hover:border-polar-border-active text-polar-text-secondary text-xs transition-colors"
+          className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-polar-base border border-polar-border hover:border-polar-border-active text-polar-text-secondary text-xs transition-colors shrink-0"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="hidden lg:inline text-polar-text-muted">HEALTH:</span>
+          <span className="hidden xl:inline text-polar-text-muted">HEALTH:</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-semibold">98.4%</span>
         </button>
 
@@ -174,18 +176,18 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onLinkToggle}
           title="Toggle Satellite Link state to test Edge Offline Buffering and Replay Sync"
-          className={`flex items-center gap-2 px-2.5 py-1 rounded-md border text-xs transition-colors ${currLink.bg}`}
+          className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs transition-colors shrink-0 ${currLink.bg}`}
         >
           <span className={`w-2 h-2 rounded-full ${currLink.dot}`} />
           <Radio className="w-3.5 h-3.5" />
-          <span className="font-semibold hidden md:inline">{currLink.label}</span>
+          <span className="font-semibold hidden lg:inline">{currLink.label}</span>
         </button>
 
         {/* Alerts Trigger */}
         <button
           onClick={onOpenAlerts}
           title="Open Operational Alerts Drawer"
-          className="relative p-2 rounded-md bg-polar-base border border-polar-border text-polar-text-secondary hover:text-polar-text-primary hover:border-polar-border-active transition-colors"
+          className="relative p-1.5 rounded-md bg-polar-base border border-polar-border text-polar-text-secondary hover:text-polar-text-primary hover:border-polar-border-active transition-colors shrink-0"
         >
           <Bell className="w-4 h-4" />
           {unreadAlertsCount > 0 && (
@@ -206,7 +208,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={onOpenLogin}
             title="Station Authentication & Identity Verification Portal"
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-polar-base hover:bg-polar-surface border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-polar-base hover:bg-polar-surface border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors shrink-0"
           >
             <LogIn className="w-3.5 h-3.5 text-polar-cyan" />
             <span className="hidden xl:inline text-[11px] font-semibold">LOGIN</span>
@@ -214,7 +216,7 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* Scientific UTC Clock */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2.5 py-1 rounded-md border border-polar-border">
+        <div className="hidden md:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2 py-1 rounded-md border border-polar-border shrink-0">
           <Clock className="w-3.5 h-3.5 text-polar-text-muted" />
           <span className="font-semibold text-polar-text-primary">{utcTime || '12:00:00 UTC'}</span>
         </div>
