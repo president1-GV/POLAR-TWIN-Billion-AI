@@ -56,6 +56,23 @@ VALUES
 ('bh_lab_01', 'station_bharati', NULL, 'type_lab', 'Space & Atmospheric Science Lab', 'BH-LAB-01', 'NORMAL', 96.0, 'MEDIUM', 'East Wing Level 2', '{"x": 8, "y": 4, "z": 4}', '{"cleanroom_pressure_pa": 35.0, "power_draw_kw": 22.5}', 'PHYSICS_SYNTHETIC')
 ON CONFLICT (id) DO UPDATE SET health_score = EXCLUDED.health_score, current_state = EXCLUDED.current_state;
 
+-- 4B. MAITRI ASSETS
+INSERT INTO station_assets (id, station_id, parent_asset_id, asset_type_id, name, code, status, health_score, criticality, location_desc, coordinates_3d, current_state, source_type)
+VALUES
+('ma_gen_01', 'station_maitri', NULL, 'type_genset', 'Primary Genset 01 (125 kVA Kirloskar)', 'MA-GEN-01', 'NORMAL', 95.0, 'CRITICAL', 'Power House Bay 1', '{"x": -10, "y": 1.5, "z": -6}', '{"load_pct": 68.0, "rpm": 1500, "exhaust_temp_c": 360.0, "vibration_mms": 1.9, "oil_pressure_bar": 4.4, "fuel_flow_lph": 24.2}', 'PHYSICS_SYNTHETIC'),
+('ma_gen_02', 'station_maitri', NULL, 'type_genset', 'Primary Genset 02 (125 kVA Kirloskar)', 'MA-GEN-02', 'NORMAL', 94.5, 'CRITICAL', 'Power House Bay 2', '{"x": -7, "y": 1.5, "z": -6}', '{"load_pct": 52.0, "rpm": 1500, "exhaust_temp_c": 340.0, "vibration_mms": 1.7, "oil_pressure_bar": 4.5, "fuel_flow_lph": 20.0}', 'PHYSICS_SYNTHETIC'),
+('ma_gen_03', 'station_maitri', NULL, 'type_genset', 'Auxiliary Genset 03 (125 kVA)', 'MA-GEN-03', 'NORMAL', 98.0, 'HIGH', 'Power House Bay 3', '{"x": -4, "y": 1.5, "z": -6}', '{"load_pct": 0.0, "status": "HOT_STANDBY", "rpm": 0, "exhaust_temp_c": 22.0}', 'PHYSICS_SYNTHETIC'),
+('ma_wind_01', 'station_maitri', NULL, 'type_wind', 'Micro-Wind Turbine Array (15 kW)', 'MA-WIND-01', 'NORMAL', 91.0, 'MEDIUM', 'North Moraine Ridge', '{"x": 16, "y": 8, "z": -14}', '{"output_kw": 11.2, "rotor_rpm": 64.0, "wind_speed_ms": 14.5}', 'PHYSICS_SYNTHETIC'),
+('ma_pdb_01', 'station_maitri', NULL, 'type_pdb', 'Maitri Central Switchgear & Bus', 'MA-PDB-01', 'NORMAL', 97.5, 'CRITICAL', 'Central Control Block', '{"x": -2, "y": 1.5, "z": 0}', '{"grid_freq_hz": 49.98, "voltage_v": 415.0, "total_demand_kw": 160.0}', 'PHYSICS_SYNTHETIC'),
+('ma_boiler_01', 'station_maitri', NULL, 'type_hvac', 'Central Hydronic Space Heating Boiler', 'MA-BLR-01', 'NORMAL', 93.0, 'CRITICAL', 'Thermal Plant Annex', '{"x": -5, "y": 1.5, "z": 2}', '{"water_supply_temp_c": 72.0, "return_temp_c": 58.0, "thermal_output_kw": 110.0}', 'PHYSICS_SYNTHETIC'),
+('ma_water_pump_01', 'station_maitri', NULL, 'type_water_plant', 'Lake Priyadarshini Water Pump House', 'MA-PUMP-01', 'NORMAL', 94.0, 'CRITICAL', 'Lake Priyadarshini Shore', '{"x": 18, "y": 0.5, "z": 8}', '{"intake_temp_c": 1.8, "flow_rate_lpm": 85.0, "heat_trace_status": "ACTIVE"}', 'PHYSICS_SYNTHETIC'),
+('ma_water_tank_01', 'station_maitri', NULL, 'type_water_plant', 'Potable Water Storage Reservoir', 'MA-RES-01', 'NORMAL', 96.0, 'HIGH', 'Utility Wing', '{"x": 6, "y": 1.5, "z": 4}', '{"level_pct": 78.5, "volume_litres": 23550, "water_temp_c": 12.0}', 'PHYSICS_SYNTHETIC'),
+('ma_fuel_tank_01', 'station_maitri', NULL, 'type_fuel_tank', 'Polar Fuel Tank Alpha (75,000 L)', 'MA-TK-01', 'NORMAL', 98.0, 'CRITICAL', 'Fuel Farm Pad', '{"x": -16, "y": 1.2, "z": 10}', '{"level_litres": 58200, "capacity_litres": 75000, "temp_c": -14.0}', 'PHYSICS_SYNTHETIC'),
+('ma_comms_01', 'station_maitri', NULL, 'type_comms', 'Inmarsat & HF Communications Array', 'MA-SAT-01', 'NORMAL', 96.5, 'HIGH', 'Comms Tower Hill', '{"x": 12, "y": 6, "z": -4}', '{"signal_quality_db": 13.9, "link_status": "ONLINE", "uplink_kbps": 1536}', 'PHYSICS_SYNTHETIC'),
+('ma_lab_geo', 'station_maitri', NULL, 'type_lab', 'Geomagnetic & Seismological Lab', 'MA-GEO-01', 'NORMAL', 99.0, 'MEDIUM', 'Isolated Non-Magnetic Hut', '{"x": -14, "y": 1.2, "z": -14}', '{"magnetic_field_nt": 42150.0, "seismic_noise": "LOW"}', 'PHYSICS_SYNTHETIC'),
+('ma_garage_01', 'station_maitri', NULL, 'type_helipad', 'Vehicle Maintenance Garage & Sledges', 'MA-GAR-01', 'NORMAL', 95.0, 'LOW', 'Heavy Logistics Pad', '{"x": 10, "y": 1.5, "z": 14}', '{"vehicles_ready": 4, "heater_active": true}', 'PHYSICS_SYNTHETIC')
+ON CONFLICT (id) DO UPDATE SET health_score = EXCLUDED.health_score, current_state = EXCLUDED.current_state;
+
 -- 5. ASSET RELATIONSHIPS (GRAPH)
 INSERT INTO asset_relationships (station_id, source_asset_id, target_asset_id, relationship_type, impact_weight, description)
 VALUES
@@ -66,7 +83,18 @@ VALUES
 ('station_bharati', 'bh_pdb_01', 'bh_comms_01', 'POWERS', 0.85, 'UPS-backed power to Satellite earth station'),
 ('station_bharati', 'bh_pdb_01', 'bh_lab_01', 'POWERS', 0.70, 'Power to scientific instrumentation racks'),
 ('station_bharati', 'bh_gen_02', 'bh_gen_01', 'BACKS_UP', 1.00, 'Auto-start sync transfer backup if Gen-01 drops'),
-('station_bharati', 'bh_bess_01', 'bh_pdb_01', 'SUPPORTS', 0.80, 'Peak shaving and transient microgrid frequency stabilization')
+('station_bharati', 'bh_bess_01', 'bh_pdb_01', 'SUPPORTS', 0.80, 'Peak shaving and transient microgrid frequency stabilization'),
+-- Maitri Relationships
+('station_maitri', 'ma_fuel_tank_01', 'ma_gen_01', 'SUPPLIES', 1.00, 'Polar diesel feed to Genset 01'),
+('station_maitri', 'ma_fuel_tank_01', 'ma_boiler_01', 'SUPPLIES', 1.00, 'Fuel line to central hydronic boiler'),
+('station_maitri', 'ma_gen_01', 'ma_pdb_01', 'POWERS', 1.00, 'Generator 01 powering Maitri 415V bus'),
+('station_maitri', 'ma_gen_02', 'ma_pdb_01', 'POWERS', 0.90, 'Generator 02 load sharing on microgrid bus'),
+('station_maitri', 'ma_wind_01', 'ma_pdb_01', 'SUPPORTS', 0.75, 'Wind turbine renewable feed to station bus'),
+('station_maitri', 'ma_pdb_01', 'ma_boiler_01', 'POWERS', 0.95, 'Electrical supply to boiler circulating pumps'),
+('station_maitri', 'ma_pdb_01', 'ma_water_pump_01', 'POWERS', 0.95, 'Power to Lake Priyadarshini water pump and heated line trace'),
+('station_maitri', 'ma_water_pump_01', 'ma_water_tank_01', 'SUPPLIES', 0.95, 'Heated water pipe charging station storage reservoir'),
+('station_maitri', 'ma_pdb_01', 'ma_comms_01', 'POWERS', 0.85, 'Power to satellite terminal and HF masts'),
+('station_maitri', 'ma_pdb_01', 'ma_lab_geo', 'POWERS', 0.70, 'Power to geomagnetic sensors')
 ON CONFLICT DO NOTHING;
 
 -- 6. LOGISTICS INVENTORY

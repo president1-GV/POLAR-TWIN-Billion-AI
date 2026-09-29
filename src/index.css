@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply bg-[#030712] text-slate-100 font-sans antialiased;
+    @apply bg-[#050A12] text-slate-100 font-sans antialiased selection:bg-sky-500/20 selection:text-sky-200;
   }
 }
 
@@ -14,38 +14,59 @@
   height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B1220;
+  background: #07111D;
 }
 ::-webkit-scrollbar-thumb {
   background: #1E293B;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #26354A;
 }
 
-/* Mission Control Precision Grid */
+/* Mission Control Precision Spatial Grid */
 .polar-grid {
-  background-image: linear-gradient(to right, rgba(56, 189, 248, 0.018) 1px, transparent 1px),
-                    linear-gradient(to bottom, rgba(56, 189, 248, 0.018) 1px, transparent 1px);
+  background-image: linear-gradient(to right, rgba(56, 189, 248, 0.015) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(56, 189, 248, 0.015) 1px, transparent 1px);
   background-size: 32px 32px;
 }
 
-/* Aerospace Card & Panel Containers */
+/* Deep Polar Command Containers */
 .polar-panel {
-  @apply bg-[#0B1220] border border-[#1E293B] rounded-lg shadow-sm;
+  @apply bg-[#07111D] border border-[#1E293B] rounded-md shadow-sm;
 }
 
 .polar-panel-elevated {
-  @apply bg-[#111827] border border-[#1E293B] rounded-lg shadow-md;
+  @apply bg-[#0A1422] border border-[#26354A] rounded-md shadow-md;
+}
+
+.polar-panel-card {
+  @apply bg-[#0D1726] border border-[#1E293B] rounded-md shadow-sm hover:border-[#26354A] transition-colors;
 }
 
 .polar-panel-header {
   @apply px-4 py-3 border-b border-[#1E293B] flex items-center justify-between text-xs font-mono tracking-wider uppercase text-slate-200 font-semibold;
 }
 
+/* Interaction Design Classes */
+.btn-primary {
+  @apply px-3.5 py-2 rounded-md bg-[#38BDF8] hover:bg-[#0284C7] active:bg-[#0369A1] text-slate-950 font-mono text-xs font-bold transition-all shadow-sm flex items-center gap-2;
+}
+
+.btn-secondary {
+  @apply px-3.5 py-2 rounded-md bg-[#0A1422] hover:bg-[#0D1726] active:bg-[#07111D] text-slate-200 border border-[#1E293B] hover:border-[#38BDF8]/40 font-mono text-xs font-medium transition-all flex items-center gap-2;
+}
+
+.btn-tertiary {
+  @apply px-2.5 py-1.5 rounded-md text-slate-400 hover:text-slate-100 hover:bg-[#0A1422] font-mono text-xs transition-colors flex items-center gap-1.5;
+}
+
+.btn-danger {
+  @apply px-3.5 py-2 rounded-md bg-rose-950/80 hover:bg-rose-900 border border-rose-500/40 text-rose-200 font-mono text-xs font-medium transition-all flex items-center gap-2;
+}
+
 /* Accessible focus ring */
 *:focus-visible {
-  outline: 2px solid #22D3EE;
+  outline: 2px solid #38BDF8;
   outline-offset: 2px;
 }

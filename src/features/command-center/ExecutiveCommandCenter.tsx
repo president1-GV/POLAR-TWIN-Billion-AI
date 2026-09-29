@@ -14,9 +14,13 @@ import {
   Map as MapIcon, 
   ArrowRight,
   TrendingDown,
+  TrendingUp,
   Clock,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Droplet,
+  Fuel,
+  Play
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
@@ -26,6 +30,9 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { DataFreshness } from '../../components/ui/DataFreshness';
 import { StationDrawer } from '../../components/ui/StationDrawer';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
+import { TelemetryMetric } from '../../components/ui/TelemetryMetric';
+import { MissionSummary } from '../../components/ui/MissionSummary';
+import { CommandButton } from '../../components/ui/CommandButton';
 
 interface Props {
   onNavigate: (screen: any) => void;
@@ -36,7 +43,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
   const [stations, setStations] = useState<any[]>([]);
   const [activeStationId, setActiveStationId] = useState<string>('station_bharati');
   const [loading, setLoading] = useState(true);
-  const [centerViewMode, setCenterViewMode] = useState<'MAP' | '3D_TWIN'>('MAP');
+  const [centerViewMode, setCenterViewMode] = useState<'3D_TWIN' | 'MAP'>('3D_TWIN');
   const [drawerStation, setDrawerStation] = useState<any | null>(null);
   const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
 
@@ -60,6 +67,13 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
   const selectedStationObj = stations.find((s) => s.id === activeStationId) || stations[0];
 
+  // Historical sparkline telemetry buffer
+  const powerSparkline = [378, 382, 385, 380, 391, 395, 394, 395];
+  const fuelSparkline = [189.5, 189.1, 188.4, 187.9, 187.2, 186.8, 186.5, 186.3];
+  const waterSparkline = [3100, 3150, 3180, 3190, 3200, 3210, 3195, 3200];
+  const satSparkline = [99.2, 99.5, 99.7, 99.8, 99.8, 99.8, 99.8, 99.8];
+  const healthSparkline = [97.0, 97.2, 97.2, 97.4, 97.4, 97.4, 97.4, 97.4];
+
   if (loading && stations.length === 0) {
     return (
       <div className="p-6 space-y-6">
@@ -69,208 +83,214 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-[1600px] mx-auto font-sans">
-      {/* 1. COMMAND CENTER HERO */}
-      <section className="bg-[#0B1220] border border-[#1E293B] rounded-lg p-5 shadow-sm">
+    <div className="p-6 space-y-6 max-w-[1680px] mx-auto font-sans select-none">
+      {/* 1. COMMAND CENTER HERO BAR */}
+      <section className="bg-[#07111D] border border-[#1E293B] rounded-md p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-[11px] font-mono text-cyan-400 font-semibold uppercase tracking-wider mb-1">
+            <div className="flex items-center gap-2 text-[11px] font-mono text-[#38BDF8] font-bold uppercase tracking-widest mb-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>POLAR-TWIN • ANTARCTIC OPERATIONS</span>
+              <span>POLAR-TWIN • ANTARCTIC MISSION OPERATIONS</span>
               <span className="text-slate-600">|</span>
               <span className="text-slate-400">MoES / NCPOR</span>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight font-mono">
+            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight font-mono">
               EXECUTIVE SITUATIONAL COMMAND CENTER
             </h1>
-            <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed">
-              Real-time station intelligence, infrastructure state, environmental telemetry and predictive operational insight for Bharati & Maitri research bases.
+            <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed font-mono">
+              Autonomous digital-twin intelligence, coupled thermodynamics, and operational resilience console for Bharati & Maitri Antarctic research bases.
             </p>
           </div>
 
-          {/* Secondary Actions */}
-          <div className="flex items-center gap-3">
-            <button
+          {/* Quick Actions */}
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <CommandButton
+              variant="secondary"
+              icon={Play}
               onClick={() => onNavigate('demo')}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-md bg-[#111827] hover:bg-[#1E293B] text-slate-200 border border-[#1E293B] text-xs font-mono font-medium transition-colors"
             >
-              <span>Run System Demonstration</span>
-            </button>
-            <button
+              System Demonstration
+            </CommandButton>
+            <CommandButton
+              variant="primary"
+              icon={AlertTriangle}
               onClick={() => onNavigate('simulation')}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-md bg-sky-950/60 hover:bg-sky-900/60 text-sky-300 border border-sky-500/40 text-xs font-mono font-medium transition-colors"
             >
-              <AlertTriangle className="w-3.5 h-3.5 text-sky-400" />
-              <span>What-If Simulator</span>
-            </button>
+              What-If Contingency Simulator
+            </CommandButton>
           </div>
         </div>
 
-        {/* Operational Status Sub-Strip */}
+        {/* Global Operational Status Sub-Strip */}
         <div className="mt-4 pt-3 border-t border-[#1E293B] grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">DATA STATUS:</span>
+            <span className="text-slate-500 uppercase text-[10px]">Data Freshness:</span>
             <DataFreshness lastUpdatedTimestamp={lastSyncTime} isLive={true} />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">ACTIVE BASES:</span>
+            <span className="text-slate-500 uppercase text-[10px]">Active Stations:</span>
             <span className="text-emerald-400 font-semibold">2 / 2 OPERATIONAL</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">SYSTEM HEALTH:</span>
-            <span className="text-slate-200 font-semibold">98.4% NOMINAL</span>
+            <span className="text-slate-500 uppercase text-[10px]">Telemetry Link:</span>
+            <span className="text-slate-200 font-semibold flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              GSAT-11 / INMARSAT NOMINAL
+            </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500">DATA BACKEND:</span>
+            <span className="text-slate-500 uppercase text-[10px]">Database Host:</span>
             <span className="text-emerald-400 font-semibold">Supabase Cloud</span>
           </div>
         </div>
       </section>
 
-      {/* 2. CORE OPERATIONAL KPI STRIP */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: Active Stations */}
-        <div className="bg-[#0B1220] border border-[#1E293B] rounded-lg p-4 font-mono shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">
-              <span>Station Availability</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">2 / 2</span>
-              <span className="text-xs text-slate-400">STATIONS</span>
-            </div>
-            <div className="text-[11px] text-emerald-400 mt-1 flex items-center gap-1">
-              <StatusBadge status="OPERATIONAL" size="sm" />
-              <span className="text-slate-400">100% Online</span>
-            </div>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-[#1E293B] text-[10px] text-slate-500">
-            Bharati (Larsemann) & Maitri (Schirmacher)
-          </div>
-        </div>
+      {/* 2. MISSION SUMMARY (Phase 6 Compositional Layout) */}
+      <MissionSummary
+        activeStationsCount={2}
+        totalStationsCount={2}
+        microgridStatus="NOMINAL • 395 kW"
+        waterStatus="OPTIMAL • 3,200 L/d"
+        fuelStatus="HEALTHY • 186.3 DAYS"
+        connectivityStatus="ONLINE • GSAT-11 (640ms)"
+        weatherStatus="-24.2°C • 18.4 m/s KATABATIC"
+      />
 
-        {/* KPI 2: Microgrid Load */}
-        <div className="bg-[#0B1220] border border-[#1E293B] rounded-lg p-4 font-mono shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">
-              <span>Total Microgrid Load</span>
-              <Zap className="w-4 h-4 text-amber-400" />
-            </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">395.0</span>
-              <span className="text-xs text-slate-400">kW</span>
-            </div>
-            <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5">
-              <TrendingDown className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400">↓ 4.2%</span>
-              <span>vs peak forecast</span>
-            </div>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-[#1E293B] flex items-center justify-between">
-            <span className="text-[10px] text-slate-500">Combined Generation</span>
-            <ProvenanceBadge type="PHYSICS_SYNTHETIC" />
-          </div>
-        </div>
+      {/* 3. CRITICAL TELEMETRY METRIC STRIP (Phase 6 & 7) */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+        <TelemetryMetric
+          label="Power Demand"
+          value="395.0"
+          unit="kW"
+          status="NORMAL"
+          trend="+3.2% vs 24h"
+          trendDirection="up"
+          timestamp="14:32:08 UTC"
+          sparklineData={powerSparkline}
+          sparklineColor="#F59E0B"
+          provenance="PHYSICS_MODEL"
+          icon={Zap}
+        />
 
-        {/* KPI 3: Fuel Reserve */}
-        <div className="bg-[#0B1220] border border-[#1E293B] rounded-lg p-4 font-mono shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">
-              <span>Polar Fuel Runway</span>
-              <Flame className="w-4 h-4 text-cyan-400" />
-            </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-white">186.3</span>
-              <span className="text-xs text-slate-400">DAYS</span>
-            </div>
-            <div className="text-[11px] text-emerald-400 mt-1">
-              Above Minimum Buffer (35,000 L)
-            </div>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-[#1E293B] flex items-center justify-between">
-            <span className="text-[10px] text-slate-500">Burn Rate: 82.5 L/hr combined</span>
-            <ProvenanceBadge type="PHYSICS_SYNTHETIC" />
-          </div>
-        </div>
+        <TelemetryMetric
+          label="Polar Fuel Runway"
+          value="186.3"
+          unit="DAYS"
+          status="NORMAL"
+          trend="-0.4% vs 24h"
+          trendDirection="down"
+          timestamp="14:32:08 UTC"
+          sparklineData={fuelSparkline}
+          sparklineColor="#38BDF8"
+          provenance="PHYSICS_MODEL"
+          icon={Fuel}
+        />
 
-        {/* KPI 4: Satellite Connectivity */}
-        <div className="bg-[#0B1220] border border-[#1E293B] rounded-lg p-4 font-mono shadow-sm flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between text-slate-400 text-xs uppercase tracking-wider">
-              <span>Telemetry Sat-Link</span>
-              <Radio className="w-4 h-4 text-emerald-400" />
-            </div>
-            <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-emerald-400">ONLINE</span>
-              <span className="text-[10px] text-slate-400">INSAT / IRNSS</span>
-            </div>
-            <div className="text-[11px] text-slate-400 mt-1">
-              Edge Store-and-Forward Synced
-            </div>
-          </div>
-          <div className="mt-3 pt-2.5 border-t border-[#1E293B] flex items-center justify-between">
-            <span className="text-[10px] text-slate-500">Latency: 640 ms</span>
-            <ProvenanceBadge type="EDGE_SIMULATED" />
-          </div>
-        </div>
+        <TelemetryMetric
+          label="Water Production"
+          value="3,200"
+          unit="L/day"
+          status="NORMAL"
+          trend="+1.1% vs 24h"
+          trendDirection="up"
+          timestamp="14:32:08 UTC"
+          sparklineData={waterSparkline}
+          sparklineColor="#60A5FA"
+          provenance="PHYSICS_MODEL"
+          icon={Droplet}
+        />
+
+        <TelemetryMetric
+          label="Satellite Link"
+          value="ONLINE"
+          unit="GSAT-11"
+          status="ONLINE"
+          trend="99.8% Uptime"
+          trendDirection="neutral"
+          timestamp="14:32:08 UTC"
+          sparklineData={satSparkline}
+          sparklineColor="#10B981"
+          provenance="EDGE_CACHE"
+          icon={Radio}
+        />
+
+        <TelemetryMetric
+          label="Station Health"
+          value="97.4"
+          unit="%"
+          status="NOMINAL"
+          trend="+0.0% vs 24h"
+          trendDirection="neutral"
+          timestamp="14:32:08 UTC"
+          sparklineData={healthSparkline}
+          sparklineColor="#10B981"
+          provenance="LIVE_NCPOR"
+          icon={ShieldCheck}
+        />
       </section>
 
-      {/* 3. CENTRAL OPERATIONAL VISUALIZATION: GEOSPATIAL / DIGITAL TWIN */}
-      <section className="bg-[#0B1220] border border-[#1E293B] rounded-lg overflow-hidden shadow-sm">
+      {/* 4. CENTRAL OPERATIONAL VISUALIZATION: DIGITAL TWIN / GEOSPATIAL MAP */}
+      <section className="bg-[#07111D] border border-[#1E293B] rounded-md overflow-hidden shadow-sm">
         {/* Visualization Toolbar */}
-        <div className="px-4 py-3 bg-[#111827] border-b border-[#1E293B] flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
-          <div className="flex items-center gap-2 text-xs">
-            <span className="w-2 h-2 rounded-full bg-cyan-400" />
-            <span className="font-bold text-white uppercase tracking-wider">
-              CENTRAL OPERATIONAL TWIN VIEW
+        <div className="px-4 py-3 bg-[#0A1422] border-b border-[#1E293B] flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
+          <div className="flex items-center gap-2.5 text-xs">
+            <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+            <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+              PRIMARY OPERATIONAL DIGITAL TWIN VIEWPORT
             </span>
             <span className="text-slate-600">|</span>
             <span className="text-slate-400 text-[11px]">
-              Active Target: <strong className="text-white">{selectedStationObj?.name}</strong>
+              Target: <strong className="text-white">{selectedStationObj?.name}</strong>
             </span>
           </div>
 
-          {/* View Mode Toggle: Geospatial Map vs 3D Twin */}
+          {/* View Mode Toggle: 3D Twin (Centerpiece) vs Geospatial Map */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center bg-[#030712] p-0.5 rounded border border-[#1E293B] text-xs">
-              <button
-                onClick={() => setCenterViewMode('MAP')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
-                  centerViewMode === 'MAP'
-                    ? 'bg-[#1E293B] text-cyan-300 font-semibold'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <MapIcon className="w-3.5 h-3.5" />
-                <span>Geospatial Map</span>
-              </button>
+            <div className="flex items-center bg-[#050A12] p-0.5 rounded border border-[#1E293B] text-xs">
               <button
                 onClick={() => setCenterViewMode('3D_TWIN')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
                   centerViewMode === '3D_TWIN'
-                    ? 'bg-[#1E293B] text-cyan-300 font-semibold'
+                    ? 'bg-[#1E293B] text-[#38BDF8] font-semibold shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Box className="w-3.5 h-3.5" />
                 <span>3D Physical Twin</span>
               </button>
+              <button
+                onClick={() => setCenterViewMode('MAP')}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
+                  centerViewMode === 'MAP'
+                    ? 'bg-[#1E293B] text-[#38BDF8] font-semibold shadow-sm'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <MapIcon className="w-3.5 h-3.5" />
+                <span>Geospatial Map</span>
+              </button>
             </div>
 
             <button
               onClick={() => onNavigate('digital-twin')}
-              className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 hover:text-cyan-300 transition-colors px-2 py-1"
+              className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#38BDF8] transition-colors px-2 py-1"
             >
-              <span>Full Screen</span>
+              <span>Full Screen 3D</span>
               <ExternalLink className="w-3 h-3" />
             </button>
           </div>
         </div>
 
-        {/* Viewport Content */}
-        <div className="min-h-[440px]">
-          {centerViewMode === 'MAP' ? (
+        {/* Viewport Canvas */}
+        <div className="min-h-[500px]">
+          {centerViewMode === '3D_TWIN' ? (
+            <div className="h-[520px]">
+              <Station3DViewer 
+                stationId={activeStationId} 
+                onNavigateToSimulation={(_key) => onNavigate('simulation')}
+              />
+            </div>
+          ) : (
             <AntarcticGISMap
               selectedStationId={activeStationId}
               onSelectStation={(id) => {
@@ -284,16 +304,12 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
                 onNavigate('digital-twin');
               }}
             />
-          ) : (
-            <div className="h-[480px]">
-              <Station3DViewer stationId={activeStationId} />
-            </div>
           )}
         </div>
       </section>
 
-      {/* 4. DUAL STATION OPERATIONAL STATUS CARDS */}
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* 5. DUAL STATION OPERATIONAL CARDS */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {stations.map((st) => {
           const isBharati = st.id === 'station_bharati';
           const env = st.environment || {};
@@ -302,17 +318,17 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
           return (
             <div
               key={st.id}
-              className="bg-[#0B1220] border border-[#1E293B] hover:border-slate-700 transition-colors rounded-lg flex flex-col justify-between shadow-sm font-mono"
+              className="bg-[#07111D] border border-[#1E293B] hover:border-[#26354A] transition-colors rounded-md flex flex-col justify-between shadow-sm font-mono"
             >
               {/* Header */}
-              <div className="px-4 py-3 bg-[#111827] border-b border-[#1E293B] flex items-center justify-between text-xs">
+              <div className="px-4 py-3 bg-[#0A1422] border-b border-[#1E293B] flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                   <span className="text-white font-bold tracking-wider uppercase">{st.name}</span>
                   <span className="text-slate-400 text-[11px]">({st.station_code})</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ProvenanceBadge type="REAL_PUBLIC" provider="NCPOR" />
+                  <ProvenanceBadge type="LIVE_NCPOR" provider="NCPOR" />
                   <StatusBadge status={st.operational_status || 'OPERATIONAL'} size="sm" />
                 </div>
               </div>
@@ -323,21 +339,21 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
                 <div className="flex items-center justify-between text-xs text-slate-400 border-b border-[#1E293B] pb-2.5">
                   <div>
                     <span className="text-slate-500">Region: </span>
-                    <span className="text-slate-300">{st.region}</span>
+                    <span className="text-slate-200">{st.region}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500">Coords: </span>
-                    <span className="text-cyan-400">
+                    <span className="text-slate-500">Coordinates: </span>
+                    <span className="text-[#38BDF8]">
                       {st.latitude.toFixed(3)}° S, {st.longitude.toFixed(3)}° E
                     </span>
                   </div>
                 </div>
 
                 {/* Weather Telemetry Strip */}
-                <div className="grid grid-cols-3 gap-2.5 bg-[#030712] p-3 rounded-lg border border-[#1E293B]">
+                <div className="grid grid-cols-3 gap-2.5 bg-[#050A12] p-3 rounded border border-[#1E293B]">
                   <div>
                     <div className="text-[10px] text-slate-500 flex items-center gap-1 uppercase">
-                      <Thermometer className="w-3 h-3 text-cyan-400" />
+                      <Thermometer className="w-3 h-3 text-[#38BDF8]" />
                       Air Temp
                     </div>
                     <div className="text-base font-bold text-white mt-0.5">
@@ -363,72 +379,82 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
                   <div>
                     <div className="text-[10px] text-slate-500 flex items-center gap-1 uppercase">
-                      <Activity className="w-3 h-3 text-amber-400" />
-                      Barometer
+                      <Activity className="w-3 h-3 text-emerald-400" />
+                      Pressure
                     </div>
                     <div className="text-base font-bold text-white mt-0.5">
-                      {env.atmospheric_pressure_hpa ?? 986.0} hPa
+                      {env.pressure_msl_hpa ?? 988.4} hPa
                     </div>
                     <div className="text-[10px] text-slate-400">
-                      RH: {env.relative_humidity_pct ?? 65}%
+                      Humidity: {env.humidity_pct ?? 65}%
                     </div>
                   </div>
                 </div>
 
-                {/* Subsystem Telemetry */}
-                <div className="space-y-2 pt-1 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-400">Microgrid Demand:</span>
-                    <span className="font-bold text-white">
-                      {st.generation_kw ?? (isBharati ? 185.0 : 210.0)} kW
+                {/* Key Subsystem Metrics */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
+                    <span className="text-[10px] text-slate-500 uppercase block">Generation</span>
+                    <span className="text-sm font-bold text-white mt-0.5 block">
+                      {isBharati ? '185.0' : '160.0'} kW
                     </span>
-                  </div>
-                  <div className="w-full bg-[#030712] h-1.5 rounded-full overflow-hidden border border-[#1E293B]">
-                    <div className="bg-amber-400 h-full rounded-full" style={{ width: '74%' }} />
+                    <span className="text-[9px] text-slate-400">3x Volvo Gensets</span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs pt-1">
-                    <span className="text-slate-400">Fuel Consumption Rate:</span>
-                    <span className="font-bold text-cyan-400">
-                      {st.fuel_burn_lph ?? (isBharati ? 38.5 : 44.0)} L/hr
+                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
+                    <span className="text-[10px] text-slate-500 uppercase block">Fuel Autonomy</span>
+                    <span className="text-sm font-bold text-emerald-400 mt-0.5 block">
+                      {isBharati ? '192.4' : '178.1'} d
                     </span>
+                    <span className="text-[9px] text-slate-400">Polar ATF / Jet-A1</span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400">Habitat Indoor Climate:</span>
-                    <span className="font-bold text-emerald-400">
-                      +{st.thermal_indoor_c ?? 21.5} °C (Regulated)
+                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
+                    <span className="text-[10px] text-slate-500 uppercase block">Indoor Temp</span>
+                    <span className="text-sm font-bold text-white mt-0.5 block">
+                      +21.2 °C
                     </span>
+                    <span className="text-[9px] text-slate-400">HVAC Loop Target</span>
+                  </div>
+
+                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
+                    <span className="text-[10px] text-slate-500 uppercase block">Sat Uptime</span>
+                    <span className="text-sm font-bold text-emerald-400 mt-0.5 block">
+                      99.8%
+                    </span>
+                    <span className="text-[9px] text-slate-400">C-Band / Inmarsat</span>
                   </div>
                 </div>
               </div>
 
-              {/* Card Footer Actions */}
-              <div className="p-3 bg-[#111827] border-t border-[#1E293B] flex items-center justify-between text-xs">
-                <span className="text-slate-400 text-[11px]">
-                  Crew: <strong className="text-white">{st.current_occupancy}</strong> / {st.population_capacity}
-                </span>
+              {/* Footer Actions */}
+              <div className="px-4 py-3 bg-[#0A1422] border-t border-[#1E293B] flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] text-slate-400">Health Index:</span>
+                  <span className="text-xs font-bold text-emerald-400">{health}%</span>
+                </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => {
+                      setDrawerStation(st);
                       setActiveStationId(st.id);
                       onSelectStation(st.id);
-                      setDrawerStation(st);
                     }}
-                    className="px-2.5 py-1 rounded bg-[#1E293B] hover:bg-[#334155] text-slate-200 text-xs transition-colors border border-slate-700"
+                    className="px-2.5 py-1 text-[11px] bg-[#1E293B] hover:bg-slate-700 text-slate-200 rounded font-medium transition-colors"
                   >
-                    Quick Inspect
+                    Inspect Station
                   </button>
                   <button
                     onClick={() => {
+                      setActiveStationId(st.id);
                       onSelectStation(st.id);
                       onNavigate('digital-twin');
                     }}
-                    className="flex items-center gap-1 px-3 py-1 rounded bg-sky-950/60 hover:bg-sky-900/60 text-sky-300 border border-sky-500/40 text-xs font-semibold transition-colors"
+                    className="px-2.5 py-1 text-[11px] bg-[#38BDF8] hover:bg-[#0284C7] text-slate-950 font-bold rounded transition-colors flex items-center gap-1"
                   >
-                    <Box className="w-3.5 h-3.5" />
                     <span>3D Twin</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -437,7 +463,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
         })}
       </section>
 
-      {/* 5. STATION INSPECTION SLIDE-OUT DRAWER */}
+      {/* Slide-out Station Detail Drawer */}
       <StationDrawer
         isOpen={drawerStation !== null}
         onClose={() => setDrawerStation(null)}

@@ -9,7 +9,9 @@ import {
   Plus,
   Minus,
   RotateCcw,
-  ExternalLink
+  ExternalLink,
+  Radio,
+  Plane
 } from 'lucide-react';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
 
@@ -27,6 +29,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
   const [showSeaIce, setShowSeaIce] = useState(true);
   const [showWinds, setShowWinds] = useState(true);
   const [showLogistics, setShowLogistics] = useState(true);
+  const [showSatellite, setShowSatellite] = useState(true);
+  const [showInfrastructure, setShowInfrastructure] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<number>(1);
 
   const stations = [
@@ -64,7 +68,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
     },
     {
       id: 'station_dg',
-      name: 'Dakshin Gangotri (Historical / Storage Depot)',
+      name: 'Dakshin Gangotri (Historical / Submerged Depot)',
       code: 'DG-01',
       region: 'Wohlthat Mountains Ice Shelf',
       coords: '70.090° S, 12.000° E',
@@ -84,60 +88,84 @@ export const AntarcticGISMap: React.FC<Props> = ({
   const handleZoomOut = () => setZoomLevel((z) => Math.max(0.85, z - 0.15));
   const handleResetZoom = () => setZoomLevel(1);
 
+  const activeSt = stations.find(s => s.id === selectedStationId) || stations[0];
+
   return (
-    <div className="bg-[#0B1220] border-t border-[#1E293B] overflow-hidden font-mono">
+    <div className="bg-[#07111D] border-t border-[#1E293B] overflow-hidden font-mono select-none">
       {/* GIS Header Toolbar */}
-      <div className="bg-[#111827] border-b border-[#1E293B] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-[#0A1422] border-b border-[#1E293B] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5">
-          <Compass className="w-4 h-4 text-cyan-400" />
-          <span className="font-bold text-white uppercase tracking-wider">
-            POLAR GEOSPATIAL OPERATIONS VIEW
+          <Compass className="w-4 h-4 text-[#38BDF8]" />
+          <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+            POLAR GEOSPATIAL INTELLIGENCE PLATFORM
           </span>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-[#030712] text-slate-400 border border-[#1E293B]">
+          <span className="text-[10px] px-2 py-0.5 rounded bg-[#050A12] text-slate-400 border border-[#1E293B]">
             EPSG:3031 Polar Stereographic
           </span>
         </div>
 
         {/* Layer Toggles & Zoom Controls */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-[11px]">
+          <div className="flex items-center gap-1.5 text-[11px] flex-wrap">
             <button
               onClick={() => setShowSeaIce(!showSeaIce)}
-              className={`px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 ${
+              className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showSeaIce 
                   ? 'bg-sky-950/60 border-sky-500/40 text-sky-300' 
-                  : 'bg-[#030712] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
               }`}
             >
-              <Layers className="w-3 h-3" />
-              <span>Sea Ice Pack</span>
+              <Layers className="w-2.5 h-2.5" />
+              <span>SEA ICE</span>
             </button>
             <button
               onClick={() => setShowWinds(!showWinds)}
-              className={`px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 ${
+              className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showWinds 
                   ? 'bg-blue-950/60 border-blue-500/40 text-blue-300' 
-                  : 'bg-[#030712] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
               }`}
             >
-              <Wind className="w-3 h-3" />
-              <span>Katabatic Flow</span>
+              <Wind className="w-2.5 h-2.5" />
+              <span>KATABATIC</span>
             </button>
             <button
               onClick={() => setShowLogistics(!showLogistics)}
-              className={`px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 ${
+              className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showLogistics 
                   ? 'bg-amber-950/60 border-amber-500/40 text-amber-300' 
-                  : 'bg-[#030712] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
               }`}
             >
-              <Ship className="w-3 h-3" />
-              <span>Supply Corridors</span>
+              <Ship className="w-2.5 h-2.5" />
+              <span>SUPPLY</span>
+            </button>
+            <button
+              onClick={() => setShowSatellite(!showSatellite)}
+              className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
+                showSatellite 
+                  ? 'bg-purple-950/60 border-purple-500/40 text-purple-300' 
+                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Radio className="w-2.5 h-2.5" />
+              <span>SATELLITE</span>
+            </button>
+            <button
+              onClick={() => setShowInfrastructure(!showInfrastructure)}
+              className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
+                showInfrastructure 
+                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
+                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+              }`}
+            >
+              <Plane className="w-2.5 h-2.5" />
+              <span>AIR / SKIWAY</span>
             </button>
           </div>
 
           {/* Zoom controls */}
-          <div className="hidden sm:flex items-center bg-[#030712] rounded border border-[#1E293B] p-0.5">
+          <div className="hidden sm:flex items-center bg-[#050A12] rounded border border-[#1E293B] p-0.5">
             <button
               onClick={handleZoomIn}
               title="Zoom In"
@@ -161,12 +189,12 @@ export const AntarcticGISMap: React.FC<Props> = ({
             </button>
           </div>
 
-          <ProvenanceBadge type="REAL_PUBLIC" provider="NCPOR / PostGIS" />
+          <ProvenanceBadge type="PUBLIC_EXTERNAL" provider="NCPOR / PostGIS" />
         </div>
       </div>
 
       {/* Map Canvas / SVG Viewport */}
-      <div className="relative w-full h-[380px] bg-[#030712] flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[400px] bg-[#050A12] flex items-center justify-center overflow-hidden">
         <svg
           viewBox="0 0 800 460"
           className="w-full h-full select-none transition-transform duration-300 ease-out"
@@ -175,16 +203,16 @@ export const AntarcticGISMap: React.FC<Props> = ({
           <defs>
             {/* Scientific Continent Shader */}
             <radialGradient id="continentGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#0E1B31" stopOpacity="0.9" />
-              <stop offset="60%" stopColor="#0B1628" stopOpacity="0.75" />
-              <stop offset="100%" stopColor="#030712" stopOpacity="0.3" />
+              <stop offset="0%" stopColor="#0B1A2F" stopOpacity="0.9" />
+              <stop offset="60%" stopColor="#07111D" stopOpacity="0.8" />
+              <stop offset="100%" stopColor="#050A12" stopOpacity="0.4" />
             </radialGradient>
             <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.75" />
               <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.75" />
             </linearGradient>
             <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" strokeWidth="0.5" strokeOpacity="0.35" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" strokeWidth="0.5" strokeOpacity="0.3" />
             </pattern>
           </defs>
 
@@ -192,9 +220,9 @@ export const AntarcticGISMap: React.FC<Props> = ({
           <rect width="800" height="460" fill="url(#gridPattern)" />
 
           {/* Latitude Concentric Rings (60°S, 70°S, 80°S) */}
-          <circle cx="400" cy="270" r="230" fill="none" stroke="#334155" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.4" />
-          <circle cx="400" cy="270" r="160" fill="none" stroke="#334155" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.5" />
-          <circle cx="400" cy="270" r="90" fill="none" stroke="#334155" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.6" />
+          <circle cx="400" cy="270" r="230" fill="none" stroke="#26354A" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.4" />
+          <circle cx="400" cy="270" r="160" fill="none" stroke="#26354A" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.5" />
+          <circle cx="400" cy="270" r="90" fill="none" stroke="#26354A" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.6" />
           <circle cx="400" cy="270" r="3" fill="#38BDF8" opacity="0.6" />
           <text x="408" y="274" fill="#94A3B8" fontSize="8" fontFamily="monospace" opacity="0.7">90°S SOUTH POLE</text>
           <text x="565" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">80°S</text>
@@ -225,7 +253,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
           {/* Antarctic Peninsula Extension */}
           <path
             d="M 230 180 Q 190 120, 180 80 Q 195 90, 220 130 Q 245 160, 250 180 Z"
-            fill="#0B1628"
+            fill="#07111D"
             stroke="#38BDF8"
             strokeWidth="1"
             strokeOpacity="0.35"
@@ -270,6 +298,29 @@ export const AntarcticGISMap: React.FC<Props> = ({
             </g>
           )}
 
+          {/* Satellite Footprint Cones */}
+          {showSatellite && (
+            <g stroke="#A855F7" strokeWidth="0.8" strokeDasharray="2 3" strokeOpacity="0.35" fill="none">
+              <circle cx="560" cy="230" r="45" />
+              <circle cx="260" cy="215" r="45" />
+              <text x="520" y="290" fill="#A855F7" fontSize="7" fontFamily="monospace" opacity="0.6">
+                GSAT-11 / INMARSAT FOOTPRINT
+              </text>
+            </g>
+          )}
+
+          {/* Infrastructure Airfields / Skiways */}
+          {showInfrastructure && (
+            <g stroke="#10B981" strokeWidth="1" strokeDasharray="2 2" strokeOpacity="0.6" fill="none">
+              {/* Maitri Blue-Ice Runway */}
+              <line x1="240" y1="225" x2="255" y2="235" />
+              <text x="215" y="245" fill="#10B981" fontSize="7" fontFamily="monospace">RWY 09/27 (BLUE-ICE)</text>
+              {/* Bharati Helipad / Skiway */}
+              <line x1="575" y1="220" x2="590" y2="230" />
+              <text x="575" y="240" fill="#10B981" fontSize="7" fontFamily="monospace">HELI-01 SKIWAY</text>
+            </g>
+          )}
+
           {/* Interactive Stations */}
           {stations.map((st) => {
             const isSelected = selectedStationId === st.id;
@@ -288,7 +339,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
                     cy={st.cy}
                     r="12"
                     fill="none"
-                    stroke="#22D3EE"
+                    stroke="#38BDF8"
                     strokeWidth="1.2"
                     strokeDasharray="2 2"
                     className="animate-spin"
@@ -301,100 +352,67 @@ export const AntarcticGISMap: React.FC<Props> = ({
                   cx={st.cx}
                   cy={st.cy}
                   r={isSelected ? '5' : '4'}
-                  fill={isDG ? '#64748B' : isSelected ? '#22D3EE' : '#10B981'}
-                  stroke="#030712"
+                  fill={isDG ? '#64748B' : isSelected ? '#38BDF8' : '#10B981'}
+                  stroke="#050A12"
                   strokeWidth="1.5"
                 />
 
-                {/* Station Callout Label */}
-                <g transform={`translate(${st.cx + 10}, ${st.cy - 12})`}>
-                  <rect
-                    x="0"
-                    y="0"
-                    width={st.isPrimary ? 120 : 100}
-                    height={st.isPrimary ? 38 : 22}
-                    rx="3"
-                    fill="#0B1220"
-                    fillOpacity="0.95"
-                    stroke={isSelected ? '#22D3EE' : '#1E293B'}
-                    strokeWidth={isSelected ? '1.2' : '1'}
+                {/* Pulse halo for active stations */}
+                {!isDG && (
+                  <circle
+                    cx={st.cx}
+                    cy={st.cy}
+                    r="9"
+                    fill="none"
+                    stroke={isSelected ? '#38BDF8' : '#10B981'}
+                    strokeWidth="0.8"
+                    opacity="0.4"
                   />
-                  <text x="7" y="13" fill="#F8FAFC" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                    {st.code}
-                  </text>
-                  <text x="7" y="23" fill={st.status === 'ACTIVE' ? '#10B981' : '#64748B'} fontSize="8" fontFamily="monospace">
-                    ● {st.status === 'ACTIVE' ? 'OPERATIONAL' : 'SUBMERGED'}
-                  </text>
-                  {st.isPrimary && (
-                    <text x="7" y="33" fill="#94A3B8" fontSize="8" fontFamily="monospace">
-                      {st.temp}°C | {st.power}
-                    </text>
-                  )}
-                </g>
+                )}
+
+                {/* Station Label */}
+                <text
+                  x={st.cx + (st.cx > 400 ? 12 : -12)}
+                  y={st.cy + 4}
+                  textAnchor={st.cx > 400 ? 'start' : 'end'}
+                  fill={isSelected ? '#FFFFFF' : '#94A3B8'}
+                  fontSize={isSelected ? '10' : '9'}
+                  fontWeight={isSelected ? 'bold' : 'normal'}
+                  fontFamily="monospace"
+                >
+                  {st.code}
+                </text>
               </g>
             );
           })}
         </svg>
 
-        {/* Selected Station Floating Quick-Action Card */}
-        {selectedStationId && (
-          <div className="absolute bottom-3 left-3 bg-[#0B1220]/95 border border-[#1E293B] p-3 rounded-lg shadow-xl backdrop-blur-md max-w-sm font-mono text-xs">
-            <div className="flex items-center justify-between gap-2 border-b border-[#1E293B] pb-2 mb-2">
-              <div className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="font-bold text-white uppercase">
-                  {stations.find((s) => s.id === selectedStationId)?.name}
-                </span>
-              </div>
-              <span className="text-[10px] text-emerald-400 font-semibold">
-                ACTIVE
+        {/* Floating Quick Inspection Card */}
+        {activeSt && (
+          <div className="absolute bottom-3 left-3 bg-[#07111D]/95 border border-[#1E293B] rounded-md p-3 shadow-xl backdrop-blur-sm max-w-xs text-xs space-y-1.5 z-20">
+            <div className="flex items-center justify-between border-b border-[#1E293B] pb-1.5">
+              <span className="font-bold text-white uppercase text-[11px]">{activeSt.name}</span>
+              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 font-semibold">
+                {activeSt.status}
               </span>
             </div>
-
-            <div className="grid grid-cols-2 gap-1.5 text-[11px] mb-3 text-slate-300">
-              <div>
-                <span className="text-slate-500">Region: </span>
-                <span className="truncate block">{stations.find((s) => s.id === selectedStationId)?.region.split(',')[0]}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Elevation: </span>
-                <span>{stations.find((s) => s.id === selectedStationId)?.elevation}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Coordinates: </span>
-                <span>{stations.find((s) => s.id === selectedStationId)?.coords}</span>
-              </div>
-              <div>
-                <span className="text-slate-500">Microgrid Bus: </span>
-                <span className="text-amber-400">{stations.find((s) => s.id === selectedStationId)?.power}</span>
-              </div>
+            <div className="text-[10px] text-slate-400 space-y-0.5">
+              <div>Coords: <strong className="text-slate-200">{activeSt.coords}</strong></div>
+              <div>Elevation: <strong className="text-slate-200">{activeSt.elevation}</strong></div>
+              <div>Air Temp: <strong className="text-sky-300">{activeSt.temp}°C</strong> | Wind: <strong className="text-sky-300">{activeSt.wind}</strong></div>
+              <div>Microgrid: <strong className="text-amber-300">{activeSt.power}</strong> | Health: <strong className="text-emerald-400">{activeSt.health}%</strong></div>
             </div>
-
-            <button
-              onClick={() => onNavigateToTwin(selectedStationId)}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-sky-950/70 hover:bg-sky-900/70 border border-sky-500/40 text-sky-200 text-xs font-semibold transition-colors"
-            >
-              <Navigation className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Launch 3D Spatial Twin ({stations.find((s) => s.id === selectedStationId)?.code})</span>
-            </button>
+            <div className="pt-1.5 border-t border-[#1E293B] flex items-center justify-between">
+              <button
+                onClick={() => onNavigateToTwin(activeSt.id)}
+                className="text-[10px] text-[#38BDF8] hover:underline flex items-center gap-1 font-semibold"
+              >
+                <span>Launch 3D Digital Twin</span>
+                <ExternalLink className="w-3 h-3" />
+              </button>
+            </div>
           </div>
         )}
-
-        {/* Legend */}
-        <div className="absolute top-3 right-3 bg-[#0B1220]/90 border border-[#1E293B] p-2 rounded text-[10px] font-mono text-slate-400 space-y-1 backdrop-blur-sm pointer-events-none">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span>Active Research Station</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-slate-500" />
-            <span>Submerged / Storage Depot</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3.5 h-0.5 bg-amber-400" />
-            <span>Maritime Resupply Corridor</span>
-          </div>
-        </div>
       </div>
     </div>
   );

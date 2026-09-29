@@ -12,7 +12,10 @@ import {
   Database,
   ChevronLeft,
   ChevronRight,
-  Server
+  Server,
+  Shield,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 export type ScreenId = 
@@ -46,28 +49,44 @@ interface NavGroup {
 export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
+  // Grouped Navigation per Phase 5 Specification
   const groups: NavGroup[] = [
     {
       title: 'OPERATIONS',
       items: [
         { id: 'command-center', label: 'Command Center', icon: LayoutDashboard },
-        { id: 'digital-twin', label: 'Digital Twin (3D)', icon: Box },
+        { id: 'digital-twin', label: '3D Digital Twin', icon: Box },
         { id: 'energy', label: 'Microgrid & Energy', icon: Zap },
         { id: 'logistics', label: 'Supply Chain', icon: Truck },
-        { id: 'meteorology', label: 'Weather & Climate', icon: CloudSnow },
+      ],
+    },
+    {
+      title: 'ENVIRONMENT',
+      items: [
+        { id: 'meteorology', label: 'NCPOR Weather & Climate', icon: CloudSnow },
+      ],
+    },
+    {
+      title: 'SIMULATION',
+      items: [
         { id: 'simulation', label: 'What-If Simulator', icon: AlertOctagon },
       ],
     },
     {
-      title: 'RESILIENCE',
+      title: 'INFRASTRUCTURE',
       items: [
         { id: 'edge', label: 'Edge Resilience', icon: Radio },
-        { id: 'analytics', label: 'Observability & Audit', icon: Activity },
         { id: 'data-catalog', label: 'Data Lineage', icon: Database },
       ],
     },
     {
-      title: 'SYSTEM',
+      title: 'GOVERNANCE',
+      items: [
+        { id: 'analytics', label: 'Observability & Audit', icon: Activity },
+      ],
+    },
+    {
+      title: 'DEMO / VALIDATION',
       items: [
         { 
           id: 'demo', 
@@ -82,8 +101,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
 
   return (
     <aside
-      className={`bg-[#0B1220] border-r border-[#1E293B] flex flex-col justify-between py-3 select-none shrink-0 transition-all duration-200 font-mono ${
-        isCollapsed ? 'w-16' : 'w-60'
+      className={`bg-[#07111D] border-r border-[#1E293B] flex flex-col justify-between py-3 select-none shrink-0 transition-all duration-200 font-mono z-20 ${
+        isCollapsed ? 'w-16' : 'w-64'
       }`}
     >
       {/* Top Header / Collapsible Toggle */}
@@ -91,27 +110,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
         <div className="px-3 pb-3 border-b border-[#1E293B] flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-              <span className="text-[11px] font-bold text-slate-300 tracking-wider">
-                NAVIGATION
+              <span className="w-1.5 h-1.5 rounded-full bg-[#38BDF8]" />
+              <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
+                MISSION SYSTEMS
               </span>
             </div>
           )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             title={isCollapsed ? 'Expand navigation' : 'Collapse navigation'}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#1E293B] transition-colors ml-auto"
+            className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#0A1422] transition-colors ml-auto"
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
 
         {/* Navigation Groups */}
-        <div className="p-2 space-y-4 overflow-y-auto">
+        <div className="p-2 space-y-3.5 overflow-y-auto max-h-[calc(100vh-140px)]">
           {groups.map((grp) => (
             <div key={grp.title} className="space-y-1">
               {!isCollapsed && (
-                <div className="px-2.5 py-1 text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+                <div className="px-2.5 py-0.5 text-[9px] font-bold tracking-widest text-slate-500 uppercase">
                   {grp.title}
                 </div>
               )}
@@ -123,16 +142,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
                     key={item.id}
                     onClick={() => onScreenChange(item.id)}
                     title={isCollapsed ? item.label : undefined}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-md text-xs font-medium transition-all group ${
+                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-all group ${
                       isActive
-                        ? 'bg-[#111827] text-cyan-300 border border-cyan-500/40 shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-[#111827]/60'
+                        ? 'bg-[#0A1422] text-[#38BDF8] border border-[#38BDF8]/40 shadow-sm'
+                        : 'text-slate-400 hover:text-slate-100 hover:bg-[#0A1422]/60 border border-transparent'
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 truncate">
                       <Icon
                         className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                          isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'
+                          isActive ? 'text-[#38BDF8]' : 'text-slate-500 group-hover:text-slate-300'
                         }`}
                       />
                       {!isCollapsed && (
@@ -142,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
 
                     {!isCollapsed && item.badge && (
                       <span
-                        className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border tracking-wider ${
+                        className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase border tracking-wider shrink-0 ${
                           item.badgeColor || 'bg-[#1E293B] text-slate-400 border-slate-700'
                         }`}
                       >
@@ -158,23 +177,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
       </div>
 
       {/* Footer Info: Backend Provider */}
-      <div className="p-3 border-t border-[#1E293B]">
+      <div className="px-3 pt-3 border-t border-[#1E293B]">
         {!isCollapsed ? (
-          <div className="space-y-1 text-[10px]">
-            <div className="flex items-center justify-between text-slate-400">
-              <span className="flex items-center gap-1.5">
-                <Server className="w-3 h-3 text-emerald-400" />
-                Backend
+          <div className="p-2.5 rounded bg-[#0A1422] border border-[#1E293B] space-y-1.5 text-[10px]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-500 font-semibold uppercase tracking-wider">BACKEND</span>
+              <span className="text-emerald-400 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                SUPABASE
               </span>
-              <span className="text-emerald-400 font-semibold">Supabase Cloud</span>
             </div>
-            <div className="text-slate-500 truncate">
-              Ref: <span className="text-slate-400">fpoxnocbznagepusczkk</span>
+            <div className="text-slate-400 font-mono text-[9px] truncate">
+              ref: fpoxnocbznagepusczkk
             </div>
           </div>
         ) : (
-          <div className="flex justify-center" title="Backend: Supabase Cloud (fpoxnocbznagepusczkk)">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <div className="flex justify-center" title="Supabase Backend Connected">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           </div>
         )}
       </div>

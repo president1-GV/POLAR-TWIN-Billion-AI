@@ -134,7 +134,12 @@ export const App: React.FC = () => {
           )}
 
           {currentScreen === 'digital-twin' && (
-            <Station3DViewer stationId={currentStationId} />
+            <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
+              <Station3DViewer 
+                stationId={currentStationId} 
+                onNavigateToSimulation={(_scenarioKey) => setCurrentScreen('simulation')}
+              />
+            </div>
           )}
 
           {currentScreen === 'energy' && (

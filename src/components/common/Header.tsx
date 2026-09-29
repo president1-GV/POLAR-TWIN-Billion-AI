@@ -78,18 +78,18 @@ export const Header: React.FC<HeaderProps> = ({
   const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-[#0B1220] border-b border-[#1E293B] px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono">
+    <header className="h-16 bg-[#07111D] border-b border-[#1E293B] px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono">
       {/* LEFT: Branding & First-Class Station Context */}
       <div className="flex items-center gap-4">
         {/* Brand Identity */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-md bg-[#111827] border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-sm">
-            <Shield className="w-4 h-4 text-cyan-400" />
+          <div className="w-8 h-8 rounded-md bg-[#0A1422] border border-[#38BDF8]/40 flex items-center justify-center text-[#38BDF8] shadow-sm">
+            <Shield className="w-4 h-4 text-[#38BDF8]" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
               <span className="font-bold text-sm tracking-wider text-white">POLAR-TWIN</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-[#111827] text-slate-400 border border-[#1E293B]">
+              <span className="text-[9px] px-1 py-0.2 rounded bg-[#0A1422] text-slate-400 border border-[#1E293B]">
                 SIH 26060
               </span>
             </div>
@@ -103,16 +103,16 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="h-7 border-l border-[#1E293B] hidden sm:block" />
 
         {/* First-Class Station Selector */}
-        <div className="hidden sm:flex items-center bg-[#030712] rounded-lg p-1 border border-[#1E293B]">
+        <div className="hidden sm:flex items-center bg-[#050A12] rounded-lg p-1 border border-[#1E293B]">
           <button
             onClick={() => onStationChange('station_bharati')}
             className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
               isBharati
-                ? 'bg-[#1E293B] text-cyan-300 border border-cyan-500/40 shadow-sm'
+                ? 'bg-[#1E293B] text-[#38BDF8] border border-[#38BDF8]/40 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-[#38BDF8]' : 'bg-slate-600'}`} />
             <span>BHARATI</span>
             <span className="text-[10px] text-slate-500 hidden md:inline">• Larsemann Hills</span>
           </button>
@@ -120,11 +120,11 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={() => onStationChange('station_maitri')}
             className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
               !isBharati
-                ? 'bg-[#1E293B] text-cyan-300 border border-cyan-500/40 shadow-sm'
+                ? 'bg-[#1E293B] text-[#38BDF8] border border-[#38BDF8]/40 shadow-sm'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-[#38BDF8]' : 'bg-slate-600'}`} />
             <span>MAITRI</span>
             <span className="text-[10px] text-slate-500 hidden md:inline">• Schirmacher Oasis</span>
           </button>
@@ -133,7 +133,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* CENTER: Primary Operational State */}
       <div className="hidden xl:flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#030712] border border-[#1E293B] text-xs">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#050A12] border border-[#1E293B] text-xs">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-slate-300 font-medium">OPERATIONAL STATE:</span>
           <span className="text-emerald-400 font-semibold">
@@ -152,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={() => setIsSecurityOpen(true)}
           title="System Health & Zero-Trust Access Controls"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#030712] border border-[#1E293B] hover:border-slate-700 text-slate-300 text-xs transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#050A12] border border-[#1E293B] hover:border-slate-700 text-slate-300 text-xs transition-colors"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
           <span className="hidden lg:inline text-slate-400">HEALTH:</span>
@@ -174,7 +174,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onOpenAlerts}
           title="Open Operational Alerts Drawer"
-          className="relative p-2 rounded-md bg-[#030712] border border-[#1E293B] text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
+          className="relative p-2 rounded-md bg-[#050A12] border border-[#1E293B] text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
         >
           <Bell className="w-4 h-4" />
           {unreadAlertsCount > 0 && (
@@ -185,24 +185,24 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* RBAC Operator Role Switcher */}
-        <div className="flex items-center gap-1.5 bg-[#030712] border border-[#1E293B] px-2.5 py-1 rounded-md">
-          <User className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="flex items-center gap-1.5 bg-[#050A12] border border-[#1E293B] px-2.5 py-1 rounded-md">
+          <User className="w-3.5 h-3.5 text-[#38BDF8]" />
           <select
             value={activeRole}
             onChange={(e) => onRoleChange(e.target.value)}
             className="bg-transparent text-xs text-slate-200 outline-none cursor-pointer pr-1"
           >
-            <option value="OPERATOR" className="bg-[#0B1220]">OPERATOR (Duty)</option>
-            <option value="ENGINEER" className="bg-[#0B1220]">ENGINEER (Base)</option>
-            <option value="SUPERVISOR" className="bg-[#0B1220]">COMMANDER (NCPOR)</option>
-            <option value="ANALYST" className="bg-[#0B1220]">ANALYST (Science)</option>
-            <option value="VIEWER" className="bg-[#0B1220]">VIEWER (Read-Only)</option>
-            <option value="ADMIN" className="bg-[#0B1220]">ADMIN (Mission Ctrl)</option>
+            <option value="OPERATOR" className="bg-[#07111D]">OPERATOR (Duty)</option>
+            <option value="ENGINEER" className="bg-[#07111D]">ENGINEER (Base)</option>
+            <option value="SUPERVISOR" className="bg-[#07111D]">COMMANDER (NCPOR)</option>
+            <option value="ANALYST" className="bg-[#07111D]">ANALYST (Science)</option>
+            <option value="VIEWER" className="bg-[#07111D]">VIEWER (Read-Only)</option>
+            <option value="ADMIN" className="bg-[#07111D]">ADMIN (Mission Ctrl)</option>
           </select>
         </div>
 
         {/* Scientific UTC Clock */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-300 bg-[#030712] px-2.5 py-1 rounded-md border border-[#1E293B]">
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-300 bg-[#050A12] px-2.5 py-1 rounded-md border border-[#1E293B]">
           <Clock className="w-3.5 h-3.5 text-slate-400" />
           <span className="font-semibold text-white">{utcTime || '12:00:00 UTC'}</span>
         </div>
