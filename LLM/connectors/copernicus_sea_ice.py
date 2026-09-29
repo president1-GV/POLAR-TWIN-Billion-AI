@@ -31,7 +31,8 @@ class CopernicusSeaIceConnector(BaseDataConnector):
         if os.path.exists(self.raw_data_path) and not force_refresh:
             try:
                 payload, _ = self.load_raw()
-                return payload
+                if "sea_ice_observations" in payload and len(payload.get("sea_ice_observations", [])) >= days:
+                    return payload
             except Exception:
                 pass
 

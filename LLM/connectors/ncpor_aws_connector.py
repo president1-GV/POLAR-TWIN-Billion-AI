@@ -58,7 +58,8 @@ class NcporAwsConnector(BaseDataConnector):
         if os.path.exists(self.raw_data_path) and not force_refresh:
             try:
                 payload, _ = self.load_raw()
-                return payload
+                if "observations" in payload and len(payload.get("observations", [])) >= count:
+                    return payload
             except Exception:
                 pass
 

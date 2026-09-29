@@ -162,8 +162,12 @@ def run_all_tests():
     t.assert_true(not is_tampered, "TEST-15", "HashVerifier.verify returns False for tampered hash")
 
     # Test 16: Connector save and reload verifies hash
-    saved_hash = c_bharati.save_raw({"test": "persistence"})
-    loaded_payload, verified_hash = c_bharati.load_raw()
+    class MockConnector(BaseDataConnector):
+        def fetch_raw(self, **kwargs): return {}
+        def parse_records(self, raw_data): return []
+    c_test_persist = MockConnector("ds_test_temp_roundtrip", ProvenanceType.SIMULATED, "Test Org")
+    saved_hash = c_test_persist.save_raw({"test": "persistence"})
+    loaded_payload, verified_hash = c_test_persist.load_raw()
     t.assert_equal(saved_hash, verified_hash, "TEST-16", "Connector roundtrip save/load preserves exact cryptographic hash")
 
     # Test 17: Dataset registry SHA-256 hashes are non-empty
