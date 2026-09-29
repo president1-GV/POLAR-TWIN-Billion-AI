@@ -153,10 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return { success: true };
           }
         } catch (backendErr: any) {
-          // If backend failed specifically with bad credentials, throw that error
-          if (backendErr?.message && !backendErr.message.includes('fetch') && !backendErr.message.includes('Failed to fetch')) {
-            throw backendErr;
-          }
+          console.warn('Backend login attempt skipped or unreachable, proceeding to Supabase/air-gap roster:', backendErr?.message);
         }
 
         // 2. Direct Supabase Cloud Authentication (if anon key provided and email/password provided)
@@ -228,11 +225,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         let matchedKey: string | null = null;
 
         for (const [rKey, creds] of Object.entries(ROLE_CREDENTIALS)) {
+          const userLower = creds.username.toLowerCase();
+          const roleLower = rKey.toLowerCase();
+          const shortUser = userLower.split('.')[0];
+          const nameLower = creds.name.toLowerCase();
+
           if (
-            creds.username.toLowerCase() === cleanInput ||
-            creds.username.split('.')[0].toLowerCase() === cleanInput ||
-            `${creds.username.toLowerCase()}@polar.gov.in` === cleanInput ||
-            rKey.toLowerCase() === cleanInput
+            userLower === cleanInput ||
+            shortUser === cleanInput ||
+            `${userLower}@polar.gov.in` === cleanInput ||
+            roleLower === cleanInput ||
+            nameLower.includes(cleanInput) ||
+            (cleanInput === 'duty operator' && roleLower === 'operator') ||
+            (cleanInput === 'base engineer' && roleLower === 'engineer') ||
+            ((cleanInput === 'expedition cmdr' || cleanInput === 'commander') && (roleLower === 'commander' || roleLower === 'supervisor')) ||
+            ((cleanInput === 'mission control' || cleanInput === 'root') && roleLower === 'admin')
           ) {
             matchedRole = normalizeRole(rKey);
             matchedKey = rKey;
@@ -246,7 +253,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (password && creds.password && password !== creds.password) {
             return { success: false, error: 'Invalid security credentials for polar station officer' };
           }
-          // Validate MFA if required
+          // Validate MFA if required and supplied
           if (creds.mfa_code && mfaCode && mfaCode !== creds.mfa_code) {
             return { success: false, error: 'Invalid 6-digit TOTP authentication token' };
           }
