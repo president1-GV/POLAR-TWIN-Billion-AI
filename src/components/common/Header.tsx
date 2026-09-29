@@ -144,17 +144,16 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* CENTER: Primary Operational State (Shown on wide monitors >= 2xl to prevent squishing) */}
-      <div className="hidden 2xl:flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-polar-base border border-polar-border text-xs whitespace-nowrap">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-          <span className="text-polar-text-secondary font-medium whitespace-nowrap">OPERATIONAL STATE:</span>
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold whitespace-nowrap">
-            {unreadAlertsCount > 0 ? `${unreadAlertsCount} ACTIVE ADVISORIES` : 'ALL SYSTEMS NOMINAL'}
-          </span>
-          <span className="text-polar-text-muted">|</span>
-          <span className="text-polar-text-muted text-[11px] whitespace-nowrap">
-            {isBharati ? '69.408° S, 76.187° E' : '70.766° S, 11.740° E'}
+      {/* CENTER: Compact Operational State Indicator */}
+      <div className="hidden xl:flex items-center shrink-0">
+        <div 
+          title={`Operational State: ${unreadAlertsCount > 0 ? `${unreadAlertsCount} Active ${unreadAlertsCount === 1 ? 'Advisory' : 'Advisories'}` : 'All Systems Nominal'} • Coordinates: ${isBharati ? '69.408° S, 76.187° E' : '70.766° S, 11.740° E'}`}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-polar-base border border-polar-border hover:border-polar-border-strong text-xs whitespace-nowrap shadow-sm transition-colors cursor-default"
+        >
+          <span className={`w-2 h-2 rounded-full shrink-0 ${unreadAlertsCount > 0 ? 'bg-amber-400 animate-pulse' : 'bg-emerald-500 animate-pulse'}`} />
+          <span className="text-polar-text-muted text-[11px] font-semibold">STATE:</span>
+          <span className={`font-semibold text-xs ${unreadAlertsCount > 0 ? 'text-amber-500 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+            {unreadAlertsCount > 0 ? `${unreadAlertsCount} ${unreadAlertsCount === 1 ? 'ADVISORY' : 'ADVISORIES'}` : 'NOMINAL'}
           </span>
         </div>
       </div>
@@ -168,7 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border hover:border-polar-border-strong text-polar-text-secondary text-xs transition-colors shrink-0 whitespace-nowrap"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-          <span className="hidden 2xl:inline text-polar-text-muted font-medium whitespace-nowrap">HEALTH:</span>
+          <span className="hidden md:inline text-polar-text-muted font-medium whitespace-nowrap">HEALTH:</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">98.4%</span>
         </button>
 
@@ -180,7 +179,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <span className={`w-2 h-2 rounded-full shrink-0 ${currLink.dot}`} />
           <Radio className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-bold hidden xl:inline whitespace-nowrap">{currLink.label}</span>
+          <span className="font-bold hidden sm:inline whitespace-nowrap">{currLink.label}</span>
         </button>
 
         {/* Alerts Trigger */}
@@ -221,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* Scientific UTC Clock */}
-        <div className="hidden lg:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2.5 py-1 rounded-md border border-polar-border shrink-0 whitespace-nowrap min-w-[105px]">
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2.5 py-1 rounded-md border border-polar-border shrink-0 whitespace-nowrap min-w-[105px]">
           <Clock className="w-3.5 h-3.5 text-polar-text-muted shrink-0" />
           <span className="font-bold text-polar-text-primary font-mono whitespace-nowrap">{utcTime || '12:00:00 UTC'}</span>
         </div>

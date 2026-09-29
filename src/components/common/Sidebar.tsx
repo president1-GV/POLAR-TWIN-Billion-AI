@@ -119,8 +119,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
           )}
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            title={isCollapsed ? 'Expand navigation' : 'Collapse navigation'}
-            className="p-1 rounded text-polar-text-muted hover:text-polar-text-primary hover:bg-polar-elevated transition-colors ml-auto"
+            aria-label={isCollapsed ? 'Expand navigation sidebar' : 'Collapse navigation sidebar'}
+            className="p-1 rounded text-polar-text-muted hover:text-polar-text-primary hover:bg-polar-elevated transition-colors ml-auto focus:outline-none"
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
@@ -190,23 +190,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
         </div>
       </div>
 
-      {/* Footer Info: Backend Provider */}
+      {/* Footer Info: Backend Connection Status */}
       <div className="px-3 pt-3 border-t border-polar-border">
         {!isCollapsed ? (
-          <div className="p-2.5 rounded bg-polar-elevated border border-polar-border space-y-1.5 text-[10px]">
+          <div className="p-2.5 rounded bg-polar-elevated border border-polar-border text-[10px]">
             <div className="flex items-center justify-between">
               <span className="text-polar-text-muted font-semibold uppercase tracking-wider">BACKEND</span>
-              <span className="text-emerald-500 font-bold flex items-center gap-1">
+              <span className="text-emerald-500 font-bold flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                SUPABASE
+                CONNECTED
               </span>
-            </div>
-            <div className="text-polar-text-muted font-mono text-[9px] truncate">
-              ref: fpoxnocbznagepusczkk
             </div>
           </div>
         ) : (
-          <div className="flex justify-center" title="Supabase Backend Connected">
+          <div className="flex justify-center" title="Backend Connected">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
         )}

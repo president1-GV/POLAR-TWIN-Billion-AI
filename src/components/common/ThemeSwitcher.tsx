@@ -39,13 +39,13 @@ export const ThemeSwitcher: React.FC = () => {
         aria-expanded={isOpen}
         aria-label={`Theme: ${theme.toUpperCase()} (Click to change)`}
         title={`Current Theme: ${theme.toUpperCase()} (${resolvedTheme} active)`}
-        className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-polar-card border border-polar-border hover:border-polar-border-active text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors focus-visible:outline-2 focus-visible:outline-sky-500 select-none shadow-sm"
+        className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-polar-card border border-polar-border hover:border-polar-border-active text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors focus-visible:outline-2 focus-visible:outline-sky-500 select-none shadow-sm whitespace-nowrap shrink-0"
       >
         <CurrentIconComponent className="w-3.5 h-3.5 text-polar-cyan shrink-0 transition-transform duration-200" />
-        <span className="hidden lg:inline text-[11px] font-semibold uppercase tracking-wider">
+        <span className="inline text-[11px] font-semibold uppercase tracking-wider whitespace-nowrap font-mono">
           {theme === 'system' ? 'AUTO' : theme}
         </span>
-        <ChevronDown className={`w-3 h-3 text-polar-text-muted transition-transform duration-150 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3 h-3 text-polar-text-muted transition-transform duration-150 shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Dropdown Menu */}

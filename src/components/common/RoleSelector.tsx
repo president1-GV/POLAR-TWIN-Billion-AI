@@ -117,29 +117,29 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-label={`Current Role: ${activeMeta.label}. Click to switch operational identity.`}
-        className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md border text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 ${
+        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 shrink-0 whitespace-nowrap ${
           isOpen
             ? 'bg-polar-surface border-polar-cyan/60 shadow-sm shadow-cyan-500/10 ring-1 ring-cyan-500/30'
             : 'bg-polar-base hover:bg-polar-surface border-polar-border hover:border-polar-border-active'
         }`}
       >
         <span 
-          className="w-2 h-2 rounded-full animate-pulse" 
+          className="w-2 h-2 rounded-full animate-pulse shrink-0" 
           style={{ backgroundColor: activeMeta.accentColor }} 
         />
-        <Shield className="w-3.5 h-3.5" style={{ color: activeMeta.accentColor }} />
+        <Shield className="w-3.5 h-3.5 shrink-0" style={{ color: activeMeta.accentColor }} />
         
-        <div className="flex items-center gap-1.5">
-          <span className="font-semibold text-polar-text-primary tracking-wide">
+        <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+          <span className="font-semibold text-polar-text-primary tracking-wide whitespace-nowrap">
             {activeMeta.shortLabel}
           </span>
-          <span className={`hidden sm:inline-block text-[10px] px-1.5 py-0.2 rounded border font-mono ${activeMeta.badgeClass}`}>
+          <span className={`hidden 2xl:inline-block text-[10px] px-1.5 py-0.2 rounded border font-mono whitespace-nowrap ${activeMeta.badgeClass}`}>
             {activeMeta.clearanceBadge}
           </span>
         </div>
 
         <ChevronDown 
-          className={`w-3.5 h-3.5 text-polar-text-muted transition-transform duration-200 ${
+          className={`w-3.5 h-3.5 text-polar-text-muted transition-transform duration-200 shrink-0 ${
             isOpen ? 'rotate-180 text-polar-cyan' : ''
           }`} 
         />

@@ -34,30 +34,32 @@ export const TelemetryMetric: React.FC<Props> = ({
   className = '',
 }) => {
   return (
-    <div className={`bg-polar-card border border-polar-border hover:border-polar-border-active rounded-md p-3.5 font-mono shadow-sm flex flex-col justify-between transition-colors ${className}`}>
+    <div className={`bg-polar-card border border-polar-border hover:border-polar-border-active rounded-md p-3.5 font-mono shadow-sm flex flex-col justify-between transition-colors overflow-hidden min-w-0 ${className}`}>
       {/* Top Header: Label + Status */}
-      <div className="flex items-center justify-between text-xs pb-1">
-        <div className="flex items-center gap-2">
-          {Icon && <Icon className="w-3.5 h-3.5 text-polar-text-muted" />}
-          <span className="text-[11px] font-bold text-polar-text-muted uppercase tracking-wider">{label}</span>
+      <div className="flex items-center justify-between text-xs pb-1 gap-2 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 truncate">
+          {Icon && <Icon className="w-3.5 h-3.5 text-polar-text-muted shrink-0" />}
+          <span className="text-[11px] font-bold text-polar-text-muted uppercase tracking-wider truncate">{label}</span>
         </div>
         <StatusBadge status={status} size="sm" />
       </div>
 
       {/* Primary Value + Sparkline */}
-      <div className="my-2 flex items-baseline justify-between gap-3">
-        <div className="flex items-baseline gap-1.5">
-          <span className="text-2xl lg:text-3xl font-bold text-polar-text-primary tracking-tight">{value}</span>
-          {unit && <span className="text-xs text-polar-text-muted uppercase font-semibold">{unit}</span>}
+      <div className="my-2 flex items-baseline justify-between gap-2 min-w-0 overflow-hidden">
+        <div className="flex items-baseline gap-1.5 min-w-0 truncate">
+          <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-polar-text-primary tracking-tight truncate">{value}</span>
+          {unit && <span className="text-[11px] text-polar-text-muted uppercase font-semibold shrink-0">{unit}</span>}
         </div>
 
         {sparklineData && (
-          <TelemetrySparkline 
-            data={sparklineData} 
-            color={sparklineColor} 
-            height={26} 
-            width={90} 
-          />
+          <div className="shrink-0 overflow-hidden">
+            <TelemetrySparkline 
+              data={sparklineData} 
+              color={sparklineColor} 
+              height={24} 
+              width={75} 
+            />
+          </div>
         )}
       </div>
 

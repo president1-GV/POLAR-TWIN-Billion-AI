@@ -41,11 +41,11 @@ export const TelemetrySparkline: React.FC<Props> = ({
   const areaD = `${pathD} L ${width - padding},${height} L ${padding},${height} Z`;
 
   return (
-    <div className={`relative inline-block ${className}`} title={`Range: ${min.toFixed(1)} - ${max.toFixed(1)}`}>
+    <div className={`relative inline-block overflow-hidden shrink-0 ${className}`} title={`Range: ${min.toFixed(1)} - ${max.toFixed(1)}`}>
       <svg
         width={width}
         height={height}
-        className="overflow-visible"
+        className="overflow-hidden block"
         viewBox={`0 0 ${width} ${height}`}
       >
         <defs>

@@ -84,9 +84,9 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-[1680px] mx-auto font-sans select-none">
+    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-[1720px] mx-auto font-sans select-none overflow-hidden">
       {/* 1. COMMAND CENTER HERO BAR */}
-      <section className="bg-polar-card border border-polar-border rounded-md p-5 shadow-sm">
+      <section className="bg-polar-card border border-polar-border rounded-md p-4 sm:p-5 shadow-sm overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-4">
             <img 
@@ -130,25 +130,25 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
         </div>
 
         {/* Global Operational Status Sub-Strip */}
-        <div className="mt-4 pt-3 border-t border-polar-border grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
-          <div className="flex items-center gap-2">
-            <span className="text-polar-text-muted uppercase text-[10px]">Data Freshness:</span>
+        <div className="mt-4 pt-3 border-t border-polar-border grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono overflow-hidden">
+          <div className="flex items-center gap-2 truncate">
+            <span className="text-polar-text-muted uppercase text-[10px] shrink-0">Data Freshness:</span>
             <DataFreshness lastUpdatedTimestamp={lastSyncTime} isLive={true} />
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-polar-text-muted uppercase text-[10px]">Active Stations:</span>
-            <span className="text-emerald-500 dark:text-emerald-400 font-semibold">2 / 2 OPERATIONAL</span>
+          <div className="flex items-center gap-2 truncate">
+            <span className="text-polar-text-muted uppercase text-[10px] shrink-0">Active Stations:</span>
+            <span className="text-emerald-500 dark:text-emerald-400 font-semibold truncate">2 / 2 OPERATIONAL</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-polar-text-muted uppercase text-[10px]">Telemetry Link:</span>
-            <span className="text-polar-text-secondary font-semibold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
-              GSAT-11 / INMARSAT NOMINAL
+          <div className="flex items-center gap-2 truncate">
+            <span className="text-polar-text-muted uppercase text-[10px] shrink-0">Telemetry Link:</span>
+            <span className="text-polar-text-secondary font-semibold flex items-center gap-1.5 truncate">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 shrink-0" />
+              <span className="truncate">GSAT-11 / INMARSAT</span>
             </span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-polar-text-muted uppercase text-[10px]">Database Host:</span>
-            <span className="text-emerald-500 dark:text-emerald-400 font-semibold">Supabase Cloud</span>
+          <div className="flex items-center gap-2 truncate">
+            <span className="text-polar-text-muted uppercase text-[10px] shrink-0">Database Host:</span>
+            <span className="text-emerald-500 dark:text-emerald-400 font-semibold truncate">Supabase Cloud</span>
           </div>
         </div>
       </section>
@@ -165,7 +165,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
       />
 
       {/* 3. CRITICAL TELEMETRY METRIC STRIP (Phase 6 & 7) */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 overflow-hidden">
         <TelemetryMetric
           label="Power Demand"
           value="395.0"
