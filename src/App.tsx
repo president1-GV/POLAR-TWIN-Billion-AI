@@ -12,6 +12,7 @@ import { AnalyticsDashboard } from './features/analytics/AnalyticsDashboard';
 import { DataCatalogDashboard } from './features/data-catalog/DataCatalogDashboard';
 import { KillerDemoPanel } from './features/demo/KillerDemoPanel';
 import { AlertsDrawer } from './features/alerts/AlertsDrawer';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LinkStatus, Alert } from './types';
 import { api } from './services/api';
 
@@ -126,49 +127,51 @@ export const App: React.FC = () => {
 
         {/* Dynamic Viewport */}
         <main className="flex-1 overflow-y-auto bg-polar-950 polar-grid">
-          {currentScreen === 'command-center' && (
-            <ExecutiveCommandCenter
-              onNavigate={setCurrentScreen}
-              onSelectStation={setCurrentStationId}
-            />
-          )}
-
-          {currentScreen === 'digital-twin' && (
-            <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
-              <Station3DViewer 
-                stationId={currentStationId} 
-                onNavigateToSimulation={(_scenarioKey) => setCurrentScreen('simulation')}
+          <ErrorBoundary key={currentScreen} fallbackTitle={`MISSION VIEW SUBSYSTEM: ${currentScreen.toUpperCase()}`}>
+            {currentScreen === 'command-center' && (
+              <ExecutiveCommandCenter
+                onNavigate={setCurrentScreen}
+                onSelectStation={setCurrentStationId}
               />
-            </div>
-          )}
+            )}
 
-          {currentScreen === 'energy' && (
-            <EnergyDashboard stationId={currentStationId} />
-          )}
+            {currentScreen === 'digital-twin' && (
+              <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
+                <Station3DViewer 
+                  stationId={currentStationId} 
+                  onNavigateToSimulation={(_scenarioKey) => setCurrentScreen('simulation')}
+                />
+              </div>
+            )}
 
-          {currentScreen === 'logistics' && (
-            <LogisticsDashboard stationId={currentStationId} />
-          )}
+            {currentScreen === 'energy' && (
+              <EnergyDashboard stationId={currentStationId} />
+            )}
 
-          {currentScreen === 'meteorology' && (
-            <MeteorologyView stationId={currentStationId} />
-          )}
+            {currentScreen === 'logistics' && (
+              <LogisticsDashboard stationId={currentStationId} />
+            )}
 
-          {currentScreen === 'simulation' && (
-            <EmergencySimulator stationId={currentStationId} />
-          )}
+            {currentScreen === 'meteorology' && (
+              <MeteorologyView stationId={currentStationId} />
+            )}
 
-          {currentScreen === 'edge' && <EdgeMonitor />}
+            {currentScreen === 'simulation' && (
+              <EmergencySimulator stationId={currentStationId} />
+            )}
 
-          {currentScreen === 'analytics' && <AnalyticsDashboard />}
+            {currentScreen === 'edge' && <EdgeMonitor />}
 
-          {currentScreen === 'data-catalog' && <DataCatalogDashboard />}
+            {currentScreen === 'analytics' && <AnalyticsDashboard />}
 
-          {currentScreen === 'demo' && (
-            <KillerDemoPanel
-              onNavigateToTwin={() => setCurrentScreen('digital-twin')}
-            />
-          )}
+            {currentScreen === 'data-catalog' && <DataCatalogDashboard />}
+
+            {currentScreen === 'demo' && (
+              <KillerDemoPanel
+                onNavigateToTwin={() => setCurrentScreen('digital-twin')}
+              />
+            )}
+          </ErrorBoundary>
         </main>
       </div>
 

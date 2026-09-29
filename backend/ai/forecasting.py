@@ -95,17 +95,30 @@ class EnergyAndLogisticsForecastService:
                 msg = "Adequate operational buffer above minimum emergency threshold."
 
             results.append({
-                "item_id": it.get("id"),
-                "name": it.get("name"),
-                "category": it.get("category"),
+                "item_id": it.get("id") or it.get("item_id"),
+                "id": it.get("id") or it.get("item_id"),
+                "name": it.get("name", "Unknown Resource"),
+                "category": it.get("category", "GENERAL"),
+                "sku": it.get("sku", "POLAR-RES"),
+                "unit": it.get("unit", "Units"),
                 "current_stock": stock,
                 "daily_burn_rate": burn,
                 "minimum_reserve": reserve,
                 "days_remaining_nominal": days_left,
+                "simulated_days_remaining": round(max(0.0, days_left - shipment_delay_days), 1),
                 "shipment_delay_days": shipment_delay_days,
                 "days_buffer_at_arrival": round(days_margin, 1),
                 "shortage_risk_level": risk,
-                "evidence_rationale": msg
+                "risk_level": risk,
+                "storage_location": it.get("storage_location", "Station Storage Depot"),
+                "evidence_rationale": msg,
+                "recommended_contingency": (
+                    "CRITICAL: Initiate Tier-3 emergency rationing and prioritize air drop resupply"
+                    if risk == "CRITICAL"
+                    else "HIGH: Implement auxiliary conservation protocol"
+                    if risk == "HIGH"
+                    else "Monitor consumption against daily burn target"
+                )
             })
         return results
 

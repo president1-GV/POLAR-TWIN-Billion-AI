@@ -902,7 +902,10 @@ export const api = {
   async getInventory(stationId: string): Promise<LogisticsItem[]> {
     try {
       const res = await backendFetch(`/logistics/${stationId}/inventory`);
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) return data;
+      }
     } catch (_) {}
 
     try {
@@ -910,76 +913,151 @@ export const api = {
       if (rows && rows.length > 0) return rows;
     } catch (_) {}
 
+    if (stationId === 'station_maitri') {
+      return [
+        {
+          id: 'inv_ma_fuel',
+          station_id: stationId,
+          category: 'FUEL',
+          name: 'Polar Diesel Grade A-1 (Low Temp)',
+          sku: 'POL-DSL-MA-01',
+          current_stock: 58200.0,
+          unit: 'Liters',
+          daily_burn_rate: 680.0,
+          minimum_reserve: 18000.0,
+          days_remaining: 85.6,
+          shortage_risk_level: 'LOW',
+          storage_location: 'Fuel Farm Pad Tanks',
+        },
+        {
+          id: 'inv_ma_food',
+          station_id: stationId,
+          category: 'FOOD',
+          name: 'Sub-Zero Freeze-Dried & Tinned Provisions',
+          sku: 'RAT-MA-FOOD',
+          current_stock: 3600.0,
+          unit: 'kg',
+          daily_burn_rate: 20.0,
+          minimum_reserve: 900.0,
+          days_remaining: 180.0,
+          shortage_risk_level: 'LOW',
+          storage_location: 'Main Block Cold Store',
+        },
+        {
+          id: 'inv_ma_med',
+          station_id: stationId,
+          category: 'MEDICAL',
+          name: 'High-Altitude Polar Trauma & Hypothermia Packs',
+          sku: 'MED-MA-HYPO',
+          current_stock: 60.0,
+          unit: 'Kits',
+          daily_burn_rate: 0.1,
+          minimum_reserve: 15.0,
+          days_remaining: 600.0,
+          shortage_risk_level: 'LOW',
+          storage_location: 'Maitri Medical Dispensary',
+        },
+        {
+          id: 'inv_ma_spares',
+          station_id: stationId,
+          category: 'SPARE_PARTS',
+          name: 'Kirloskar 125kVA Genset Overhaul & Filter Kits',
+          sku: 'KIR-MA-FLT',
+          current_stock: 8.0,
+          unit: 'Sets',
+          daily_burn_rate: 0.04,
+          minimum_reserve: 2.0,
+          days_remaining: 200.0,
+          shortage_risk_level: 'LOW',
+          storage_location: 'Workshop & Garage',
+        },
+        {
+          id: 'inv_ma_water',
+          station_id: stationId,
+          category: 'WATER',
+          name: 'Lake Priyadarshini Potable Water Buffer',
+          sku: 'H2O-PRIYA-MA',
+          current_stock: 23550.0,
+          unit: 'Liters',
+          daily_burn_rate: 1100.0,
+          minimum_reserve: 6000.0,
+          days_remaining: 21.4,
+          shortage_risk_level: 'MEDIUM',
+          storage_location: 'Potable Water Storage Reservoir',
+        },
+      ];
+    }
+
     return [
       {
-        id: 'log_fuel_01',
+        id: 'inv_bh_fuel',
         station_id: stationId,
         category: 'FUEL',
-        name: 'Aviation Turbine Fuel / Jet A-1 (Low Temp Arctic)',
-        sku: 'POLAR-FUEL-A1',
-        current_stock: 42000.0,
+        name: 'Aviation Jet A-1 / Polar Diesel (Additised)',
+        sku: 'POL-DSL-A1',
+        current_stock: 170500.0,
         unit: 'Liters',
-        daily_burn_rate: 1156.0,
-        minimum_reserve: 15000.0,
-        days_remaining: 36.3,
+        daily_burn_rate: 915.0,
+        minimum_reserve: 35000.0,
+        days_remaining: 186.3,
         shortage_risk_level: 'LOW',
-        storage_location: 'Tank Farm 01',
+        storage_location: 'Bulk Fuel Tanks 01 & 02',
       },
       {
-        id: 'log_food_01',
+        id: 'inv_bh_food',
         station_id: stationId,
         category: 'FOOD',
-        name: 'Deep Freeze & Dry Provisions Ration Pack',
-        sku: 'POLAR-FOOD-RATION',
-        current_stock: 4800.0,
+        name: 'Long-Shelf Freeze-Dried & Frozen Rations',
+        sku: 'RAT-POL-FOOD',
+        current_stock: 4320.0,
         unit: 'kg',
-        daily_burn_rate: 32.0,
+        daily_burn_rate: 24.0,
         minimum_reserve: 1200.0,
-        days_remaining: 150.0,
+        days_remaining: 180.0,
         shortage_risk_level: 'LOW',
-        storage_location: 'Main Food Locker',
+        storage_location: 'Main Deep Freeze & Dry Pantry',
       },
       {
-        id: 'log_med_01',
+        id: 'inv_bh_med',
         station_id: stationId,
         category: 'MEDICAL',
-        name: 'Emergency Polar Medical Trauma & Hypothermia Kits',
-        sku: 'POLAR-MED-HYPO',
-        current_stock: 85.0,
+        name: 'Emergency Trauma & Surgical Consumables',
+        sku: 'MED-TRM-KIT',
+        current_stock: 95.0,
         unit: 'Kits',
-        daily_burn_rate: 0.1,
-        minimum_reserve: 20.0,
-        days_remaining: 650.0,
+        daily_burn_rate: 0.15,
+        minimum_reserve: 30.0,
+        days_remaining: 633.0,
         shortage_risk_level: 'LOW',
-        storage_location: 'Station Medical Clinic',
+        storage_location: 'Station Medical Bay Dispensary',
       },
       {
-        id: 'log_spare_01',
+        id: 'inv_bh_spares',
         station_id: stationId,
         category: 'SPARE_PARTS',
-        name: 'Volvo Penta Genset Injector & Turbo Rebuild Kit',
-        sku: 'GEN-SPARE-TURBO',
-        current_stock: 2.0,
+        name: 'Kirloskar 250kVA Turbo & Filter Maintenance Sets',
+        sku: 'KIR-FLT-SET',
+        current_stock: 14.0,
         unit: 'Sets',
-        daily_burn_rate: 0.02,
-        minimum_reserve: 1.0,
-        days_remaining: 100.0,
-        shortage_risk_level: 'MEDIUM',
-        storage_location: 'Heavy Mechanical Workshop',
+        daily_burn_rate: 0.05,
+        minimum_reserve: 5.0,
+        days_remaining: 280.0,
+        shortage_risk_level: 'LOW',
+        storage_location: 'Heavy Spares Container B4',
       },
       {
-        id: 'log_water_01',
+        id: 'inv_bh_water',
         station_id: stationId,
         category: 'WATER',
-        name: 'Potable Water Reserve',
-        sku: 'POLAR-WATER-POTABLE',
-        current_stock: 18500.0,
+        name: 'Treated Potable Water Storage',
+        sku: 'H2O-POT-L',
+        current_stock: 16500.0,
         unit: 'Liters',
-        daily_burn_rate: 1400.0,
-        minimum_reserve: 5000.0,
-        days_remaining: 13.2,
+        daily_burn_rate: 1200.0,
+        minimum_reserve: 4000.0,
+        days_remaining: 13.8,
         shortage_risk_level: 'MEDIUM',
-        storage_location: 'Insulated Potable Tank 02',
+        storage_location: 'Insulated Buffer Storage Bladders',
       },
     ];
   },
@@ -987,7 +1065,10 @@ export const api = {
   async getShipments(stationId: string): Promise<Shipment[]> {
     try {
       const res = await backendFetch(`/logistics/${stationId}/shipments`);
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) return data;
+      }
     } catch (_) {}
 
     try {
@@ -1000,21 +1081,42 @@ export const api = {
       }
     } catch (_) {}
 
+    if (stationId === 'station_maitri') {
+      return [
+        {
+          id: 'ship_papanin_44',
+          vessel_name: 'MV Ivan Papanin',
+          voyage_number: 'V44-MAITRI-EXP',
+          departure_port: 'Cape Town, South Africa',
+          destination_station_id: stationId,
+          scheduled_departure: '2026-11-25T06:00:00Z',
+          scheduled_arrival: '2026-12-28T12:00:00Z',
+          delay_days: 0,
+          status: 'EN_ROUTE',
+          cargo_manifest: [
+            { item: 'Arctic Diesel Fuel', quantity: 120000, unit: 'Liters' },
+            { item: 'Kirloskar 125kVA Overhaul Modules', quantity: 4, unit: 'Sets' },
+            { item: 'Antarctic Winter Food Rations', quantity: 8500, unit: 'kg' },
+          ],
+        },
+      ];
+    }
+
     return [
       {
-        id: 'ship_01',
+        id: 'ship_vasiliy_44',
         vessel_name: 'MV Vasiliy Golovnin',
-        voyage_number: 'IN-ANT-44-A',
+        voyage_number: 'V44-IND-ANTARCTIC',
         departure_port: 'Cape Town, South Africa',
         destination_station_id: stationId,
-        scheduled_departure: '2026-11-15T00:00:00Z',
-        scheduled_arrival: '2026-12-05T00:00:00Z',
+        scheduled_departure: '2026-11-20T08:00:00Z',
+        scheduled_arrival: '2026-12-15T14:00:00Z',
         delay_days: 0,
-        status: 'EN_ROUTE_SOUTHERN_OCEAN',
+        status: 'EN_ROUTE',
         cargo_manifest: [
-          { item: 'Arctic Grade Diesel ATF', quantity: 180000, unit: 'Liters' },
-          { item: 'Dry & Frozen Rations', quantity: 12000, unit: 'kg' },
-          { item: 'Scientific Spare Modules', quantity: 45, unit: 'crates' },
+          { item: 'Polar Diesel Fuel', quantity: 180000, unit: 'Liters' },
+          { item: 'Heavy Genset Overhaul Kit', quantity: 3, unit: 'Sets' },
+          { item: 'Fresh Expedition Rations', quantity: 3500, unit: 'kg' },
         ],
       },
     ];
@@ -1026,28 +1128,70 @@ export const api = {
         method: 'POST',
         body: JSON.stringify({ station_id: stationId, delay_days: delayDays }),
       });
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.projections) && data.projections.length > 0) {
+          return data;
+        }
+      }
     } catch (_) {}
 
-    const baselineDays = 36.3;
-    const adjustedDays = Math.max(0, baselineDays - delayDays * 0.95);
-    const risk = adjustedDays < 15 ? 'CRITICAL' : adjustedDays < 25 ? 'HIGH' : 'LOW';
+    const inventory = await this.getInventory(stationId);
+    const nominalArrivalDays = 78;
+    const effectiveArrivalDay = nominalArrivalDays + delayDays;
+
+    const projections = inventory.map((item) => {
+      const stock = item.current_stock ?? 1000;
+      const burn = item.daily_burn_rate > 0 ? item.daily_burn_rate : 1;
+      const reserve = item.minimum_reserve ?? 200;
+      const nominalDays = Math.round((stock / burn) * 10) / 10;
+      const simulatedDays = Math.max(0, Math.round((nominalDays - delayDays) * 10) / 10);
+      const daysMargin = Math.round((nominalDays - effectiveArrivalDay) * 10) / 10;
+
+      let risk: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
+      let rationale = 'Adequate operational buffer above minimum emergency threshold.';
+      let contingency = 'Maintain standard wintering burn protocol';
+
+      if (daysMargin < 0 || simulatedDays < (reserve / burn)) {
+        risk = 'CRITICAL';
+        rationale = `Stock will be exhausted before delayed vessel arrival! (${Math.abs(daysMargin)} days deficit)`;
+        contingency = 'INITIATE TIER 3 RATIONING: Shed non-essential research pods & request priority air drop';
+      } else if (daysMargin < 15 || simulatedDays < (reserve / burn * 1.5)) {
+        risk = 'HIGH';
+        rationale = `Severe reserve breach: Only ${daysMargin} buffer days remain at vessel arrival.`;
+        contingency = 'Implement auxiliary conservation protocol; reduce heating in uncrewed modules';
+      } else if (daysMargin < 30 || simulatedDays < (reserve / burn * 2.0)) {
+        risk = 'MEDIUM';
+        rationale = `Close tolerance: Safety reserve compromised by ${delayDays} days voyage delay.`;
+        contingency = 'Monitor daily burn rates and verify seal integrity';
+      }
+
+      return {
+        item_id: item.id,
+        id: item.id,
+        name: item.name,
+        sku: item.sku,
+        category: item.category,
+        unit: item.unit,
+        current_stock: stock,
+        daily_burn_rate: burn,
+        minimum_reserve: reserve,
+        days_remaining_nominal: nominalDays,
+        simulated_days_remaining: simulatedDays,
+        shipment_delay_days: delayDays,
+        days_buffer_at_arrival: daysMargin,
+        shortage_risk_level: risk,
+        risk_level: risk,
+        storage_location: item.storage_location || 'Main Storage Depot',
+        evidence_rationale: rationale,
+        recommended_contingency: contingency,
+      };
+    });
 
     return {
       station_id: stationId,
-      delay_days: delayDays,
-      projections: [
-        {
-          sku: 'POLAR-FUEL-A1',
-          name: 'Aviation Turbine Fuel / Jet A-1',
-          baseline_days: baselineDays,
-          projected_days_remaining: Math.round(adjustedDays * 10) / 10,
-          risk_level: risk,
-          recommended_contingency: risk === 'CRITICAL'
-            ? 'INITIATE TIER 3 FUEL RATIONING: Shed non-essential research pods immediately'
-            : 'Maintain standard wintering burn protocol',
-        },
-      ],
+      simulated_delay_days: delayDays,
+      projections,
       provenance: {
         source_type: 'PHYSICS_SYNTHETIC',
         description: 'Linear burn depletion integration with sea ice voyage transit variance',

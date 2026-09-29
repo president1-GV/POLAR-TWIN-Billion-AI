@@ -104,14 +104,22 @@ VALUES
 ('inv_bh_food', 'station_bharati', 'FOOD', 'Long-Shelf Freeze-Dried & Frozen Rations', 'RAT-POL-FOOD', 4320, 'MAN_DAYS', 24.0, 1200, 180.0, 'LOW', 'Main Deep Freeze & Dry Pantry'),
 ('inv_bh_med', 'station_bharati', 'MEDICAL', 'Emergency Trauma & Surgical Consumables', 'MED-TRM-KIT', 95, 'KITS', 0.15, 30, 633.0, 'LOW', 'Station Medical Bay Dispensary'),
 ('inv_bh_spares', 'station_bharati', 'SPARE_PARTS', 'Kirloskar 250kVA Turbo & Filter Maintenance Sets', 'KIR-FLT-SET', 14, 'UNITS', 0.05, 5, 280.0, 'LOW', 'Heavy Spares Container B4'),
-('inv_bh_water', 'station_bharati', 'WATER', 'Treated Potable Water Storage', 'H2O-POT-L', 16500, 'LITRES', 1200.0, 4000, 13.8, 'MEDIUM', 'Insulated Buffer Storage Bladders')
+('inv_bh_water', 'station_bharati', 'WATER', 'Treated Potable Water Storage', 'H2O-POT-L', 16500, 'LITRES', 1200.0, 4000, 13.8, 'MEDIUM', 'Insulated Buffer Storage Bladders'),
+-- Maitri Inventory Items
+('inv_ma_fuel', 'station_maitri', 'FUEL', 'Polar Diesel Grade A-1 (Low Temp)', 'POL-DSL-MA-01', 58200, 'LITRES', 680.0, 18000, 85.6, 'LOW', 'Fuel Farm Pad Tanks'),
+('inv_ma_food', 'station_maitri', 'FOOD', 'Sub-Zero Freeze-Dried & Tinned Provisions', 'RAT-MA-FOOD', 3600, 'MAN_DAYS', 20.0, 900, 180.0, 'LOW', 'Main Block Cold Store'),
+('inv_ma_med', 'station_maitri', 'MEDICAL', 'High-Altitude Polar Trauma & Hypothermia Packs', 'MED-MA-HYPO', 60, 'KITS', 0.1, 15, 600.0, 'LOW', 'Maitri Medical Dispensary'),
+('inv_ma_spares', 'station_maitri', 'SPARE_PARTS', 'Kirloskar 125kVA Genset Overhaul & Filter Kits', 'KIR-MA-FLT', 8, 'UNITS', 0.04, 2, 200.0, 'LOW', 'Workshop & Garage'),
+('inv_ma_water', 'station_maitri', 'WATER', 'Lake Priyadarshini Potable Water Buffer', 'H2O-PRIYA-MA', 23550, 'LITRES', 1100.0, 6000, 21.4, 'MEDIUM', 'Potable Water Storage Reservoir')
 ON CONFLICT (id) DO UPDATE SET current_stock = EXCLUDED.current_stock, days_remaining = EXCLUDED.days_remaining;
 
 -- 7. SHIPMENTS
 INSERT INTO shipments (id, vessel_name, voyage_number, departure_port, destination_station_id, scheduled_departure, scheduled_arrival, delay_days, status, cargo_manifest)
 VALUES
 ('ship_vasiliy_44', 'MV Vasiliy Golovnin', 'V44-IND-ANTARCTIC', 'Cape Town, South Africa', 'station_bharati', '2026-11-20 08:00:00Z', '2026-12-15 14:00:00Z', 0, 'SCHEDULED', 
- '[{"item": "Polar Diesel Fuel", "quantity": 180000, "unit": "Litres"}, {"item": "Heavy Genset Overhaul Kit", "quantity": 3, "unit": "Sets"}, {"item": "Fresh Expedition Rations", "quantity": 3500, "unit": "Kg"}]'::jsonb)
+ '[{"item": "Polar Diesel Fuel", "quantity": 180000, "unit": "Litres"}, {"item": "Heavy Genset Overhaul Kit", "quantity": 3, "unit": "Sets"}, {"item": "Fresh Expedition Rations", "quantity": 3500, "unit": "Kg"}]'::jsonb),
+('ship_papanin_44', 'MV Ivan Papanin', 'V44-MAITRI-EXP', 'Cape Town, South Africa', 'station_maitri', '2026-11-25 06:00:00Z', '2026-12-28 12:00:00Z', 0, 'SCHEDULED', 
+ '[{"item": "Arctic Diesel Fuel", "quantity": 120000, "unit": "Litres"}, {"item": "Kirloskar 125kVA Overhaul Modules", "quantity": 4, "unit": "Sets"}, {"item": "Antarctic Winter Food Rations", "quantity": 8500, "unit": "Kg"}]'::jsonb)
 ON CONFLICT (id) DO NOTHING;
 
 -- 8. DIGITAL TWIN STATES
