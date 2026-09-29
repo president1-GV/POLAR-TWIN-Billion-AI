@@ -1287,49 +1287,73 @@ export const api = {
     return [
       {
         key: 'GENERATOR_FAILURE',
+        name: 'Primary Diesel Genset 01 Catastrophic Trip',
         title: 'Primary Diesel Genset 01 Catastrophic Trip',
+        category: 'ENERGY',
+        default_severity: 'CRITICAL',
         criticality: 'CRITICAL',
         description: 'Simulates instantaneous breaker trip on Primary Genset 01 under -25°C ambient conditions.',
       },
       {
         key: 'BLIZZARD_VORTEX',
+        name: 'Severe Katabatic Blizzard Incursion (120 km/h)',
         title: 'Severe Katabatic Blizzard Incursion (120 km/h)',
+        category: 'HVAC',
+        default_severity: 'CRITICAL',
         criticality: 'CRITICAL',
         description: 'Extreme polar vortex wind chill (-42°C, 35 m/s gusts) spiking building convective thermal losses.',
       },
       {
         key: 'WATER_PIPE_FREEZE',
+        name: 'Desalination Intake Line Freeze Risk',
         title: 'Desalination Intake Line Freeze Risk',
+        category: 'LIFE_SUPPORT',
+        default_severity: 'HIGH',
         criticality: 'HIGH',
         description: 'Heating trace power disruption to seawater intake pipe threatening station potable water supply.',
       },
       {
         key: 'FIRE_IN_ENERGY_HUB',
+        name: 'Electrical Arc Fire in Energy Hub Bay',
         title: 'Electrical Arc Fire in Energy Hub Bay',
+        category: 'ENERGY',
+        default_severity: 'CRITICAL',
         criticality: 'CRITICAL',
         description: 'Battery containment thermal runaway requiring automated gaseous fire suppression & load isolation.',
       },
       {
         key: 'SUPPLY_SHIP_DELAY',
+        name: 'Polar Supply Vessel 45-Day Sea Ice Trap',
         title: 'Polar Supply Vessel 45-Day Sea Ice Trap',
+        category: 'LOGISTICS',
+        default_severity: 'HIGH',
         criticality: 'HIGH',
         description: 'Supply vessel MV Vasiliy Golovnin trapped in pack ice requiring wintering fuel rationing.',
       },
       {
         key: 'SATELLITE_BLACKOUT',
+        name: 'Geomagnetic Storm Satellite Uplink Blackout',
         title: 'Geomagnetic Storm Satellite Uplink Blackout',
+        category: 'COMMS',
+        default_severity: 'WARNING',
         criticality: 'MEDIUM',
         description: 'K-index 8 aurora event disrupting Ku/C-band communications, forcing store-and-forward edge autonomy.',
       },
       {
         key: 'STRUCTURAL_ICE_ACCUMULATION',
+        name: 'Heavy Glaze Ice Overload on Radar Radome',
         title: 'Heavy Glaze Ice Overload on Radar Radome',
+        category: 'STRUCTURAL',
+        default_severity: 'WARNING',
         criticality: 'MEDIUM',
         description: 'Supercooled fog forming 1500 kg asymmetric ice loading on Bharati earth observation radome.',
       },
       {
         key: 'MICROGRID_STABILIZATION',
+        name: 'Sudden Solar PV Clouding & Step Load Inrush',
         title: 'Sudden Solar PV Clouding & Step Load Inrush',
+        category: 'ENERGY',
+        default_severity: 'WARNING',
         criticality: 'LOW',
         description: 'Microgrid frequency droop response using BESS inverter synthetic inertia.',
       },
@@ -1349,42 +1373,99 @@ export const api = {
       if (res.ok) return await res.json();
     } catch (_) {}
 
+    const scenarioConfigs: Record<string, {
+      name: string;
+      deficit_kw: number;
+      loss_pct: number;
+      decay_hours: number;
+      systems_count: number;
+      critical_systems: string[];
+      load_shed: Array<{ asset_id: string; name: string; shed_priority: number }>;
+      recommendations: Array<{ step: number; action: string; rationale: string; estimated_recovery_hours: number }>;
+    }> = {
+      GENERATOR_FAILURE: {
+        name: 'Primary Diesel Genset 01 Catastrophic Trip',
+        deficit_kw: 185.0,
+        loss_pct: 74.0,
+        decay_hours: 4.5,
+        systems_count: 4,
+        critical_systems: ['Central Microgrid Bus', 'Life Support HVAC', 'RO Water Treatment', 'East Lab Science Array'],
+        load_shed: [
+          { asset_id: 'bh_lab_01', name: 'East Wing Science Lab Array', shed_priority: 1 },
+          { asset_id: 'bh_workshop_01', name: 'Heavy Maintenance Workshop Heaters', shed_priority: 2 },
+          { asset_id: 'bh_cargo_01', name: 'Tactical Cargo Bay Climate Loop', shed_priority: 3 },
+        ],
+        recommendations: [
+          { step: 1, action: 'AUTO_START_AUXILIARY_GENSET_02', rationale: 'Spin up and synchronize Auxiliary Genset 02 (250 kVA) to station 415V bus within 45s.', estimated_recovery_hours: 0.1 },
+          { step: 2, action: 'SHED_NON_CRITICAL_SCIENCE_LOAD', rationale: 'Shed 32 kW non-essential atmospheric science radar and auxiliary workshop heaters to prevent bus blackout.', estimated_recovery_hours: 0.2 },
+          { step: 3, action: 'ENGAGE_LITHIUM_BESS_TRANSIENT', rationale: 'Discharge 200 kWh BESS to maintain 50.0 Hz frequency stability during auxiliary breaker closure.', estimated_recovery_hours: 0.5 },
+        ],
+      },
+      BLIZZARD_VORTEX: {
+        name: 'Severe Katabatic Blizzard Incursion (120 km/h)',
+        deficit_kw: 95.0,
+        loss_pct: 38.0,
+        decay_hours: 2.8,
+        systems_count: 5,
+        critical_systems: ['Thermal Recovery Loop', 'Station Habitat Core', 'Intake Air Dampers'],
+        load_shed: [
+          { asset_id: 'bh_outbuilding_01', name: 'External Magnetic Observatory', shed_priority: 1 },
+          { asset_id: 'bh_snowmelt_02', name: 'Auxiliary Snow Melter Unit', shed_priority: 2 },
+        ],
+        recommendations: [
+          { step: 1, action: 'SEAL_PERIMETER_HVAC_DAMPERS', rationale: 'Restrict intake volume to recirculating air loops to minimize katabatic wind temperature drop.', estimated_recovery_hours: 0.3 },
+          { step: 2, action: 'PARALLEL_GENSET_COGENERATION', rationale: 'Boost engine jacket water heat exchangers to maximize building thermal recovery output.', estimated_recovery_hours: 0.5 },
+        ],
+      },
+      WATER_PIPE_FREEZE: {
+        name: 'Desalination Intake Line Freeze Risk',
+        deficit_kw: 25.0,
+        loss_pct: 12.0,
+        decay_hours: 1.8,
+        systems_count: 2,
+        critical_systems: ['Potable Water Distribution', 'Reverse Osmosis Plant'],
+        load_shed: [
+          { asset_id: 'bh_laundry_01', name: 'Habitat Laundry Facilities', shed_priority: 1 },
+        ],
+        recommendations: [
+          { step: 1, action: 'ACTIVATE_HIGH_OUTPUT_TRACE_HEATING', rationale: 'Divert 30 kW trace heating loop to intake manifold before ice crystal nucleation.', estimated_recovery_hours: 0.8 },
+          { step: 2, action: 'CIRCULATE_RESERVE_WATER_BUFFER', rationale: 'Cycle 12,000L heated water buffer through exterior pipe jacket.', estimated_recovery_hours: 1.2 },
+        ],
+      },
+    };
+
+    const cfg = scenarioConfigs[scenarioKey] || scenarioConfigs.GENERATOR_FAILURE;
     const simId = `sim_${Date.now()}`;
+
     return {
       simulation_id: simId,
+      scenario_name: cfg.name,
       scenario_key: scenarioKey,
       station_id: stationId,
       criticality: 'CRITICAL',
-      time_to_critical_hours: 3.8,
+      time_to_critical_hours: cfg.decay_hours,
+      consequences: {
+        power_generation_deficit_kw: cfg.deficit_kw,
+        power_capacity_loss_pct: cfg.loss_pct,
+        thermal_decay_hours_to_freeze: cfg.decay_hours,
+        battery_bridging_hours: 3.4,
+        systems_impacted_count: cfg.systems_count,
+        critical_subsystems_at_risk: cfg.critical_systems,
+        load_shed_order: cfg.load_shed,
+      },
+      recommendations: cfg.recommendations,
       cascading_failures: [
-        'Main generator trip creates instant 185 kW deficit on 415V station bus',
+        `Trip on trigger component creates instantaneous ${cfg.deficit_kw} kW deficit on 415V station bus`,
         'Heat recovery loop drops to zero; building envelope cooling begins at 2.4°C/hour',
-        'Potable water line and RO intake freeze risk escalates to CRITICAL within 4.5 hours',
-        'Auxiliary battery storage (200 kWh) reaches 20% floor in 65 minutes without auxiliary genset',
+        `Critical subsystems (${cfg.critical_systems.slice(0, 2).join(', ')}) at immediate risk of shutdown`,
+        'Auxiliary battery storage (200 kWh) reaches emergency threshold without rapid intervention',
       ],
-      mitigation_plan: [
-        {
-          step: 1,
-          action: 'AUTO_START_AUX_GENSET',
-          target_asset: 'bh_gen_02',
-          description: 'Spin up and synchronize Auxiliary Genset 02 to station bus (estimated 45s)',
-          power_impact_kw: 160.0,
-        },
-        {
-          step: 2,
-          action: 'LOAD_SHED_NON_CRITICAL',
-          target_asset: 'bh_lab_east',
-          description: 'Shed non-essential atmospheric science radar and auxiliary workshop heaters',
-          power_impact_kw: -32.0,
-        },
-        {
-          step: 3,
-          action: 'ACTIVATE_TRACE_HEATING',
-          target_asset: 'bh_water_ro',
-          description: 'Lock RO intake trace heating to high-priority life support emergency bus',
-          power_impact_kw: 14.0,
-        },
-      ],
+      mitigation_plan: cfg.recommendations.map((r) => ({
+        step: r.step,
+        action: r.action,
+        description: r.rationale,
+        power_impact_kw: r.step === 1 ? 160.0 : r.step === 2 ? -32.0 : 14.0,
+      })),
       net_stabilized_health_score: 93.5,
       review_status: 'PENDING_OPERATOR_APPROVAL',
       provenance: {

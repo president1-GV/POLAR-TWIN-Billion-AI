@@ -109,6 +109,10 @@ export const EmergencySimulator: React.FC<Props> = ({ stationId }) => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {scenarios.map((sc) => {
             const isSelected = selectedScenarioKey === sc.key;
+            const scName = sc.name || sc.title || sc.key;
+            const scCategory = sc.category || 'CONTINGENCY';
+            const scSeverity = sc.default_severity || sc.criticality || 'WARNING';
+
             return (
               <button
                 key={sc.key}
@@ -119,10 +123,10 @@ export const EmergencySimulator: React.FC<Props> = ({ stationId }) => {
                     : 'bg-polar-card border-polar-border text-polar-text-secondary hover:text-polar-text-primary hover:bg-polar-elevated'
                 }`}
               >
-                <div className="text-[10px] text-polar-text-muted uppercase">{sc.category}</div>
-                <div className="text-xs font-bold mt-1 text-polar-text-primary truncate">{sc.name}</div>
+                <div className="text-[10px] text-polar-text-muted uppercase">{scCategory}</div>
+                <div className="text-xs font-bold mt-1 text-polar-text-primary truncate">{scName}</div>
                 <div className="mt-2 flex items-center justify-between text-[10px]">
-                  <StatusBadge status={sc.default_severity || 'WARNING'} size="sm" showIcon={false} />
+                  <StatusBadge status={scSeverity} size="sm" showIcon={false} />
                   <span className="text-polar-cyan flex items-center gap-1 font-semibold">
                     <Play className="w-3 h-3" /> Run
                   </span>
@@ -141,11 +145,15 @@ export const EmergencySimulator: React.FC<Props> = ({ stationId }) => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-polar-border pb-3 gap-2">
               <div>
                 <span className="text-[10px] text-polar-text-muted uppercase">ACTIVE CONTINGENCY RUN</span>
-                <h3 className="text-base font-bold text-polar-text-primary">{simResult.scenario_name}</h3>
+                <h3 className="text-base font-bold text-polar-text-primary">
+                  {simResult.scenario_name || simResult.scenario_key || 'Active Contingency Simulation'}
+                </h3>
               </div>
               <div className="text-right text-xs text-polar-text-secondary">
                 <span>Run ID: </span>
-                <span className="text-polar-cyan font-mono">{simResult.simulation_id.slice(0, 12)}</span>
+                <span className="text-polar-cyan font-mono">
+                  {simResult.simulation_id ? simResult.simulation_id.slice(0, 12) : 'SIM-ACT-001'}
+                </span>
               </div>
             </div>
 
@@ -186,26 +194,34 @@ export const EmergencySimulator: React.FC<Props> = ({ stationId }) => {
                 <div className="space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-polar-text-secondary">Power Deficit:</span>
-                    <span className="text-rose-600 dark:text-rose-400 font-bold">-{simResult.consequences.power_generation_deficit_kw ?? 185} kW</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-bold">
+                      -{simResult.consequences?.power_generation_deficit_kw ?? 185} kW
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-polar-text-secondary">Capacity Loss:</span>
-                    <span className="text-rose-600 dark:text-rose-400 font-bold">{simResult.consequences.power_capacity_loss_pct ?? 74}%</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-bold">
+                      {simResult.consequences?.power_capacity_loss_pct ?? 74}%
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-polar-text-secondary">Thermal Buffer to Freeze (+5°C):</span>
-                    <span className="text-amber-600 dark:text-amber-400 font-bold">{simResult.consequences.thermal_decay_hours_to_freeze ?? 14.0} hours</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-bold">
+                      {simResult.consequences?.thermal_decay_hours_to_freeze ?? 14.0} hours
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-polar-text-secondary">Subsystems at Risk:</span>
-                    <span className="text-polar-text-primary">{simResult.consequences.systems_impacted_count ?? 3} Critical Systems</span>
+                    <span className="text-polar-text-primary">
+                      {simResult.consequences?.systems_impacted_count ?? 3} Critical Systems
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Recommended Load Shedding Candidates */}
-            {simResult.consequences.load_shed_order && (
+            {Array.isArray(simResult.consequences?.load_shed_order) && simResult.consequences.load_shed_order.length > 0 && (
               <div className="bg-polar-elevated p-4 rounded-lg border border-polar-border space-y-2">
                 <div className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase flex items-center gap-2">
                   <ListOrdered className="w-4 h-4" />
@@ -213,7 +229,7 @@ export const EmergencySimulator: React.FC<Props> = ({ stationId }) => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs pt-1">
                   {simResult.consequences.load_shed_order.map((item: any) => (
-                    <div key={item.asset_id} className="p-2.5 rounded bg-polar-card border border-polar-border flex items-center justify-between">
+                    <div key={item.asset_id || item.name} className="p-2.5 rounded bg-polar-card border border-polar-border flex items-center justify-between">
                       <div>
                         <span className="text-polar-text-primary font-bold">{item.name}</span>
                         <div className="text-[10px] text-polar-text-muted">Priority #{item.shed_priority}</div>
@@ -241,20 +257,22 @@ export const EmergencySimulator: React.FC<Props> = ({ stationId }) => {
             </div>
 
             <div className="space-y-3">
-              {simResult.recommendations?.map((rec: any, idx: number) => (
+              {(simResult.recommendations || []).map((rec: any, idx: number) => (
                 <div key={idx} className="bg-polar-elevated p-3.5 rounded-lg border border-polar-border flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-polar-cyan font-bold">Action #{rec.step}:</span>
-                      <span className="text-polar-text-primary font-semibold">{rec.action}</span>
+                      <span className="text-polar-cyan font-bold">Action #{rec.step || rec.priority || idx + 1}:</span>
+                      <span className="text-polar-text-primary font-semibold">{rec.action || rec.title}</span>
                     </div>
                     <p className="text-polar-text-secondary text-[11px] mt-1 font-sans">
-                      {rec.rationale}
+                      {rec.rationale || rec.description}
                     </p>
                   </div>
                   <div className="text-right">
                     <span className="text-[10px] text-polar-text-muted uppercase">Estimated Recovery</span>
-                    <div className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">{rec.estimated_recovery_hours} hrs</div>
+                    <div className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">
+                      {rec.estimated_recovery_hours ?? 1.5} hrs
+                    </div>
                   </div>
                 </div>
               ))}
