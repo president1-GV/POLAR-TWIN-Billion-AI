@@ -23,6 +23,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_CREDENTIALS } from '../../services/api';
 import { PolarRole, getRoleMeta } from '../../services/rbac';
+import polarTwinIcon from '../../assets/polar-twin-icon.png';
 
 interface LoginPageProps {
   onLoginSuccess?: () => void;
@@ -83,8 +84,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       {/* Top Bar / Government Header */}
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-polar-border/60 pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center shadow-lg shadow-cyan-500/10">
-            <Compass className="w-6 h-6 text-polar-cyan" />
+          <div className="w-11 h-11 rounded-lg bg-polar-bg/80 border-2 border-polar-cyan/60 flex items-center justify-center shadow-lg shadow-cyan-500/20 ring-2 ring-polar-cyan/25 overflow-hidden p-0.5">
+            <img 
+              src={polarTwinIcon} 
+              alt="POLAR-TWIN Mission Logo" 
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" 
+            />
           </div>
           <div>
             <div className="flex items-center gap-2">
