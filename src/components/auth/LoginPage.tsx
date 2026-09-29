@@ -44,13 +44,32 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onReturnHo
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
-  const handleQuickPreset = (roleKey: string) => {
+  const handleQuickPreset = async (roleKey: string) => {
     const creds = ROLE_CREDENTIALS[roleKey];
     if (creds) {
       setUsername(creds.username);
       setPassword(creds.password || '');
       setMfaCode(creds.mfa_code || '');
       setErrorMessage(null);
+      setIsSubmitting(true);
+
+      try {
+        const res = await login(creds.username, creds.password, creds.mfa_code || undefined);
+        if (res.success) {
+          setSuccessNotice(`Authentication token validated: ${creds.name}. Establishing telemetry uplink...`);
+          setTimeout(() => {
+            if (onLoginSuccess) {
+              onLoginSuccess();
+            }
+          }, 600);
+        } else {
+          setErrorMessage(res.error || 'Authentication denied. Verify credentials.');
+        }
+      } catch (err: any) {
+        setErrorMessage(err.message || 'Authentication error encountered.');
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -204,32 +223,36 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onReturnHo
               <div className="grid grid-cols-2 gap-2.5 text-xs">
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => handleQuickPreset('OPERATOR')}
-                  className="p-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-left transition-colors group shadow-sm"
+                  className="p-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
                   <p className="font-bold text-cyan-700 dark:text-cyan-300 text-[11px] group-hover:text-cyan-600 dark:group-hover:text-cyan-200">Duty Operator</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">V. Sharma (Bharati)</p>
                 </button>
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => handleQuickPreset('ENGINEER')}
-                  className="p-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-left transition-colors group shadow-sm"
+                  className="p-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
                   <p className="font-bold text-amber-700 dark:text-amber-300 text-[11px] group-hover:text-amber-600 dark:group-hover:text-amber-200">Base Engineer</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">A. Deshmukh (Bharati)</p>
                 </button>
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => handleQuickPreset('SUPERVISOR')}
-                  className="p-2.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-left transition-colors group shadow-sm"
+                  className="p-2.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
                   <p className="font-bold text-purple-700 dark:text-purple-300 text-[11px] group-hover:text-purple-600 dark:group-hover:text-purple-200">Expedition Cmdr</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">Col. R. Nair (MFA: 123456)</p>
                 </button>
                 <button
                   type="button"
+                  disabled={isSubmitting}
                   onClick={() => handleQuickPreset('ADMIN')}
-                  className="p-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-left transition-colors group shadow-sm"
+                  className="p-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
                   <p className="font-bold text-rose-700 dark:text-rose-300 text-[11px] group-hover:text-rose-600 dark:group-hover:text-rose-200">Mission Control</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">NCPOR Admin (Root)</p>
