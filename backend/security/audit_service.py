@@ -63,7 +63,7 @@ class SecurityAuditLogger:
                 "role": role,
                 "station_id": station_id or "GLOBAL",
                 "action": action,
-                "details": json.dumps(safe_details),
+                "details": safe_details,
                 "client_ip": client_ip or "127.0.0.1",
                 "timestamp": ts
             })

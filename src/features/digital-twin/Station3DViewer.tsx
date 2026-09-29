@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { StationAsset } from '../../types';
 import { api } from '../../services/api';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 import { 
   X, 
   Activity, 
@@ -61,8 +62,8 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
     const height = mountRef.current.clientHeight;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x060B14);
-    scene.fog = new THREE.FogExp2(0x060B14, 0.015);
+    scene.background = new THREE.Color(0x030712);
+    scene.fog = new THREE.FogExp2(0x030712, 0.012);
 
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     camera.position.set(30, 24, 38);
@@ -83,14 +84,14 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
     dirLight.castShadow = true;
     scene.add(dirLight);
 
-    const polarBlueLight = new THREE.PointLight(0x00E5FF, 1.5, 60);
+    const polarBlueLight = new THREE.PointLight(0x22D3EE, 1.2, 60);
     polarBlueLight.position.set(-10, 8, -5);
     scene.add(polarBlueLight);
 
     // Ground plane: Antarctic Ice and Permafrost
     const groundGeo = new THREE.PlaneGeometry(160, 160, 32, 32);
     const groundMat = new THREE.MeshStandardMaterial({
-      color: 0x0A1428,
+      color: 0x080E1A,
       roughness: 0.9,
       metalness: 0.1,
     });
@@ -100,7 +101,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
     scene.add(ground);
 
     // Grid helper
-    const grid = new THREE.GridHelper(120, 24, 0x1E3A5F, 0x0E223D);
+    const grid = new THREE.GridHelper(120, 24, 0x1E293B, 0x0B1220);
     grid.position.y = 0.02;
     scene.add(grid);
 
@@ -321,24 +322,24 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
   }, [assets]);
 
   return (
-    <div className="relative w-full h-[calc(100vh-4rem)] bg-polar-950 overflow-hidden flex">
+    <div className="relative w-full h-[calc(100vh-4rem)] bg-[#030712] overflow-hidden flex font-mono">
       {/* 3D Canvas Mount */}
       <div ref={mountRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
       {/* Top HUD Overlay */}
       <div className="absolute top-4 left-4 z-10 space-y-2 pointer-events-none">
-        <div className="bg-polar-900/90 border border-polar-750 p-3 rounded-lg backdrop-blur-md pointer-events-auto">
-          <div className="flex items-center gap-2 text-xs font-mono text-polar-cyan font-bold">
-            <Layers className="w-4 h-4 text-polar-cyan" />
+        <div className="bg-[#0B1220]/95 border border-[#1E293B] p-3 rounded-lg shadow-lg pointer-events-auto backdrop-blur-md">
+          <div className="flex items-center gap-2 text-xs text-cyan-400 font-bold tracking-wider">
+            <Layers className="w-4 h-4 text-cyan-400" />
             <span>3D PHYSICAL DIGITAL TWIN — {stationId === 'station_bharati' ? 'BHARATI' : 'MAITRI'}</span>
           </div>
-          <p className="text-[11px] font-mono text-slate-400 mt-1">
-            Click any modular unit or equipment bay to inspect live physics telemetry and downstream cascading dependency propagation.
+          <p className="text-[11px] text-slate-400 mt-1 max-w-sm">
+            Select any structural module or mechanical bay to inspect real-time physics telemetry and downstream cascading dependency propagation.
           </p>
-          <div className="flex items-center gap-3 mt-2 text-[10px] font-mono">
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-500" /> NORMAL</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-500" /> WARNING</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500" /> CRITICAL</span>
+          <div className="flex items-center gap-3 mt-2 text-[10px]">
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-emerald-400" /> NORMAL</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-amber-400" /> WARNING</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-rose-500" /> CRITICAL</span>
             <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-slate-500" /> OFFLINE</span>
           </div>
         </div>
@@ -346,39 +347,41 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
 
       {/* Right Asset Inspection Drawer */}
       {selectedAsset && (
-        <div className="absolute top-4 right-4 bottom-4 w-96 bg-polar-900/95 border border-polar-750/90 rounded-xl backdrop-blur-md shadow-2xl flex flex-col z-20 overflow-hidden">
-          <div className="p-4 border-b border-polar-750 flex items-center justify-between">
+        <div className="absolute top-4 right-4 bottom-4 w-96 bg-[#0B1220]/95 border border-[#1E293B] rounded-lg shadow-2xl flex flex-col z-20 overflow-hidden backdrop-blur-md">
+          <div className="p-3.5 bg-[#111827] border-b border-[#1E293B] flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${
                   selectedAsset.status === 'NORMAL' ? 'bg-emerald-400' :
                   selectedAsset.status === 'WARNING' ? 'bg-amber-400 animate-pulse' :
-                  selectedAsset.status === 'CRITICAL' ? 'bg-red-500 animate-ping' : 'bg-slate-400'
+                  selectedAsset.status === 'CRITICAL' ? 'bg-rose-500 animate-ping' : 'bg-slate-400'
                 }`} />
-                <span className="text-xs font-mono font-bold text-white uppercase">{selectedAsset.code}</span>
+                <span className="text-xs font-bold text-white uppercase">{selectedAsset.code}</span>
               </div>
               <h3 className="text-sm font-bold text-slate-100 mt-0.5">{selectedAsset.name}</h3>
             </div>
             <button
               onClick={() => setSelectedAsset(null)}
-              className="text-slate-400 hover:text-white p-1 rounded hover:bg-polar-800"
+              className="text-slate-400 hover:text-white p-1 rounded hover:bg-[#1E293B] transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="p-4 overflow-y-auto space-y-4 flex-1">
+          <div className="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
             {/* Status & Health Header */}
             <div className="grid grid-cols-2 gap-2">
-              <div className="bg-polar-950 p-2.5 rounded border border-polar-800">
-                <span className="text-[10px] font-mono text-slate-500">OPERATIONAL STATUS</span>
-                <div className="text-sm font-mono font-bold text-white mt-1">{selectedAsset.status}</div>
+              <div className="bg-[#111827] p-2.5 rounded border border-[#1E293B]">
+                <span className="text-[10px] text-slate-500 uppercase">Operational Status</span>
+                <div className="mt-1">
+                  <StatusBadge status={selectedAsset.status} size="sm" />
+                </div>
               </div>
-              <div className="bg-polar-950 p-2.5 rounded border border-polar-800">
-                <span className="text-[10px] font-mono text-slate-500">HEALTH SCORE</span>
-                <div className={`text-sm font-mono font-bold mt-1 ${
+              <div className="bg-[#111827] p-2.5 rounded border border-[#1E293B]">
+                <span className="text-[10px] text-slate-500 uppercase">Health Score</span>
+                <div className={`text-base font-bold mt-0.5 ${
                   selectedAsset.health_score > 80 ? 'text-emerald-400' :
-                  selectedAsset.health_score > 50 ? 'text-amber-400' : 'text-red-400'
+                  selectedAsset.health_score > 50 ? 'text-amber-400' : 'text-rose-400'
                 }`}>
                   {selectedAsset.health_score}%
                 </div>
@@ -387,13 +390,13 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
 
             {/* Live Physical Telemetry Readings */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono text-polar-cyan font-semibold">
-                <span>PHYSICAL TELEMETRY STREAM</span>
+              <div className="flex items-center justify-between text-xs text-cyan-400 font-semibold uppercase tracking-wider">
+                <span>Physics Telemetry Stream</span>
                 <ProvenanceBadge type="PHYSICS_SYNTHETIC" />
               </div>
-              <div className="bg-polar-950 p-3 rounded-lg border border-polar-800 space-y-2 text-xs font-mono">
+              <div className="bg-[#111827] p-3 rounded-lg border border-[#1E293B] space-y-2 text-xs">
                 {Object.entries(selectedAsset.current_state || {}).map(([k, v]) => (
-                  <div key={k} className="flex items-center justify-between border-b border-polar-850 pb-1 last:border-0 last:pb-0">
+                  <div key={k} className="flex items-center justify-between border-b border-[#1E293B]/60 pb-1 last:border-0 last:pb-0">
                     <span className="text-slate-400 capitalize">{k.replace(/_/g, ' ')}:</span>
                     <span className="font-semibold text-white">
                       {typeof v === 'number' ? v.toFixed(2) : String(v)}
@@ -405,16 +408,16 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
 
             {/* Downstream Cascade Consequences */}
             {consequences && (
-              <div className="space-y-2 pt-2 border-t border-polar-800">
-                <div className="flex items-center gap-1.5 text-xs font-mono text-amber-400 font-semibold">
+              <div className="space-y-2 pt-2 border-t border-[#1E293B]">
+                <div className="flex items-center gap-1.5 text-xs text-amber-400 font-semibold uppercase tracking-wider">
                   <AlertTriangle className="w-3.5 h-3.5" />
-                  <span>DOWNSTREAM IMPACT ("WHAT IF IT FAILS?")</span>
+                  <span>Downstream Failure Impact</span>
                 </div>
-                <div className="bg-polar-950/90 p-3 rounded-lg border border-polar-800 space-y-2 text-xs font-mono">
+                <div className="bg-[#111827] p-3 rounded-lg border border-[#1E293B] space-y-2 text-xs">
                   {consequences.power_deficit_kw > 0 && (
-                    <div className="flex items-center justify-between text-red-400">
+                    <div className="flex items-center justify-between text-rose-400">
                       <span>Power Deficit:</span>
-                      <strong className="font-mono">-{consequences.power_deficit_kw} kW</strong>
+                      <strong>-{consequences.power_deficit_kw} kW</strong>
                     </div>
                   )}
                   {consequences.thermal_decay_to_5c_hours && (
@@ -434,8 +437,8 @@ export const Station3DViewer: React.FC<Props> = ({ stationId }) => {
           </div>
 
           {/* Footer Provenance */}
-          <div className="p-3 bg-polar-950 border-t border-polar-800 flex items-center justify-between">
-            <span className="text-[10px] font-mono text-slate-500">Source: Physics Differential</span>
+          <div className="p-3 bg-[#111827] border-t border-[#1E293B] flex items-center justify-between text-[10px]">
+            <span className="text-slate-500">Source: Physics Differential Engine</span>
             <ProvenanceBadge type="PHYSICS_SYNTHETIC" />
           </div>
         </div>

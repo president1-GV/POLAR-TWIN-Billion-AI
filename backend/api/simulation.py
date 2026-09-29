@@ -69,10 +69,10 @@ def execute_simulation(
             "station_id": payload.station_id,
             "trigger_asset_id": res["trigger_asset"],
             "severity": res["severity"],
-            "initial_conditions": json.dumps(res["initial_conditions"]),
-            "parameters": json.dumps(res["parameters"]),
-            "consequences": json.dumps(res["consequences"]),
-            "recommendations": json.dumps(res["recommendations"]),
+            "initial_conditions": res["initial_conditions"],
+            "parameters": res["parameters"],
+            "consequences": res["consequences"],
+            "recommendations": res["recommendations"],
             "operator_action": "PENDING_REVIEW"
         })
     except Exception as e:
@@ -141,4 +141,4 @@ def review_mitigation(
 @router.get("/runs")
 def list_simulation_runs(limit: int = 10):
     """List recent scenario execution runs."""
-    return supabase_client.get_table("simulation_runs", {"order": "created_at.desc", "limit": str(limit)})
+    return supabase_client.get_table("simulation_runs", {"order": "started_at.desc", "limit": str(limit)})

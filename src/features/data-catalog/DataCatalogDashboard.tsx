@@ -14,9 +14,12 @@ import {
   Sparkles,
   Search,
   RefreshCw,
-  Terminal
+  Terminal,
+  Copy,
+  Check
 } from 'lucide-react';
-import { api } from '../../services/api';
+import { StatusBadge } from '../../components/ui/StatusBadge';
+import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 
 interface DatasetItem {
   id: string;
@@ -56,6 +59,7 @@ export const DataCatalogDashboard: React.FC = () => {
   const [lineageEdges, setLineageEdges] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filterProv, setFilterProv] = useState<string>('ALL');
+  const [copiedHash, setCopiedHash] = useState<string | null>(null);
 
   // Grounding interactive console state
   const [userQuery, setUserQuery] = useState<string>('What is current Bharati surface temperature, wind speed and lead generator load?');
@@ -215,20 +219,26 @@ export const DataCatalogDashboard: React.FC = () => {
     }
   };
 
+  const copyHash = (hash: string) => {
+    navigator.clipboard.writeText(hash);
+    setCopiedHash(hash);
+    setTimeout(() => setCopiedHash(null), 2000);
+  };
+
   const getProvenanceBadgeStyle = (tier: string) => {
     switch (tier) {
       case 'REAL_NCPOR':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+        return 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40';
       case 'EXTERNAL_ANTARCTIC_BENCHMARK':
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+        return 'bg-amber-950/70 text-amber-300 border-amber-500/40';
       case 'PUBLIC_EXTERNAL':
-        return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+        return 'bg-blue-950/70 text-blue-300 border-blue-500/40';
       case 'SIMULATED':
-        return 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+        return 'bg-purple-950/70 text-purple-300 border-purple-500/40';
       case 'DERIVED':
-        return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30';
+        return 'bg-cyan-950/70 text-cyan-300 border-cyan-500/40';
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
+        return 'bg-slate-800/80 text-slate-300 border-slate-700';
     }
   };
 
@@ -239,15 +249,15 @@ export const DataCatalogDashboard: React.FC = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Title & Provenance Architecture Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-polar-800 pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-polar-border pb-5">
         <div>
           <div className="flex items-center gap-3">
-            <Database className="w-6 h-6 text-polar-cyan" />
-            <h1 className="text-xl font-bold font-mono tracking-tight text-white">
+            <Database className="w-5 h-5 text-cyan-400" />
+            <h1 className="text-xl font-bold font-mono tracking-tight text-slate-100">
               Data Lineage, Provenance & ML Model Registry
             </h1>
-            <span className="px-2.5 py-0.5 text-[10px] font-mono font-semibold rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3" />
+            <span className="px-2.5 py-0.5 text-[10px] font-mono font-semibold rounded bg-emerald-950/70 text-emerald-300 border border-emerald-500/40 flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
               SIH 26060 REPRODUCIBLE
             </span>
           </div>
@@ -259,44 +269,44 @@ export const DataCatalogDashboard: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={loadDataCatalog}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono bg-polar-800 hover:bg-polar-750 text-slate-300 border border-polar-700 transition-all"
+            className="flex items-center gap-2 px-3 py-1.5 rounded text-xs font-mono bg-surface hover:bg-elevated text-slate-200 border border-polar-border transition-all shadow-sm"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            Sync Registry
+            <RefreshCw className={`w-3.5 h-3.5 text-cyan-400 ${loading ? 'animate-spin' : ''}`} />
+            <span>Sync Registry</span>
           </button>
         </div>
       </div>
 
       {/* KPI Highlights */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-4">
+        <div className="polar-panel p-4">
           <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Registered Datasets</div>
-          <div className="text-2xl font-bold font-mono text-white mt-1 flex items-center justify-between">
+          <div className="text-2xl font-bold font-mono text-slate-100 mt-1 flex items-center justify-between">
             {datasets.length}
-            <Database className="w-5 h-5 text-polar-cyan/60" />
+            <Database className="w-5 h-5 text-cyan-400/60" />
           </div>
           <div className="text-[10px] font-mono text-emerald-400 mt-1">100% SHA-256 Verified</div>
         </div>
 
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-4">
+        <div className="polar-panel p-4">
           <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Antarctic AWS Sources</div>
-          <div className="text-2xl font-bold font-mono text-white mt-1 flex items-center justify-between">
+          <div className="text-2xl font-bold font-mono text-slate-100 mt-1 flex items-center justify-between">
             2 Stations
             <Layers className="w-5 h-5 text-blue-400/60" />
           </div>
           <div className="text-[10px] font-mono text-blue-400 mt-1">Bharati + Maitri (REAL_NCPOR)</div>
         </div>
 
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-4">
+        <div className="polar-panel p-4">
           <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">ML Production Models</div>
-          <div className="text-2xl font-bold font-mono text-white mt-1 flex items-center justify-between">
+          <div className="text-2xl font-bold font-mono text-slate-100 mt-1 flex items-center justify-between">
             {models.length}
             <Cpu className="w-5 h-5 text-purple-400/60" />
           </div>
           <div className="text-[10px] font-mono text-purple-400 mt-1">Forecaster + Anomaly + RUL</div>
         </div>
 
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-4">
+        <div className="polar-panel p-4">
           <div className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">Physical Bounds Pass Rate</div>
           <div className="text-2xl font-bold font-mono text-emerald-400 mt-1 flex items-center justify-between">
             100.0%
@@ -307,7 +317,7 @@ export const DataCatalogDashboard: React.FC = () => {
       </div>
 
       {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 border-b border-polar-800">
+      <div className="flex items-center gap-2 border-b border-polar-border overflow-x-auto pb-px">
         {[
           { id: 'datasets', label: 'Dataset Catalog & Provenance', icon: Database },
           { id: 'lineage', label: 'Data Lineage DAG', icon: GitBranch },
@@ -321,13 +331,13 @@ export const DataCatalogDashboard: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-medium border-b-2 transition-all ${
+              className={`flex items-center gap-2 px-4 py-2.5 text-xs font-mono font-medium border-b-2 transition-all whitespace-nowrap ${
                 isActive
-                  ? 'border-polar-cyan text-polar-cyan bg-polar-cyan/5'
+                  ? 'border-cyan-400 text-cyan-400 bg-cyan-950/20'
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className="w-3.5 h-3.5" />
               {tab.label}
             </button>
           );
@@ -338,7 +348,7 @@ export const DataCatalogDashboard: React.FC = () => {
       {activeTab === 'datasets' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-mono text-slate-400">Filter Provenance:</span>
               {['ALL', 'REAL_NCPOR', 'EXTERNAL_ANTARCTIC_BENCHMARK', 'PUBLIC_EXTERNAL', 'SIMULATED'].map(p => (
                 <button
@@ -346,8 +356,8 @@ export const DataCatalogDashboard: React.FC = () => {
                   onClick={() => setFilterProv(p)}
                   className={`px-2.5 py-1 rounded text-[11px] font-mono transition-all ${
                     filterProv === p
-                      ? 'bg-polar-cyan/20 text-polar-cyan border border-polar-cyan/40 font-semibold'
-                      : 'bg-polar-900 text-slate-400 border border-polar-800 hover:text-slate-200'
+                      ? 'bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-semibold'
+                      : 'bg-surface text-slate-400 border border-polar-border hover:text-slate-200'
                   }`}
                 >
                   {p.replace(/_/g, ' ')}
@@ -361,47 +371,65 @@ export const DataCatalogDashboard: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filteredDatasets.map(d => (
-              <div key={d.id} className="bg-polar-900 border border-polar-800 rounded-xl p-5 space-y-4 hover:border-polar-700 transition-all">
+              <div key={d.id} className="polar-panel p-5 space-y-4 hover:border-cyan-500/30 transition-all">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <span className={`px-2 py-0.5 text-[10px] font-mono font-semibold rounded-full border ${getProvenanceBadgeStyle(d.provenance_type)}`}>
+                    <span className={`px-2 py-0.5 text-[10px] font-mono font-semibold rounded border ${getProvenanceBadgeStyle(d.provenance_type)}`}>
                       {d.provenance_type}
                     </span>
-                    <h3 className="text-sm font-bold font-mono text-white mt-2">{d.name}</h3>
+                    <h3 className="text-sm font-bold font-mono text-slate-100 mt-2">{d.name}</h3>
                     <p className="text-xs text-slate-400 font-mono mt-0.5">ID: {d.id}</p>
                   </div>
-                  <span className="text-xs font-mono font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded border border-emerald-500/20">
+                  <span className="text-xs font-mono font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded border border-emerald-500/30">
                     {d.record_count.toLocaleString()} rows
                   </span>
                 </div>
 
-                <div className="space-y-2 text-xs font-mono bg-polar-950/70 p-3 rounded-lg border border-polar-850">
+                <div className="space-y-2 text-xs font-mono bg-surface p-3.5 rounded border border-polar-border">
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Organization:</span>
-                    <span className="text-slate-300 font-medium">{d.source_organization}</span>
+                    <span className="text-slate-400">Organization:</span>
+                    <span className="text-slate-200 font-medium">{d.source_organization}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">Country of Origin:</span>
-                    <span className="text-slate-300">{d.source_country}</span>
+                    <span className="text-slate-400">Country of Origin:</span>
+                    <span className="text-slate-200">{d.source_country}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500">License:</span>
-                    <span className="text-slate-300">{d.license}</span>
+                    <span className="text-slate-400">License:</span>
+                    <span className="text-slate-200">{d.license}</span>
                   </div>
-                  <div className="pt-2 border-t border-polar-800 flex flex-col gap-1">
-                    <span className="text-slate-500 flex items-center gap-1">
-                      <Lock className="w-3 h-3 text-polar-cyan" /> SHA-256 Digest:
-                    </span>
-                    <span className="text-[10px] text-polar-cyan font-mono break-all bg-polar-900 p-1.5 rounded border border-polar-800">
+                  <div className="pt-2 border-t border-polar-border flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span className="flex items-center gap-1">
+                        <Lock className="w-3 h-3 text-cyan-400" /> SHA-256 Digest:
+                      </span>
+                      <button
+                        onClick={() => copyHash(d.sha256_hash)}
+                        className="text-[10px] font-mono text-slate-400 hover:text-cyan-400 flex items-center gap-1 transition-colors"
+                      >
+                        {copiedHash === d.sha256_hash ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <span className="text-[10px] text-cyan-400 font-mono break-all bg-elevated p-2 rounded border border-polar-border">
                       {d.sha256_hash}
                     </span>
                   </div>
                 </div>
 
                 {d.isolation_guarantee && (
-                  <div className="text-[11px] font-mono text-amber-400 bg-amber-500/10 border border-amber-500/20 p-2.5 rounded flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 shrink-0" />
-                    {d.isolation_guarantee}
+                  <div className="text-[11px] font-mono text-amber-300 bg-amber-950/60 border border-amber-500/40 p-2.5 rounded flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                    <span>{d.isolation_guarantee}</span>
                   </div>
                 )}
               </div>
@@ -412,59 +440,59 @@ export const DataCatalogDashboard: React.FC = () => {
 
       {/* TAB 2: DATA LINEAGE DAG */}
       {activeTab === 'lineage' && (
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-6 space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="polar-panel p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-polar-border pb-4">
             <div>
-              <h3 className="text-sm font-bold font-mono text-white flex items-center gap-2">
-                <GitBranch className="w-4 h-4 text-polar-cyan" />
+              <h3 className="text-sm font-bold font-mono text-slate-100 flex items-center gap-2">
+                <GitBranch className="w-4 h-4 text-cyan-400" />
                 End-to-End Data Transformation Directed Acyclic Graph (DAG)
               </h3>
               <p className="text-xs text-slate-400 font-mono mt-1">
                 Visualizes transformation flow: Raw Ingestion → Deduplication/Validation → Feature Engineering → Model Training & Digital Twin State
               </p>
             </div>
-            <span className="text-xs font-mono text-polar-cyan bg-polar-cyan/10 px-2.5 py-1 rounded border border-polar-cyan/20">
+            <span className="text-xs font-mono text-cyan-300 bg-cyan-950/60 px-3 py-1 rounded border border-cyan-500/40 self-start sm:self-auto font-semibold">
               Deterministic Lineage
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Step 1: Raw Collection */}
-            <div className="bg-polar-950 border border-polar-800 rounded-xl p-4 space-y-3">
+            <div className="bg-surface border border-polar-border rounded-lg p-4 space-y-3">
               <div className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1.5 uppercase">
-                <Database className="w-3.5 h-3.5" /> 1. Raw Collection
+                <Database className="w-3.5 h-3.5 text-emerald-400" /> 1. Raw Collection
               </div>
               <div className="space-y-2">
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">NCPOR AWS Gateway</div>
                   <div className="text-[10px] text-emerald-400">[REAL_NCPOR]</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Bharati & Maitri Surface Weather</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Bharati & Maitri Surface Weather</div>
                 </div>
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">AADC Benchmark</div>
                   <div className="text-[10px] text-amber-400">[EXTERNAL_ANTARCTIC_BENCHMARK]</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Davis Station Energy Profile</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Davis Station Energy Profile</div>
                 </div>
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">Copernicus CMEMS</div>
                   <div className="text-[10px] text-blue-400">[PUBLIC_EXTERNAL]</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Southern Ocean Sea Ice Extent</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Southern Ocean Sea Ice Extent</div>
                 </div>
               </div>
             </div>
 
             {/* Step 2: Quality & Cleaning */}
-            <div className="bg-polar-950 border border-polar-800 rounded-xl p-4 space-y-3">
-              <div className="text-[11px] font-mono font-bold text-polar-cyan flex items-center gap-1.5 uppercase">
-                <ShieldCheck className="w-3.5 h-3.5" /> 2. Quality & Bounds
+            <div className="bg-surface border border-polar-border rounded-lg p-4 space-y-3">
+              <div className="text-[11px] font-mono font-bold text-cyan-400 flex items-center gap-1.5 uppercase">
+                <ShieldCheck className="w-3.5 h-3.5 text-cyan-400" /> 2. Quality & Bounds
               </div>
               <div className="space-y-2">
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">Physical Bounds Engine</div>
                   <div className="text-[10px] text-slate-400">Temp: -90°C to +35°C</div>
                   <div className="text-[10px] text-slate-400">Wind: 0 to 120 m/s</div>
                 </div>
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">CDC & Deduplication</div>
                   <div className="text-[10px] text-slate-400">Composite Key Hashing</div>
                   <div className="text-[10px] text-slate-400">UTC Standardization</div>
@@ -473,39 +501,39 @@ export const DataCatalogDashboard: React.FC = () => {
             </div>
 
             {/* Step 3: Feature Engineering */}
-            <div className="bg-polar-950 border border-polar-800 rounded-xl p-4 space-y-3">
+            <div className="bg-surface border border-polar-border rounded-lg p-4 space-y-3">
               <div className="text-[11px] font-mono font-bold text-purple-400 flex items-center gap-1.5 uppercase">
-                <Layers className="w-3.5 h-3.5" /> 3. Physics Coupling
+                <Layers className="w-3.5 h-3.5 text-purple-400" /> 3. Physics Coupling
               </div>
               <div className="space-y-2">
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">Thermal Envelope Loss</div>
                   <div className="text-[10px] text-purple-400">[DERIVED]</div>
-                  <div className="text-[10px] text-slate-500 mt-1">HDH = max(0, 20 - T_amb)</div>
+                  <div className="text-[10px] text-slate-400 mt-1">HDH = max(0, 20 - T_amb)</div>
                 </div>
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">Wind-Chill Convection</div>
                   <div className="text-[10px] text-purple-400">[DERIVED]</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Convective Multiplier: 1 + 0.018*V</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Convective Multiplier: 1 + 0.018*V</div>
                 </div>
               </div>
             </div>
 
             {/* Step 4: ML Models & Digital Twin */}
-            <div className="bg-polar-950 border border-polar-800 rounded-xl p-4 space-y-3">
+            <div className="bg-surface border border-polar-border rounded-lg p-4 space-y-3">
               <div className="text-[11px] font-mono font-bold text-amber-400 flex items-center gap-1.5 uppercase">
-                <Cpu className="w-3.5 h-3.5" /> 4. Models & Twin
+                <Cpu className="w-3.5 h-3.5 text-amber-400" /> 4. Models & Twin
               </div>
               <div className="space-y-2">
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">Energy Forecaster</div>
                   <div className="text-[10px] text-emerald-400">+22.07% over baseline</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Gradient Boosting Regressor</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Gradient Boosting Regressor</div>
                 </div>
-                <div className="bg-polar-900 p-2.5 rounded border border-polar-800 text-xs font-mono">
+                <div className="bg-elevated p-2.5 rounded border border-polar-border text-xs font-mono">
                   <div className="font-bold text-slate-200">Multivariate Anomaly</div>
                   <div className="text-[10px] text-emerald-400">F1: 1.0, ROC-AUC: 1.0</div>
-                  <div className="text-[10px] text-slate-500 mt-1">Mahalanobis + Isolation Forest</div>
+                  <div className="text-[10px] text-slate-400 mt-1">Mahalanobis + Isolation Forest</div>
                 </div>
               </div>
             </div>
@@ -518,42 +546,42 @@ export const DataCatalogDashboard: React.FC = () => {
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {models.map(m => (
-              <div key={m.id} className="bg-polar-900 border border-polar-800 rounded-xl p-5 space-y-4 flex flex-col justify-between">
+              <div key={m.id} className="polar-panel p-5 space-y-4 flex flex-col justify-between hover:border-cyan-500/30 transition-all">
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-purple-950/70 text-purple-300 border border-purple-500/40 font-semibold">
                       {m.task_type}
                     </span>
                     <span className="text-[10px] font-mono text-slate-400">{m.version}</span>
                   </div>
 
-                  <h3 className="text-sm font-bold font-mono text-white mt-3">{m.name}</h3>
-                  <div className="text-xs font-mono text-slate-400 mt-1">Framework: {m.framework}</div>
-                  <div className="text-xs font-mono text-slate-400">Target: {m.target_metric}</div>
+                  <h3 className="text-sm font-bold font-mono text-slate-100 mt-3">{m.name}</h3>
+                  <div className="text-xs font-mono text-slate-400 mt-1">Framework: <strong className="text-slate-300">{m.framework}</strong></div>
+                  <div className="text-xs font-mono text-slate-400">Target: <strong className="text-cyan-400">{m.target_metric}</strong></div>
 
-                  <div className="mt-4 p-3 bg-polar-950 rounded-lg border border-polar-800 space-y-2 text-xs font-mono">
-                    <div className="font-semibold text-slate-300 border-b border-polar-800 pb-1">
+                  <div className="mt-4 p-3 bg-surface rounded border border-polar-border space-y-2 text-xs font-mono">
+                    <div className="font-semibold text-slate-200 border-b border-polar-border pb-1">
                       Evaluation Metrics:
                     </div>
                     {Object.entries(m.evaluation_metrics).map(([k, v]: [string, any]) => (
                       <div key={k} className="flex justify-between">
-                        <span className="text-slate-500">{k}:</span>
+                        <span className="text-slate-400">{k}:</span>
                         <span className="text-emerald-400 font-semibold">{v}</span>
                       </div>
                     ))}
                   </div>
 
                   {m.passed_10pct_superiority && (
-                    <div className="mt-3 p-2 bg-emerald-500/10 border border-emerald-500/20 rounded text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
-                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                      Passed Acceptance Criteria: &gt;= 10% MAE improvement over baseline
+                    <div className="mt-3 p-2 bg-emerald-950/60 border border-emerald-500/40 rounded text-[11px] font-mono text-emerald-300 flex items-center gap-1.5">
+                      <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-400" />
+                      <span>Passed Acceptance Criteria: &gt;= 10% MAE improvement over baseline</span>
                     </div>
                   )}
                 </div>
 
-                <div className="pt-3 border-t border-polar-800 text-[10px] font-mono text-slate-500 flex flex-col gap-1">
-                  <div>Risk Level: <span className="text-amber-400">{m.disclosure_risk_level}</span></div>
-                  <div className="text-slate-600 truncate">Artifact: {m.artifact_path}</div>
+                <div className="pt-3 border-t border-polar-border text-[10px] font-mono text-slate-400 flex flex-col gap-1">
+                  <div>Risk Level: <span className="text-amber-400 font-semibold">{m.disclosure_risk_level}</span></div>
+                  <div className="text-slate-500 truncate">Artifact: {m.artifact_path}</div>
                 </div>
               </div>
             ))}
@@ -563,10 +591,10 @@ export const DataCatalogDashboard: React.FC = () => {
 
       {/* TAB 4: QUALITY AUDITS */}
       {activeTab === 'quality' && (
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-6 space-y-6">
-          <div className="flex items-center justify-between">
+        <div className="polar-panel p-6 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-polar-border pb-4">
             <div>
-              <h3 className="text-sm font-bold font-mono text-white flex items-center gap-2">
+              <h3 className="text-sm font-bold font-mono text-slate-100 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 Antarctic Physical Quality Engine Audit Report
               </h3>
@@ -574,23 +602,23 @@ export const DataCatalogDashboard: React.FC = () => {
                 Verifies range plausibility, timestamp monotonicity, and absence of null corruption across operational telemetry
               </p>
             </div>
-            <span className="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/30 font-semibold flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5" /> AUDIT STATUS: PASSED
+            <span className="text-xs font-mono text-emerald-300 bg-emerald-950/60 px-3 py-1 rounded border border-emerald-500/40 font-semibold flex items-center gap-1.5 self-start sm:self-auto">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> AUDIT STATUS: PASSED
             </span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-xs font-mono">
               <thead>
-                <tr className="border-b border-polar-800 text-left text-slate-400">
+                <tr className="border-b border-polar-border text-left text-slate-400 text-[10px] uppercase">
                   <th className="py-2.5">Metric Name</th>
                   <th className="py-2.5">Physical Bound (Min, Max)</th>
                   <th className="py-2.5">Null Rate</th>
                   <th className="py-2.5">Outlier Count</th>
-                  <th className="py-2.5">Status</th>
+                  <th className="py-2.5">Audit Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-polar-850">
+              <tbody className="divide-y divide-polar-border/60">
                 {[
                   { name: 'temperature_c', bounds: '[-90.0°C, +35.0°C]', nulls: '0.0%', outliers: '0 (Normal)', status: 'VALID' },
                   { name: 'wind_speed_ms', bounds: '[0.0, 120.0 m/s]', nulls: '0.0%', outliers: '2 (Blizzard Katabatic)', status: 'VALID' },
@@ -600,13 +628,17 @@ export const DataCatalogDashboard: React.FC = () => {
                   { name: 'vibration_rms_mms', bounds: '[0.0, 25.0 mm/s]', nulls: '0.0%', outliers: '1 (Mechanical Anomaly)', status: 'FLAGGED_TEST' },
                   { name: 'exhaust_temp_c', bounds: '[15.0°C, 650.0°C]', nulls: '0.0%', outliers: '0 (Normal)', status: 'VALID' },
                 ].map(row => (
-                  <tr key={row.name} className="hover:bg-polar-850/40">
-                    <td className="py-2.5 font-semibold text-slate-200">{row.name}</td>
-                    <td className="py-2.5 text-slate-400">{row.bounds}</td>
-                    <td className="py-2.5 text-emerald-400">{row.nulls}</td>
-                    <td className="py-2.5 text-slate-400">{row.outliers}</td>
-                    <td className="py-2.5">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <tr key={row.name} className="hover:bg-elevated/40 transition-colors">
+                    <td className="py-3 font-semibold text-slate-200">{row.name}</td>
+                    <td className="py-3 text-slate-400">{row.bounds}</td>
+                    <td className="py-3 text-emerald-400 font-semibold">{row.nulls}</td>
+                    <td className="py-3 text-slate-400">{row.outliers}</td>
+                    <td className="py-3">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                        row.status === 'VALID' 
+                          ? 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40' 
+                          : 'bg-amber-950/70 text-amber-300 border-amber-500/40'
+                      }`}>
                         {row.status}
                       </span>
                     </td>
@@ -620,10 +652,10 @@ export const DataCatalogDashboard: React.FC = () => {
 
       {/* TAB 5: LLM EVIDENCE GROUNDING CONSOLE */}
       {activeTab === 'grounding' && (
-        <div className="bg-polar-900 border border-polar-800 rounded-xl p-6 space-y-6">
-          <div>
-            <h3 className="text-sm font-bold font-mono text-white flex items-center gap-2">
-              <Terminal className="w-4 h-4 text-polar-cyan" />
+        <div className="polar-panel p-6 space-y-6">
+          <div className="border-b border-polar-border pb-4">
+            <h3 className="text-sm font-bold font-mono text-slate-100 flex items-center gap-2">
+              <Terminal className="w-4 h-4 text-cyan-400" />
               Sovereign Evidence-Grounding Console (Zero-Hallucination Guardrail)
             </h3>
             <p className="text-xs text-slate-400 font-mono mt-1">
@@ -631,40 +663,40 @@ export const DataCatalogDashboard: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={userQuery}
               onChange={(e) => setUserQuery(e.target.value)}
               placeholder="Enter operational question..."
-              className="flex-1 bg-polar-950 border border-polar-750 rounded-lg px-4 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-polar-cyan"
+              className="flex-1 bg-surface border border-polar-border rounded px-4 py-2.5 text-xs font-mono text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-400"
             />
             <button
               onClick={handleExecuteGroundedQuery}
               disabled={queryLoading}
-              className="px-4 py-2.5 bg-polar-600 hover:bg-polar-500 text-white rounded-lg text-xs font-mono font-semibold transition-all flex items-center gap-2"
+              className="px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded text-xs font-mono font-bold transition-all flex items-center justify-center gap-2 shadow-sm shrink-0"
             >
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-slate-950" />
               {queryLoading ? 'Retrieving Evidence...' : 'Query Database Evidence'}
             </button>
           </div>
 
           {groundedResponse && (
-            <div className="space-y-4 pt-4 border-t border-polar-800">
+            <div className="space-y-4 pt-4 border-t border-polar-border">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono text-slate-400">
-                  Grounded Evidence Records Found: <strong className="text-emerald-400">{groundedResponse.evidence_record_count}</strong>
+                  Grounded Evidence Records Found: <strong className="text-emerald-400 font-semibold">{groundedResponse.evidence_record_count}</strong>
                 </span>
-                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-[10px] font-mono text-emerald-300 bg-emerald-950/70 px-2 py-0.5 rounded border border-emerald-500/40">
                   PROVENANCE_ATTACHED
                 </span>
               </div>
 
-              <div className="bg-polar-950 p-4 rounded-xl border border-polar-800 font-mono text-xs space-y-3">
-                <div className="text-slate-400 font-semibold border-b border-polar-800 pb-2">
+              <div className="bg-surface p-4 rounded border border-polar-border font-mono text-xs space-y-3">
+                <div className="text-slate-300 font-semibold border-b border-polar-border pb-2">
                   Constructed Evidence Packet (Sent to LLM Context):
                 </div>
-                <pre className="text-[11px] text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-80">
+                <pre className="text-[11px] text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-80 font-mono">
                   {groundedResponse.grounded_prompt}
                 </pre>
               </div>

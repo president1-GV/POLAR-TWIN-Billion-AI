@@ -6,6 +6,16 @@ import json
 import time
 from typing import Dict, Any, Optional, Tuple
 
+# Auto-load .env if available
+env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env")
+if os.path.exists(env_path):
+    with open(env_path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ.setdefault(k.strip(), v.strip())
+
 # Secure secret key from environment or cryptographically generated fallback
 SECRET_KEY = os.getenv("POLAR_TWIN_JWT_SECRET", "polar-twin-zero-trust-secret-key-antigravity-2026-sih26060-production-hardened")
 SALT_LENGTH = 16

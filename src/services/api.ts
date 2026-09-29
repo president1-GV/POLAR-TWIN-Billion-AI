@@ -1,11 +1,14 @@
 import { Station, StationAsset, EnvironmentObservation, Alert, LogisticsItem, Shipment, EdgeStatus } from '../types';
 
 const API_BASE = '/api';
-const SUPABASE_URL = 'https://fpoxnocbznagepusczkk.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwb3hub2Niem5hZ2VwdXNjemtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1NTMyNTMsImV4cCI6MjEwNjEyOTI1M30.Np8y0hopJxoTHHY587rKDhKB0Jk6m95SxoS8owCL6qY';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://fpoxnocbznagepusczkk.supabase.co';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
-// Helper for direct Supabase PostgREST queries
+// Helper for direct Supabase PostgREST queries (only when anon key provided)
 async function supabaseFetch(endpoint: string, options: RequestInit = {}): Promise<any> {
+  if (!SUPABASE_ANON_KEY) {
+    throw new Error('Supabase client-side anon key not configured');
+  }
   const headers = {
     'apikey': SUPABASE_ANON_KEY,
     'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,

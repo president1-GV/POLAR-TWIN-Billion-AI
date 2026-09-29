@@ -75,7 +75,7 @@ def update_asset_telemetry(
     require_station_access(station_id, current_user)
 
     curr = asset.get("current_state", {}) or {}
-    updates_dict = {k: v for k, v in payload.dict().items() if v is not None}
+    updates_dict = payload.model_dump(exclude_unset=True)
     curr.update(updates_dict)
 
     # Run AI evaluation

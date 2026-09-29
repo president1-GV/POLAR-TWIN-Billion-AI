@@ -5,13 +5,11 @@ import {
   Layers, 
   Wind, 
   Ship, 
-  Radio, 
-  Maximize2, 
-  Eye, 
   Navigation,
-  Activity,
-  Zap,
-  Thermometer
+  Plus,
+  Minus,
+  RotateCcw,
+  ExternalLink
 } from 'lucide-react';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
 
@@ -29,21 +27,16 @@ export const AntarcticGISMap: React.FC<Props> = ({
   const [showSeaIce, setShowSeaIce] = useState(true);
   const [showWinds, setShowWinds] = useState(true);
   const [showLogistics, setShowLogistics] = useState(true);
-  const [hoveredStation, setHoveredStation] = useState<string | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1);
 
-  // Geo points mapped to polar orthographic SVG viewbox (800 x 500)
-  // Center is approx South Pole (90°S).
-  // Maitri: 70.767°S, 11.733°E -> Top-left quadrant
-  // Bharati: 69.407°S, 76.195°E -> Top-right quadrant
-  // Dakshin Gangotri: 70.09°S, 12.00°E -> Near Maitri
   const stations = [
     {
       id: 'station_bharati',
       name: 'Bharati Antarctic Station',
       code: 'BHARATI',
       region: 'Larsemann Hills, Princess Elizabeth Land',
-      coords: '69.407°S, 76.195°E',
-      elevation: '35m a.s.l.',
+      coords: '69.408° S, 76.187° E',
+      elevation: '35 m a.s.l.',
       status: 'ACTIVE',
       cx: 560,
       cy: 230,
@@ -58,8 +51,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
       name: 'Maitri Antarctic Station',
       code: 'MAITRI',
       region: 'Schirmacher Oasis, Queen Maud Land',
-      coords: '70.767°S, 11.733°E',
-      elevation: '117m a.s.l.',
+      coords: '70.766° S, 11.740° E',
+      elevation: '117 m a.s.l.',
       status: 'ACTIVE',
       cx: 260,
       cy: 215,
@@ -71,12 +64,12 @@ export const AntarcticGISMap: React.FC<Props> = ({
     },
     {
       id: 'station_dg',
-      name: 'Dakshin Gangotri (Historical / Storage)',
+      name: 'Dakshin Gangotri (Historical / Storage Depot)',
       code: 'DG-01',
-      region: 'Wohlthat Mountains Shelf',
-      coords: '70.09°S, 12.00°E',
-      elevation: '15m a.s.l.',
-      status: 'SUBMERGED_HISTORICAL',
+      region: 'Wohlthat Mountains Ice Shelf',
+      coords: '70.090° S, 12.000° E',
+      elevation: '15 m a.s.l.',
+      status: 'SUBMERGED_DEPOT',
       cx: 275,
       cy: 200,
       health: 0.0,
@@ -87,82 +80,111 @@ export const AntarcticGISMap: React.FC<Props> = ({
     },
   ];
 
+  const handleZoomIn = () => setZoomLevel((z) => Math.min(1.6, z + 0.15));
+  const handleZoomOut = () => setZoomLevel((z) => Math.max(0.85, z - 0.15));
+  const handleResetZoom = () => setZoomLevel(1);
+
   return (
-    <div className="polar-panel overflow-hidden border border-polar-750">
+    <div className="bg-[#0B1220] border-t border-[#1E293B] overflow-hidden font-mono">
       {/* GIS Header Toolbar */}
-      <div className="polar-panel-header bg-polar-900 border-b border-polar-750 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <div className="flex items-center gap-2 font-mono text-xs font-bold text-white uppercase tracking-wider">
-            <Compass className="w-4 h-4 text-polar-cyan" />
-            <span>ANTARCTIC GEOSPATIAL & INFRASTRUCTURE SITUATIONAL MAP</span>
-          </div>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-polar-800 text-slate-400 border border-polar-700">
-            PostGIS EPSG:3031 Polar Stereographic
+      <div className="bg-[#111827] border-b border-[#1E293B] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-2.5">
+          <Compass className="w-4 h-4 text-cyan-400" />
+          <span className="font-bold text-white uppercase tracking-wider">
+            POLAR GEOSPATIAL OPERATIONS VIEW
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-[#030712] text-slate-400 border border-[#1E293B]">
+            EPSG:3031 Polar Stereographic
           </span>
         </div>
 
+        {/* Layer Toggles & Zoom Controls */}
         <div className="flex items-center gap-3">
-          {/* Layer toggles */}
-          <div className="hidden md:flex items-center gap-2 text-xs font-mono">
+          <div className="flex items-center gap-1.5 text-[11px]">
             <button
               onClick={() => setShowSeaIce(!showSeaIce)}
-              className={`px-2.5 py-1 rounded border text-[11px] transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 ${
                 showSeaIce 
-                  ? 'bg-cyan-950/60 border-cyan-500/50 text-cyan-300' 
-                  : 'bg-polar-850 border-polar-750 text-slate-500 hover:text-slate-300'
+                  ? 'bg-sky-950/60 border-sky-500/40 text-sky-300' 
+                  : 'bg-[#030712] border-[#1E293B] text-slate-500 hover:text-slate-300'
               }`}
             >
               <Layers className="w-3 h-3" />
-              Sea Ice Pack
+              <span>Sea Ice Pack</span>
             </button>
             <button
               onClick={() => setShowWinds(!showWinds)}
-              className={`px-2.5 py-1 rounded border text-[11px] transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 ${
                 showWinds 
-                  ? 'bg-blue-950/60 border-blue-500/50 text-blue-300' 
-                  : 'bg-polar-850 border-polar-750 text-slate-500 hover:text-slate-300'
+                  ? 'bg-blue-950/60 border-blue-500/40 text-blue-300' 
+                  : 'bg-[#030712] border-[#1E293B] text-slate-500 hover:text-slate-300'
               }`}
             >
               <Wind className="w-3 h-3" />
-              Katabatic Streams
+              <span>Katabatic Flow</span>
             </button>
             <button
               onClick={() => setShowLogistics(!showLogistics)}
-              className={`px-2.5 py-1 rounded border text-[11px] transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 py-1 rounded border transition-colors flex items-center gap-1.5 ${
                 showLogistics 
-                  ? 'bg-amber-950/60 border-amber-500/50 text-amber-300' 
-                  : 'bg-polar-850 border-polar-750 text-slate-500 hover:text-slate-300'
+                  ? 'bg-amber-950/60 border-amber-500/40 text-amber-300' 
+                  : 'bg-[#030712] border-[#1E293B] text-slate-500 hover:text-slate-300'
               }`}
             >
               <Ship className="w-3 h-3" />
-              Supply Corridors
+              <span>Supply Corridors</span>
             </button>
           </div>
+
+          {/* Zoom controls */}
+          <div className="hidden sm:flex items-center bg-[#030712] rounded border border-[#1E293B] p-0.5">
+            <button
+              onClick={handleZoomIn}
+              title="Zoom In"
+              className="p-1 text-slate-400 hover:text-white transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              title="Zoom Out"
+              className="p-1 text-slate-400 hover:text-white transition-colors border-l border-r border-[#1E293B]"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={handleResetZoom}
+              title="Reset Zoom"
+              className="p-1 text-slate-400 hover:text-white transition-colors text-[10px] px-1.5"
+            >
+              <RotateCcw className="w-3 h-3" />
+            </button>
+          </div>
+
           <ProvenanceBadge type="REAL_PUBLIC" provider="NCPOR / PostGIS" />
         </div>
       </div>
 
       {/* Map Canvas / SVG Viewport */}
-      <div className="relative w-full h-[360px] bg-gradient-to-b from-polar-950 via-polar-900 to-polar-950 flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[380px] bg-[#030712] flex items-center justify-center overflow-hidden">
         <svg
           viewBox="0 0 800 460"
-          className="w-full h-full select-none"
-          style={{ filter: 'drop-shadow(0 0 20px rgba(0, 229, 255, 0.05))' }}
+          className="w-full h-full select-none transition-transform duration-300 ease-out"
+          style={{ transform: `scale(${zoomLevel})` }}
         >
           <defs>
-            {/* Gradients */}
+            {/* Scientific Continent Shader */}
             <radialGradient id="continentGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#0B2B47" stopOpacity="0.8" />
-              <stop offset="60%" stopColor="#081E33" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#030E1A" stopOpacity="0.2" />
+              <stop offset="0%" stopColor="#0E1B31" stopOpacity="0.9" />
+              <stop offset="60%" stopColor="#0B1628" stopOpacity="0.75" />
+              <stop offset="100%" stopColor="#030712" stopOpacity="0.3" />
             </radialGradient>
             <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#00E5FF" stopOpacity="0.8" />
+              <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.75" />
+              <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.75" />
             </linearGradient>
             <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00E5FF" strokeWidth="0.5" strokeOpacity="0.08" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" strokeWidth="0.5" strokeOpacity="0.35" />
             </pattern>
           </defs>
 
@@ -170,98 +192,87 @@ export const AntarcticGISMap: React.FC<Props> = ({
           <rect width="800" height="460" fill="url(#gridPattern)" />
 
           {/* Latitude Concentric Rings (60°S, 70°S, 80°S) */}
-          <circle cx="400" cy="270" r="230" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeDasharray="3 4" strokeOpacity="0.15" />
-          <circle cx="400" cy="270" r="160" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeDasharray="3 4" strokeOpacity="0.2" />
-          <circle cx="400" cy="270" r="90" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeDasharray="3 4" strokeOpacity="0.25" />
-          <circle cx="400" cy="270" r="3" fill="#00E5FF" opacity="0.6" />
-          <text x="408" y="274" fill="#94A3B8" fontSize="9" fontFamily="monospace" opacity="0.6">90°S SOUTH POLE</text>
-          <text x="565" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.5">80°S</text>
-          <text x="635" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.5">70°S</text>
+          <circle cx="400" cy="270" r="230" fill="none" stroke="#334155" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.4" />
+          <circle cx="400" cy="270" r="160" fill="none" stroke="#334155" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.5" />
+          <circle cx="400" cy="270" r="90" fill="none" stroke="#334155" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.6" />
+          <circle cx="400" cy="270" r="3" fill="#38BDF8" opacity="0.6" />
+          <text x="408" y="274" fill="#94A3B8" fontSize="8" fontFamily="monospace" opacity="0.7">90°S SOUTH POLE</text>
+          <text x="565" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">80°S</text>
+          <text x="635" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">70°S</text>
 
-          {/* Sea Ice Margin (Contour) */}
+          {/* Sea Ice Margin */}
           {showSeaIce && (
             <path
               d="M 120 180 Q 200 120, 400 110 Q 600 120, 700 200 Q 730 330, 580 390 Q 420 420, 240 380 Q 90 300, 120 180 Z"
-              fill="#06B6D4"
-              fillOpacity="0.04"
-              stroke="#06B6D4"
-              strokeWidth="1.2"
+              fill="#0284C7"
+              fillOpacity="0.03"
+              stroke="#0284C7"
+              strokeWidth="1"
               strokeDasharray="4 4"
-              strokeOpacity="0.3"
+              strokeOpacity="0.25"
             />
           )}
 
-          {/* Stylized Antarctic Coastline Shape (EPSG:3031 Representation) */}
+          {/* Antarctic Continent Outline (EPSG:3031 Representation) */}
           <path
             d="M 180 230 C 210 170, 310 150, 400 160 C 470 150, 550 170, 600 210 C 660 250, 670 320, 580 360 C 510 390, 440 370, 360 380 C 260 370, 190 320, 170 270 C 160 250, 170 240, 180 230 Z"
             fill="url(#continentGlow)"
-            stroke="#00E5FF"
-            strokeWidth="1.8"
-            strokeOpacity="0.5"
+            stroke="#38BDF8"
+            strokeWidth="1.2"
+            strokeOpacity="0.45"
           />
 
           {/* Antarctic Peninsula Extension */}
           <path
             d="M 230 180 Q 190 120, 180 80 Q 195 90, 220 130 Q 245 160, 250 180 Z"
-            fill="#081E33"
-            stroke="#00E5FF"
-            strokeWidth="1.2"
-            strokeOpacity="0.4"
+            fill="#0B1628"
+            stroke="#38BDF8"
+            strokeWidth="1"
+            strokeOpacity="0.35"
           />
           <text x="130" y="85" fill="#64748B" fontSize="8" fontFamily="monospace">ANTARCTIC PENINSULA</text>
 
-          {/* Ice Shelves: Ross & Ronne-Filchner */}
-          <path d="M 330 360 Q 400 380, 450 360" fill="none" stroke="#38BDF8" strokeWidth="1.5" strokeDasharray="2 3" strokeOpacity="0.4" />
+          {/* Ice Shelves */}
+          <path d="M 330 360 Q 400 380, 450 360" fill="none" stroke="#60A5FA" strokeWidth="1" strokeDasharray="2 3" strokeOpacity="0.3" />
           <text x="350" y="395" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">ROSS ICE SHELF</text>
 
           {/* Katabatic Wind Vectors */}
           {showWinds && (
-            <g stroke="#38BDF8" strokeWidth="1" strokeOpacity="0.35" fill="none">
-              <path d="M 400 270 Q 470 250, 540 240" markerEnd="url(#arrow)" strokeDasharray="3 3" />
-              <path d="M 400 270 Q 330 240, 280 225" markerEnd="url(#arrow)" strokeDasharray="3 3" />
-              <path d="M 400 270 Q 410 320, 420 360" markerEnd="url(#arrow)" strokeDasharray="3 3" />
-              <path d="M 400 270 Q 360 310, 300 350" markerEnd="url(#arrow)" strokeDasharray="3 3" />
-              <text x="470" y="240" fill="#38BDF8" fontSize="8" fontFamily="monospace" opacity="0.6">KATABATIC RUNOFF →</text>
+            <g stroke="#38BDF8" strokeWidth="0.8" strokeOpacity="0.3" fill="none">
+              <path d="M 400 270 Q 470 250, 540 240" strokeDasharray="3 3" />
+              <path d="M 400 270 Q 330 240, 280 225" strokeDasharray="3 3" />
+              <path d="M 400 270 Q 410 320, 420 360" strokeDasharray="3 3" />
+              <path d="M 400 270 Q 360 310, 300 350" strokeDasharray="3 3" />
+              <text x="470" y="240" fill="#38BDF8" fontSize="8" fontFamily="monospace" opacity="0.5">KATABATIC DRAINAGE →</text>
             </g>
           )}
 
-          {/* Maritime Supply Corridor from Cape Town to Bharati & Maitri */}
+          {/* Maritime Supply Corridors */}
           {showLogistics && (
             <g>
-              {/* Route to Maitri */}
               <path
                 d="M 320 20 Q 280 100, 260 215"
                 fill="none"
                 stroke="url(#routeGrad)"
-                strokeWidth="1.8"
+                strokeWidth="1.2"
                 strokeDasharray="4 4"
-                className="animate-pulse"
               />
-              {/* Route to Bharati */}
               <path
                 d="M 450 20 Q 520 120, 560 230"
                 fill="none"
                 stroke="url(#routeGrad)"
-                strokeWidth="1.8"
+                strokeWidth="1.2"
                 strokeDasharray="4 4"
-                className="animate-pulse"
               />
-              <text x="340" y="30" fill="#F59E0B" fontSize="9" fontFamily="monospace" fontWeight="bold">
-                ▲ FROM CAPE TOWN (MV VASILIY GOLOVNIN)
-              </text>
-              <text x="515" y="150" fill="#F59E0B" fontSize="8" fontFamily="monospace" opacity="0.8">
-                PRYDZ BAY CORRIDOR
-              </text>
-              <text x="210" y="140" fill="#F59E0B" fontSize="8" fontFamily="monospace" opacity="0.8">
-                INDIA BAY APPROACH
+              <text x="340" y="30" fill="#F59E0B" fontSize="8" fontFamily="monospace" opacity="0.85">
+                ▲ RESUPPLY CORRIDOR (CAPE TOWN / GOA)
               </text>
             </g>
           )}
 
-          {/* Station Pins */}
+          {/* Interactive Stations */}
           {stations.map((st) => {
             const isSelected = selectedStationId === st.id;
-            const isHovered = hoveredStation === st.id;
             const isDG = st.id === 'station_dg';
 
             return (
@@ -269,63 +280,53 @@ export const AntarcticGISMap: React.FC<Props> = ({
                 key={st.id}
                 className="cursor-pointer transition-all"
                 onClick={() => onSelectStation(st.id)}
-                onMouseEnter={() => setHoveredStation(st.id)}
-                onMouseLeave={() => setHoveredStation(null)}
               >
-                {/* Radar Pulse Ring for Active Selected Stations */}
-                {isSelected && st.status === 'ACTIVE' && (
+                {/* Highlight Circle on Selection */}
+                {isSelected && (
                   <circle
                     cx={st.cx}
                     cy={st.cy}
-                    r="18"
+                    r="12"
                     fill="none"
-                    stroke="#00E5FF"
-                    strokeWidth="1.5"
-                    className="animate-ping"
-                    opacity="0.4"
+                    stroke="#22D3EE"
+                    strokeWidth="1.2"
+                    strokeDasharray="2 2"
+                    className="animate-spin"
+                    style={{ transformOrigin: `${st.cx}px ${st.cy}px`, animationDuration: '8s' }}
                   />
                 )}
-
-                {/* Base Outer Ring */}
-                <circle
-                  cx={st.cx}
-                  cy={st.cy}
-                  r={isSelected ? 10 : 8}
-                  fill={isDG ? '#475569' : isSelected ? '#00E5FF' : '#1E293B'}
-                  stroke={isDG ? '#64748B' : isSelected ? '#FFFFFF' : '#00E5FF'}
-                  strokeWidth="2"
-                  opacity={isDG ? 0.6 : 1}
-                />
 
                 {/* Core Dot */}
                 <circle
                   cx={st.cx}
                   cy={st.cy}
-                  r="4"
-                  fill={isDG ? '#94A3B8' : isSelected ? '#030E1A' : '#10B981'}
+                  r={isSelected ? '5' : '4'}
+                  fill={isDG ? '#64748B' : isSelected ? '#22D3EE' : '#10B981'}
+                  stroke="#030712"
+                  strokeWidth="1.5"
                 />
 
                 {/* Station Callout Label */}
-                <g transform={`translate(${st.cx + 12}, ${st.cy - 12})`}>
+                <g transform={`translate(${st.cx + 10}, ${st.cy - 12})`}>
                   <rect
                     x="0"
                     y="0"
-                    width={st.isPrimary ? 130 : 110}
-                    height={st.isPrimary ? 44 : 26}
-                    rx="4"
-                    fill="#0B132B"
-                    fillOpacity="0.92"
-                    stroke={isSelected ? '#00E5FF' : '#334155'}
-                    strokeWidth={isSelected ? '1.5' : '1'}
+                    width={st.isPrimary ? 120 : 100}
+                    height={st.isPrimary ? 38 : 22}
+                    rx="3"
+                    fill="#0B1220"
+                    fillOpacity="0.95"
+                    stroke={isSelected ? '#22D3EE' : '#1E293B'}
+                    strokeWidth={isSelected ? '1.2' : '1'}
                   />
-                  <text x="8" y="14" fill="#FFFFFF" fontSize="10" fontFamily="monospace" fontWeight="bold">
+                  <text x="7" y="13" fill="#F8FAFC" fontSize="9" fontFamily="monospace" fontWeight="bold">
                     {st.code}
                   </text>
-                  <text x="8" y="24" fill={st.status === 'ACTIVE' ? '#10B981' : '#94A3B8'} fontSize="8" fontFamily="monospace">
-                    ● {st.status} {st.isPrimary && `• H:${st.health}%`}
+                  <text x="7" y="23" fill={st.status === 'ACTIVE' ? '#10B981' : '#64748B'} fontSize="8" fontFamily="monospace">
+                    ● {st.status === 'ACTIVE' ? 'OPERATIONAL' : 'SUBMERGED'}
                   </text>
                   {st.isPrimary && (
-                    <text x="8" y="36" fill="#94A3B8" fontSize="8" fontFamily="monospace">
+                    <text x="7" y="33" fill="#94A3B8" fontSize="8" fontFamily="monospace">
                       {st.temp}°C | {st.power}
                     </text>
                   )}
@@ -337,61 +338,61 @@ export const AntarcticGISMap: React.FC<Props> = ({
 
         {/* Selected Station Floating Quick-Action Card */}
         {selectedStationId && (
-          <div className="absolute bottom-3 left-3 bg-polar-900/95 border border-polar-750 p-3 rounded-lg shadow-xl backdrop-blur-md max-w-sm">
-            <div className="flex items-center justify-between gap-2 border-b border-polar-800 pb-2 mb-2">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-polar-cyan" />
-                <span className="font-mono text-xs font-bold text-white uppercase">
-                  {stations.find(s => s.id === selectedStationId)?.name}
+          <div className="absolute bottom-3 left-3 bg-[#0B1220]/95 border border-[#1E293B] p-3 rounded-lg shadow-xl backdrop-blur-md max-w-sm font-mono text-xs">
+            <div className="flex items-center justify-between gap-2 border-b border-[#1E293B] pb-2 mb-2">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                <span className="font-bold text-white uppercase">
+                  {stations.find((s) => s.id === selectedStationId)?.name}
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-emerald-400 font-semibold">
-                POSTGIS VERIFIED
+              <span className="text-[10px] text-emerald-400 font-semibold">
+                ACTIVE
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mb-3">
+            <div className="grid grid-cols-2 gap-1.5 text-[11px] mb-3 text-slate-300">
               <div>
                 <span className="text-slate-500">Region: </span>
-                <span className="text-slate-300">{stations.find(s => s.id === selectedStationId)?.region}</span>
+                <span className="truncate block">{stations.find((s) => s.id === selectedStationId)?.region.split(',')[0]}</span>
               </div>
               <div>
                 <span className="text-slate-500">Elevation: </span>
-                <span className="text-polar-cyan">{stations.find(s => s.id === selectedStationId)?.elevation}</span>
+                <span>{stations.find((s) => s.id === selectedStationId)?.elevation}</span>
               </div>
               <div>
                 <span className="text-slate-500">Coordinates: </span>
-                <span className="text-slate-300">{stations.find(s => s.id === selectedStationId)?.coords}</span>
+                <span>{stations.find((s) => s.id === selectedStationId)?.coords}</span>
               </div>
               <div>
                 <span className="text-slate-500">Microgrid Bus: </span>
-                <span className="text-amber-400">{stations.find(s => s.id === selectedStationId)?.power}</span>
+                <span className="text-amber-400">{stations.find((s) => s.id === selectedStationId)?.power}</span>
               </div>
             </div>
 
             <button
               onClick={() => onNavigateToTwin(selectedStationId)}
-              className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-polar-600 hover:bg-polar-500 text-white text-xs font-mono font-bold transition-all shadow"
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded bg-sky-950/70 hover:bg-sky-900/70 border border-sky-500/40 text-sky-200 text-xs font-semibold transition-colors"
             >
-              <Navigation className="w-3.5 h-3.5 text-cyan-300" />
-              <span>Enter 3D Spatial Twin ({stations.find(s => s.id === selectedStationId)?.code})</span>
+              <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Launch 3D Spatial Twin ({stations.find((s) => s.id === selectedStationId)?.code})</span>
             </button>
           </div>
         )}
 
         {/* Legend */}
-        <div className="absolute top-3 right-3 bg-polar-950/80 border border-polar-800 p-2.5 rounded text-[10px] font-mono text-slate-400 space-y-1 backdrop-blur-sm pointer-events-none">
+        <div className="absolute top-3 right-3 bg-[#0B1220]/90 border border-[#1E293B] p-2 rounded text-[10px] font-mono text-slate-400 space-y-1 backdrop-blur-sm pointer-events-none">
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-            <span>Active Research Base</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-400" />
+            <span>Active Research Station</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-500" />
+            <span className="w-2 h-2 rounded-full bg-slate-500" />
             <span>Submerged / Storage Depot</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="w-4 h-0.5 bg-amber-400" />
-            <span>Maritime Resupply Route</span>
+            <span className="w-3.5 h-0.5 bg-amber-400" />
+            <span>Maritime Resupply Corridor</span>
           </div>
         </div>
       </div>

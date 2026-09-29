@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Shield, Radio, Bell, User, Clock, AlertTriangle, RefreshCw, ShieldCheck, Lock } from 'lucide-react';
+import { 
+  Shield, 
+  Radio, 
+  Bell, 
+  User, 
+  Clock, 
+  ShieldCheck, 
+  Activity, 
+  ChevronDown,
+  Compass
+} from 'lucide-react';
 import { LinkStatus } from '../../types';
-import { api } from '../../services/api';
 import { SecurityModal } from './SecurityModal';
 
 interface HeaderProps {
@@ -13,6 +22,7 @@ interface HeaderProps {
   onOpenAlerts: () => void;
   activeRole: string;
   onRoleChange: (role: string) => void;
+  onOpenStationDrawer?: (stationId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -24,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAlerts,
   activeRole,
   onRoleChange,
+  onOpenStationDrawer,
 }) => {
   const [utcTime, setUtcTime] = useState('');
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
@@ -31,142 +42,173 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     const update = () => {
       const d = new Date();
-      setUtcTime(d.toUTCString().replace('GMT', 'UTC'));
+      setUtcTime(
+        d.toUTCString().replace('GMT', 'UTC').split(' ').slice(4, 6).join(' ')
+      );
     };
     update();
     const interval = setInterval(update, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  const linkColors: Record<LinkStatus, { bg: string; text: string; dot: string; label: string }> = {
-    ONLINE: { bg: 'bg-emerald-950/70 border-emerald-500/40', text: 'text-emerald-400', dot: 'bg-emerald-400', label: 'SAT-LINK ONLINE' },
-    DEGRADED: { bg: 'bg-amber-950/70 border-amber-500/40', text: 'text-amber-400', dot: 'bg-amber-400 animate-pulse', label: 'SAT-LINK DEGRADED' },
-    OFFLINE: { bg: 'bg-red-950/70 border-red-500/40', text: 'text-red-400', dot: 'bg-red-500 animate-ping', label: 'EDGE OFFLINE' },
-    SYNCING: { bg: 'bg-cyan-950/70 border-cyan-500/40', text: 'text-cyan-400', dot: 'bg-cyan-400 animate-spin', label: 'REPLAY SYNCING' },
+  const linkConfigs: Record<LinkStatus, { bg: string; dot: string; label: string }> = {
+    ONLINE: { 
+      bg: 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300 hover:bg-emerald-900/40', 
+      dot: 'bg-emerald-400', 
+      label: 'SAT-LINK ONLINE' 
+    },
+    DEGRADED: { 
+      bg: 'bg-amber-950/40 border-amber-500/30 text-amber-300 hover:bg-amber-900/40', 
+      dot: 'bg-amber-400 animate-pulse', 
+      label: 'SAT-LINK DEGRADED' 
+    },
+    OFFLINE: { 
+      bg: 'bg-rose-950/40 border-rose-500/40 text-rose-300 hover:bg-rose-900/40', 
+      dot: 'bg-rose-400 animate-ping', 
+      label: 'EDGE OFFLINE MODE' 
+    },
+    SYNCING: { 
+      bg: 'bg-sky-950/40 border-sky-500/30 text-sky-300 hover:bg-sky-900/40', 
+      dot: 'bg-sky-400 animate-spin', 
+      label: 'STORE-AND-FORWARD SYNC' 
+    },
   };
 
-  const currLink = linkColors[linkStatus] || linkColors.ONLINE;
+  const currLink = linkConfigs[linkStatus] || linkConfigs.ONLINE;
+  const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-polar-900 border-b border-polar-750/80 px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-md">
-      {/* Brand & Subtitle */}
+    <header className="h-16 bg-[#0B1220] border-b border-[#1E293B] px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono">
+      {/* LEFT: Branding & First-Class Station Context */}
       <div className="flex items-center gap-4">
+        {/* Brand Identity */}
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-polar-cyan/30 to-polar-600/30 border border-polar-cyan/50 flex items-center justify-center text-polar-cyan shadow-sm shadow-polar-cyan/20">
-            <Shield className="w-5 h-5 text-polar-cyan" />
+          <div className="w-8 h-8 rounded-md bg-[#111827] border border-cyan-500/40 flex items-center justify-center text-cyan-400 shadow-sm">
+            <Shield className="w-4 h-4 text-cyan-400" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-base font-bold tracking-widest text-white">POLAR-TWIN</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30">SIH 26060</span>
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-sm tracking-wider text-white">POLAR-TWIN</span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-[#111827] text-slate-400 border border-[#1E293B]">
+                SIH 26060
+              </span>
             </div>
-            <p className="text-[10px] font-mono text-slate-400 tracking-tight">
-              ANTARCTIC RESEARCH STATIONS DIGITAL PLATFORM
+            <p className="text-[10px] text-slate-400 tracking-tight font-sans">
+              Indian Antarctic Research Operations • NCPOR
             </p>
           </div>
         </div>
 
-        {/* Station Switcher */}
-        <div className="h-8 border-l border-polar-750/80 mx-2" />
-        <div className="flex items-center bg-polar-950 rounded-lg p-1 border border-polar-750">
+        {/* Vertical Divider */}
+        <div className="h-7 border-l border-[#1E293B] hidden sm:block" />
+
+        {/* First-Class Station Selector */}
+        <div className="hidden sm:flex items-center bg-[#030712] rounded-lg p-1 border border-[#1E293B]">
           <button
             onClick={() => onStationChange('station_bharati')}
-            className={`px-3 py-1 rounded text-xs font-mono font-semibold transition-all ${
-              currentStationId === 'station_bharati'
-                ? 'bg-polar-600 text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              isBharati
+                ? 'bg-[#1E293B] text-cyan-300 border border-cyan-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            BHARATI (-69.4°S)
+            <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+            <span>BHARATI</span>
+            <span className="text-[10px] text-slate-500 hidden md:inline">• Larsemann Hills</span>
           </button>
           <button
             onClick={() => onStationChange('station_maitri')}
-            className={`px-3 py-1 rounded text-xs font-mono font-semibold transition-all ${
-              currentStationId === 'station_maitri'
-                ? 'bg-polar-600 text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                : 'text-slate-400 hover:text-white'
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
+              !isBharati
+                ? 'bg-[#1E293B] text-cyan-300 border border-cyan-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            MAITRI (-70.7°S)
+            <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-cyan-400' : 'bg-slate-600'}`} />
+            <span>MAITRI</span>
+            <span className="text-[10px] text-slate-500 hidden md:inline">• Schirmacher Oasis</span>
           </button>
         </div>
       </div>
 
-      {/* Center Mission Model */}
-      <div className="hidden xl:flex items-center gap-2 text-[11px] font-mono text-slate-400 border border-polar-800/80 bg-polar-950/60 px-3 py-1 rounded-full">
-        <span className="text-polar-cyan font-semibold">OBSERVE</span>
-        <span>→</span>
-        <span className="text-polar-cyan font-semibold">UNDERSTAND</span>
-        <span>→</span>
-        <span className="text-polar-cyan font-semibold">PREDICT</span>
-        <span>→</span>
-        <span className="text-polar-cyan font-semibold">SIMULATE</span>
-        <span>→</span>
-        <span className="text-polar-cyan font-semibold">DECIDE</span>
+      {/* CENTER: Primary Operational State */}
+      <div className="hidden xl:flex items-center gap-3">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#030712] border border-[#1E293B] text-xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-slate-300 font-medium">OPERATIONAL STATE:</span>
+          <span className="text-emerald-400 font-semibold">
+            {unreadAlertsCount > 0 ? `${unreadAlertsCount} ACTIVE ADVISORIES` : 'ALL SYSTEMS NOMINAL'}
+          </span>
+          <span className="text-slate-600">|</span>
+          <span className="text-slate-400 text-[11px]">
+            {isBharati ? '69.408° S, 76.187° E' : '70.766° S, 11.740° E'}
+          </span>
+        </div>
       </div>
 
-      {/* Right Controls: Link status toggle, Alerts, RBAC, Clock */}
-      <div className="flex items-center gap-4">
-        {/* Link Status Pill with interactive toggle */}
+      {/* RIGHT: System Health, Satellite Link, Alerts, RBAC, Clock */}
+      <div className="flex items-center gap-3">
+        {/* System Health / Zero-Trust Security */}
+        <button
+          onClick={() => setIsSecurityOpen(true)}
+          title="System Health & Zero-Trust Access Controls"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#030712] border border-[#1E293B] hover:border-slate-700 text-slate-300 text-xs transition-colors"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+          <span className="hidden lg:inline text-slate-400">HEALTH:</span>
+          <span className="text-emerald-400 font-semibold">98.4%</span>
+        </button>
+
+        {/* Satellite Link Toggle */}
         <button
           onClick={onLinkToggle}
-          title="Click to simulate Satellite Connection Loss or Restore Reconnect Sync"
-          className={`flex items-center gap-2 px-2.5 py-1 rounded-md border text-xs font-mono transition-all hover:brightness-125 ${currLink.bg} ${currLink.text}`}
+          title="Toggle Satellite Link state to test Edge Offline Buffering and Replay Sync"
+          className={`flex items-center gap-2 px-2.5 py-1 rounded-md border text-xs transition-colors ${currLink.bg}`}
         >
           <span className={`w-2 h-2 rounded-full ${currLink.dot}`} />
           <Radio className="w-3.5 h-3.5" />
-          <span className="font-semibold">{currLink.label}</span>
+          <span className="font-semibold hidden md:inline">{currLink.label}</span>
         </button>
 
-        {/* Alerts Button */}
+        {/* Alerts Trigger */}
         <button
           onClick={onOpenAlerts}
-          className="relative p-2 rounded-lg bg-polar-950 border border-polar-750 text-slate-300 hover:text-polar-cyan hover:border-polar-cyan/40 transition-all"
+          title="Open Operational Alerts Drawer"
+          className="relative p-2 rounded-md bg-[#030712] border border-[#1E293B] text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
         >
           <Bell className="w-4 h-4" />
           {unreadAlertsCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-600 text-white font-mono text-[9px] font-bold flex items-center justify-center animate-pulse">
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
               {unreadAlertsCount}
             </span>
           )}
         </button>
 
-        {/* Zero-Trust Security Pill */}
-        <button
-          onClick={() => setIsSecurityOpen(true)}
-          title="Inspect Zero-Trust Identity, Bearer Token, and RBAC / ABAC Permissions"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/60 text-xs font-mono transition-all"
-        >
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="font-semibold hidden md:inline">ZERO-TRUST</span>
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-        </button>
-
-        {/* RBAC Role Switcher */}
-        <div className="flex items-center gap-2 bg-polar-950 border border-polar-750 px-2.5 py-1 rounded-lg">
-          <User className="w-3.5 h-3.5 text-polar-cyan" />
+        {/* RBAC Operator Role Switcher */}
+        <div className="flex items-center gap-1.5 bg-[#030712] border border-[#1E293B] px-2.5 py-1 rounded-md">
+          <User className="w-3.5 h-3.5 text-cyan-400" />
           <select
             value={activeRole}
             onChange={(e) => onRoleChange(e.target.value)}
-            className="bg-transparent text-xs font-mono text-slate-200 outline-none cursor-pointer"
+            className="bg-transparent text-xs text-slate-200 outline-none cursor-pointer pr-1"
           >
-            <option value="OPERATOR" className="bg-polar-900">OPERATOR (Duty)</option>
-            <option value="ENGINEER" className="bg-polar-900">ENGINEER (Mech/Elec)</option>
-            <option value="SUPERVISOR" className="bg-polar-900">SUPERVISOR (Cmdr)</option>
-            <option value="ANALYST" className="bg-polar-900">ANALYST (Sci)</option>
-            <option value="VIEWER" className="bg-polar-900">VIEWER (Read-Only)</option>
-            <option value="ADMIN" className="bg-polar-900">ADMIN (Mission Ctrl)</option>
+            <option value="OPERATOR" className="bg-[#0B1220]">OPERATOR (Duty)</option>
+            <option value="ENGINEER" className="bg-[#0B1220]">ENGINEER (Base)</option>
+            <option value="SUPERVISOR" className="bg-[#0B1220]">COMMANDER (NCPOR)</option>
+            <option value="ANALYST" className="bg-[#0B1220]">ANALYST (Science)</option>
+            <option value="VIEWER" className="bg-[#0B1220]">VIEWER (Read-Only)</option>
+            <option value="ADMIN" className="bg-[#0B1220]">ADMIN (Mission Ctrl)</option>
           </select>
         </div>
 
-        {/* UTC Clock */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-slate-400 bg-polar-950/80 px-2.5 py-1 rounded border border-polar-800">
-          <Clock className="w-3.5 h-3.5 text-polar-cyan" />
-          <span>{utcTime}</span>
+        {/* Scientific UTC Clock */}
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-300 bg-[#030712] px-2.5 py-1 rounded-md border border-[#1E293B]">
+          <Clock className="w-3.5 h-3.5 text-slate-400" />
+          <span className="font-semibold text-white">{utcTime || '12:00:00 UTC'}</span>
         </div>
       </div>
 
-      {/* Zero-Trust Security & Identity Modal */}
+      {/* Security & Access Inspection Modal */}
       <SecurityModal
         isOpen={isSecurityOpen}
         onClose={() => setIsSecurityOpen(false)}

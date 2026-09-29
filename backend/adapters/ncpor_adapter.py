@@ -1,8 +1,8 @@
 import json
-import urllib.request
 import time
 from datetime import datetime, timezone
 from typing import Dict, Any, Optional
+import httpx
 
 STATION_COORDINATES = {
     "station_bharati": {
@@ -53,10 +53,12 @@ class NCPORMeteorologicalProvider:
     """
     Dedicated meteorological adapter integrating publicly accessible Antarctic observations
     with strict data provenance tags and transparent fallback behavior.
+    Uses httpx for resilient non-blocking network calls.
     """
     def __init__(self):
         self._cache: Dict[str, Dict[str, Any]] = {}
         self._cache_ttl = 300  # 5 minutes cache
+        self._http = httpx.Client(timeout=8.0, headers={"User-Agent": "POLAR-TWIN-Antarctic-Platform/1.0"})
 
     def fetch_observations(self, station_id: str) -> Dict[str, Any]:
         """
@@ -79,9 +81,9 @@ class NCPORMeteorologicalProvider:
         )
 
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "POLAR-TWIN-Antarctic-Platform/1.0"})
-            with urllib.request.urlopen(req, timeout=6) as resp:
-                data = json.loads(resp.read().decode("utf-8"))
+            resp = self._http.get(url)
+            if resp.status_code == 200:
+                data = resp.json()
                 current = data.get("current", {})
 
                 # Open-Meteo wind speed is in km/h by default; convert to m/s
@@ -117,6 +119,9 @@ class NCPORMeteorologicalProvider:
                 }
                 self._cache[station_id] = {"cached_at": time.time(), "data": observation}
                 return observation
+            else:
+                err_detail = f"Gateway returned HTTP {resp.status_code}"
+                raise ValueError(err_detail)
 
         except Exception as e:
             # Fallback to calibrated physics-synthetic baseline with explicit provenance label

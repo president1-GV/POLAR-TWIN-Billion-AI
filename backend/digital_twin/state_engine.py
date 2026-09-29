@@ -115,7 +115,7 @@ class DigitalTwinStateEngine:
                 "severity": "CRITICAL" if new_status in ["CRITICAL", "FAILED"] else "WARNING",
                 "status": "ACTIVE",
                 "source_type": "PHYSICS_SYNTHETIC",
-                "evidence": json.dumps([f"Health dropped to {updates.get('health_score', 0)}%", f"Status set to {new_status}"]),
+                "evidence": [f"Health dropped to {updates.get('health_score', 0)}%", f"Status set to {new_status}"],
                 "predicted_consequence": "Potential generation deficit or thermal instability",
                 "recommended_action": "Inspect asset telemetry and review automated mitigation plan"
             })

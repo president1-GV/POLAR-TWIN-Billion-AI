@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, AlertTriangle, ShieldCheck, Check, CheckCheck, Clock } from 'lucide-react';
+import { X, AlertTriangle, ShieldCheck, Check, CheckCheck, Clock, MapPin } from 'lucide-react';
 import { Alert } from '../../types';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
+import { StatusBadge } from '../../components/ui/StatusBadge';
 
 interface Props {
   isOpen: boolean;
@@ -21,86 +22,93 @@ export const AlertsDrawer: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end">
-      <div className="w-full max-w-lg bg-polar-900 border-l border-polar-750 h-full flex flex-col shadow-2xl">
+    <div className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-sm flex justify-end font-mono">
+      <div className="w-full max-w-lg bg-[#0B1220] border-l border-[#1E293B] h-full flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="p-4 border-b border-polar-750 flex items-center justify-between">
+        <div className="p-4 bg-[#111827] border-b border-[#1E293B] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
-            <h3 className="font-mono text-sm font-bold text-white uppercase tracking-wider">
+            <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">
               Operational Alerts Center ({alerts.length})
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded text-slate-400 hover:text-white hover:bg-polar-850"
+            className="p-1 rounded text-slate-400 hover:text-white hover:bg-[#1E293B] transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* List */}
-        <div className="p-4 overflow-y-auto space-y-4 flex-1">
+        <div className="p-4 overflow-y-auto space-y-3.5 flex-1">
           {alerts.length === 0 ? (
-            <div className="text-center py-12 font-mono text-slate-500">
-              <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-60" />
-              All Antarctic station systems operating within normal parameters.
+            <div className="text-center py-16 text-slate-500 space-y-2">
+              <ShieldCheck className="w-10 h-10 text-emerald-400 mx-auto opacity-70" />
+              <div className="text-sm font-bold text-slate-300">All Systems Nominal</div>
+              <p className="text-xs text-slate-500 max-w-xs mx-auto">
+                No active critical incidents or advisories reported across Antarctic stations.
+              </p>
             </div>
           ) : (
             alerts.map((al) => {
               const isCrit = al.severity === 'CRITICAL';
               const isWarn = al.severity === 'WARNING';
-              const evidenceList = Array.isArray(al.evidence) ? al.evidence : (typeof al.evidence === 'string' ? JSON.parse(al.evidence || '[]') : []);
+              const evidenceList = Array.isArray(al.evidence)
+                ? al.evidence
+                : typeof al.evidence === 'string'
+                ? JSON.parse(al.evidence || '[]')
+                : [];
 
               return (
                 <div
                   key={al.id}
-                  className={`polar-panel p-4 space-y-3 transition-all ${
-                    isCrit ? 'border-red-500/80 bg-red-950/20' :
-                    isWarn ? 'border-amber-500/60 bg-amber-950/10' : 'border-polar-750'
+                  className={`bg-[#0B1220] border rounded-lg p-4 space-y-3 transition-all ${
+                    isCrit ? 'border-rose-500/60 bg-rose-950/15' :
+                    isWarn ? 'border-amber-500/50 bg-amber-950/10' : 'border-[#1E293B]'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                        isCrit ? 'bg-red-950 text-red-400 border border-red-500/50 animate-pulse' :
-                        isWarn ? 'bg-amber-950 text-amber-400 border border-amber-500/50' :
-                        'bg-polar-800 text-slate-300'
-                      }`}>
-                        {al.severity}
-                      </span>
-                      <h4 className="text-xs font-mono font-bold text-white mt-1.5">{al.title}</h4>
+                      <div className="flex items-center gap-2">
+                        <StatusBadge status={al.severity} size="sm" />
+                        <span className="text-[10px] text-slate-500 flex items-center gap-1">
+                          <MapPin className="w-3 h-3 text-cyan-400" />
+                          {al.station_id === 'station_bharati' ? 'Bharati' : 'Maitri'}
+                        </span>
+                      </div>
+                      <h4 className="text-xs font-bold text-white mt-1.5">{al.title}</h4>
                     </div>
                     <ProvenanceBadge type={al.source_type} />
                   </div>
 
-                  {/* Evidence */}
+                  {/* Evidence Stream */}
                   {evidenceList.length > 0 && (
-                    <div className="bg-polar-950 p-2.5 rounded border border-polar-800 text-[11px] font-mono space-y-1">
+                    <div className="bg-[#111827] p-2.5 rounded border border-[#1E293B] text-[11px] space-y-1">
                       <span className="text-[10px] text-slate-500 uppercase font-semibold">Evidence:</span>
                       {evidenceList.map((ev: string, idx: number) => (
                         <div key={idx} className="text-slate-300 flex items-center gap-1.5">
-                          <span className="text-polar-cyan">•</span> {ev}
+                          <span className="text-cyan-400">•</span> {ev}
                         </div>
                       ))}
                     </div>
                   )}
 
-                  {/* Consequence & Recommendation */}
+                  {/* Predicted Consequence & Recommended Action */}
                   {al.predicted_consequence && (
-                    <div className="text-[11px] font-mono text-slate-300">
-                      <strong className="text-slate-400">Predicted Consequence: </strong>
+                    <div className="text-[11px] text-slate-300">
+                      <strong className="text-slate-400">Consequence: </strong>
                       {al.predicted_consequence}
                     </div>
                   )}
                   {al.recommended_action && (
-                    <div className="text-[11px] font-mono text-emerald-400 bg-emerald-950/40 p-2 rounded border border-emerald-500/30">
-                      <strong>Action: </strong> {al.recommended_action}
+                    <div className="text-[11px] text-emerald-300 bg-emerald-950/40 p-2.5 rounded border border-emerald-500/30">
+                      <strong className="text-emerald-400">Action: </strong> {al.recommended_action}
                     </div>
                   )}
 
-                  {/* Actions */}
-                  <div className="pt-2 border-t border-polar-800 flex items-center justify-between text-xs font-mono">
+                  {/* Action Buttons */}
+                  <div className="pt-2 border-t border-[#1E293B] flex items-center justify-between text-xs">
                     <span className="text-[10px] text-slate-500 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {new Date(al.created_at).toLocaleTimeString()}
@@ -110,14 +118,14 @@ export const AlertsDrawer: React.FC<Props> = ({
                       {al.status === 'ACTIVE' && (
                         <button
                           onClick={() => onAcknowledge(al.id)}
-                          className="flex items-center gap-1 px-2.5 py-1 rounded bg-polar-800 hover:bg-polar-750 text-slate-200 border border-polar-700"
+                          className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#111827] hover:bg-[#1E293B] text-slate-200 border border-[#1E293B] transition-colors"
                         >
-                          <Check className="w-3 h-3 text-polar-cyan" /> Acknowledge
+                          <Check className="w-3 h-3 text-cyan-400" /> Acknowledge
                         </button>
                       )}
                       <button
                         onClick={() => onResolve(al.id)}
-                        className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-900/60 hover:bg-emerald-900 text-emerald-300 border border-emerald-700"
+                        className="flex items-center gap-1 px-2.5 py-1 rounded bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 transition-colors"
                       >
                         <CheckCheck className="w-3 h-3" /> Resolve
                       </button>

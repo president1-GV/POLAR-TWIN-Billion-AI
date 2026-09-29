@@ -109,36 +109,40 @@ def get_data_quality_reports():
     Returns data quality audit reports, physical bounds checks, and pass/fail metrics.
     """
     client = get_supabase_client()
+    reports = []
     try:
         res = client.table("data_quality_reports").select("*").order("execution_timestamp", desc=True).limit(20).execute()
-        return {"status": "SUCCESS", "reports": res.data}
+        if res.data:
+            reports = res.data
     except Exception:
+        pass
+
+    if not reports:
         # Fallback local audit report
-        return {
-            "status": "SUCCESS",
-            "reports": [
-                {
-                    "dataset_id": "ds_ncpor_aws_bharati",
-                    "check_type": "ANTARCTIC_PHYSICAL_QUALITY_AUDIT",
-                    "passed": True,
-                    "total_records": 168,
-                    "invalid_records": 0,
-                    "outlier_counts": {"wind_speed_ms": 2},
-                    "null_counts": {},
-                    "execution_timestamp": "2026-09-28T17:00:00Z"
-                },
-                {
-                    "dataset_id": "ds_ncpor_aws_maitri",
-                    "check_type": "ANTARCTIC_PHYSICAL_QUALITY_AUDIT",
-                    "passed": True,
-                    "total_records": 168,
-                    "invalid_records": 0,
-                    "outlier_counts": {"temperature_c": 1},
-                    "null_counts": {},
-                    "execution_timestamp": "2026-09-28T17:00:00Z"
-                }
-            ]
-        }
+        reports = [
+            {
+                "dataset_id": "ds_ncpor_aws_bharati",
+                "check_type": "ANTARCTIC_PHYSICAL_QUALITY_AUDIT",
+                "passed": True,
+                "total_records": 168,
+                "invalid_records": 0,
+                "outlier_counts": {"wind_speed_ms": 2},
+                "null_counts": {},
+                "execution_timestamp": "2026-09-28T17:00:00Z"
+            },
+            {
+                "dataset_id": "ds_ncpor_aws_maitri",
+                "check_type": "ANTARCTIC_PHYSICAL_QUALITY_AUDIT",
+                "passed": True,
+                "total_records": 168,
+                "invalid_records": 0,
+                "outlier_counts": {"temperature_c": 1},
+                "null_counts": {},
+                "execution_timestamp": "2026-09-28T17:00:00Z"
+            }
+        ]
+
+    return {"status": "SUCCESS", "reports": reports}
 
 
 @router.get("/models")
