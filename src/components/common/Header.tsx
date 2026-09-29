@@ -204,7 +204,11 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* RBAC Operator Role Switcher Dropdown */}
         <div className="shrink-0">
-          <RoleSelector activeRole={activeRole} onRoleChange={onRoleChange} />
+          <RoleSelector 
+            activeRole={activeRole} 
+            onRoleChange={onRoleChange} 
+            onOpenLogin={onOpenLogin} 
+          />
         </div>
 
         {/* Authentication Login / Station Gateway Trigger */}
