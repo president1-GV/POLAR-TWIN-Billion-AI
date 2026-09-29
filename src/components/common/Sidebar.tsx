@@ -8,7 +8,8 @@ import {
   AlertOctagon, 
   Radio, 
   Activity, 
-  PlayCircle 
+  PlayCircle,
+  Database
 } from 'lucide-react';
 
 export type ScreenId = 
@@ -20,6 +21,7 @@ export type ScreenId =
   | 'simulation'
   | 'edge'
   | 'analytics'
+  | 'data-catalog'
   | 'demo';
 
 interface SidebarProps {
@@ -37,6 +39,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
     { id: 'simulation', label: 'What-If Simulator', icon: AlertOctagon },
     { id: 'edge', label: 'Edge Resilience', icon: Radio, tag: 'Offline' },
     { id: 'analytics', label: 'Observability & Audit', icon: Activity },
+    { id: 'data-catalog', label: 'Data Lineage & Registry', icon: Database, tag: 'NCPOR' },
     { id: 'demo', label: '1-Click Killer Demo', icon: PlayCircle, tag: 'DEMO' },
   ];
 

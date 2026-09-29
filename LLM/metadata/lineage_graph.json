@@ -1,0 +1,80 @@
+{
+  "graph_version": "v1.0.0",
+  "generated_at": "2026-09-28T17:35:00Z",
+  "nodes": [
+    {
+      "id": "raw_ncpor_bharati",
+      "type": "RAW_SOURCE",
+      "provenance": "REAL_NCPOR",
+      "title": "NCPOR Automatic Weather Station (Bharati)",
+      "endpoint": "https://npdc.ncpor.res.in/pdc/Aws/imd/Awsdata.jsp"
+    },
+    {
+      "id": "val_ncpor_bharati",
+      "type": "VALIDATED_DATASET",
+      "provenance": "REAL_NCPOR",
+      "title": "Cleaned & Bounds-Checked Hourly Meteorology",
+      "quality_check": "ANTARCTIC_PHYSICAL_QUALITY_AUDIT"
+    },
+    {
+      "id": "feat_physics_bharati",
+      "type": "FEATURE_SET",
+      "provenance": "DERIVED",
+      "title": "Physics-Informed Features (HDH, Wind Convection, Thermal Loss)",
+      "derived_from": ["val_ncpor_bharati"]
+    },
+    {
+      "id": "sim_ops_bharati",
+      "type": "SIMULATION_ENGINE",
+      "provenance": "SIMULATED",
+      "title": "Digital Twin Genset & Thermal Envelope Simulator",
+      "parameters": { "seed": 42, "UA_kw_per_k": 1.8 }
+    },
+    {
+      "id": "val_ops_bharati",
+      "type": "VALIDATED_DATASET",
+      "provenance": "SIMULATED",
+      "title": "Synthetic High-Frequency Operational Telemetry",
+      "derived_from": ["sim_ops_bharati"]
+    },
+    {
+      "id": "model_energy_forecaster",
+      "type": "ML_MODEL",
+      "task": "ENERGY_DEMAND_FORECAST",
+      "trained_on": ["val_ops_bharati", "feat_physics_bharati"],
+      "improvement_over_baseline": "22.07%"
+    },
+    {
+      "id": "model_anomaly_detector",
+      "type": "ML_MODEL",
+      "task": "MULTIVARIATE_ANOMALY",
+      "trained_on": ["val_ops_bharati"],
+      "f1_score": 1.0,
+      "roc_auc": 1.0
+    },
+    {
+      "id": "raw_aad_davis",
+      "type": "RAW_SOURCE",
+      "provenance": "EXTERNAL_ANTARCTIC_BENCHMARK",
+      "title": "Australian Antarctic Data Centre (Davis Station)",
+      "country": "Australia",
+      "isolation": "Segregated from Indian station telemetry"
+    },
+    {
+      "id": "benchmark_comp_engine",
+      "type": "EVALUATION_MODULE",
+      "title": "Relative Specific Fuel Consumption Comparison",
+      "inputs": ["val_ops_bharati", "raw_aad_davis"]
+    }
+  ],
+  "edges": [
+    { "from": "raw_ncpor_bharati", "to": "val_ncpor_bharati", "operation": "Clean & Validate" },
+    { "from": "val_ncpor_bharati", "to": "feat_physics_bharati", "operation": "Physics Feature Extraction" },
+    { "from": "feat_physics_bharati", "to": "model_energy_forecaster", "operation": "Model Training" },
+    { "from": "sim_ops_bharati", "to": "val_ops_bharati", "operation": "Telemetry Generation & Audit" },
+    { "from": "val_ops_bharati", "to": "model_energy_forecaster", "operation": "Energy Load Target" },
+    { "from": "val_ops_bharati", "to": "model_anomaly_detector", "operation": "Multivariate Fitting" },
+    { "from": "val_ops_bharati", "to": "benchmark_comp_engine", "operation": "Indian Station Baseline" },
+    { "from": "raw_aad_davis", "to": "benchmark_comp_engine", "operation": "External Benchmark" }
+  ]
+}

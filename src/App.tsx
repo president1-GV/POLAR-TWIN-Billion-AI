@@ -9,6 +9,7 @@ import { MeteorologyView } from './features/meteorology/MeteorologyView';
 import { EmergencySimulator } from './features/simulation/EmergencySimulator';
 import { EdgeMonitor } from './features/edge/EdgeMonitor';
 import { AnalyticsDashboard } from './features/analytics/AnalyticsDashboard';
+import { DataCatalogDashboard } from './features/data-catalog/DataCatalogDashboard';
 import { KillerDemoPanel } from './features/demo/KillerDemoPanel';
 import { AlertsDrawer } from './features/alerts/AlertsDrawer';
 import { LinkStatus, Alert } from './types';
@@ -155,6 +156,8 @@ export const App: React.FC = () => {
           {currentScreen === 'edge' && <EdgeMonitor />}
 
           {currentScreen === 'analytics' && <AnalyticsDashboard />}
+
+          {currentScreen === 'data-catalog' && <DataCatalogDashboard />}
 
           {currentScreen === 'demo' && (
             <KillerDemoPanel

@@ -1,0 +1,917 @@
+{
+  "dataset_id": "ds_copernicus_sea_ice",
+  "provenance_type": "PUBLIC_EXTERNAL",
+  "source_organization": "Copernicus Marine Environment Monitoring Service (CMEMS)",
+  "source_country": "European Union / International",
+  "sha256_hash": "af12ed79d59823a897c3ae17b906e111f99a8d260e43bb57e7505c2751a57bd5",
+  "captured_at": "2026-09-28T17:00:52.846557",
+  "payload": {
+    "source_title": "Copernicus Southern Ocean Daily Sea Ice Analysis",
+    "region": "Prydz Bay & Princess Astrid Coast",
+    "source_organization": "Copernicus Marine Environment Monitoring Service (CMEMS)",
+    "provenance_type": "PUBLIC_EXTERNAL",
+    "record_count": 90,
+    "sea_ice_observations": [
+      {
+        "timestamp": "2025-01-01T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 25.9,
+        "fast_ice_thickness_m": 0.47,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-02T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 25.5,
+        "fast_ice_thickness_m": 0.46,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-03T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 25.0,
+        "fast_ice_thickness_m": 0.45,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-04T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 24.6,
+        "fast_ice_thickness_m": 0.44,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-05T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 24.1,
+        "fast_ice_thickness_m": 0.43,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-06T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 23.7,
+        "fast_ice_thickness_m": 0.43,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-07T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 23.3,
+        "fast_ice_thickness_m": 0.42,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-08T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 22.8,
+        "fast_ice_thickness_m": 0.41,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-09T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 22.4,
+        "fast_ice_thickness_m": 0.4,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-10T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 22.0,
+        "fast_ice_thickness_m": 0.4,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-11T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 21.7,
+        "fast_ice_thickness_m": 0.39,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-12T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 21.3,
+        "fast_ice_thickness_m": 0.38,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-13T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 20.9,
+        "fast_ice_thickness_m": 0.38,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-14T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 20.6,
+        "fast_ice_thickness_m": 0.37,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-15T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 20.2,
+        "fast_ice_thickness_m": 0.36,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-16T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 19.9,
+        "fast_ice_thickness_m": 0.36,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-17T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 19.6,
+        "fast_ice_thickness_m": 0.35,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-18T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 19.2,
+        "fast_ice_thickness_m": 0.35,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-19T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.9,
+        "fast_ice_thickness_m": 0.34,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-20T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.6,
+        "fast_ice_thickness_m": 0.33,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-21T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.4,
+        "fast_ice_thickness_m": 0.33,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-22T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.1,
+        "fast_ice_thickness_m": 0.33,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-23T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.8,
+        "fast_ice_thickness_m": 0.32,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-24T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.6,
+        "fast_ice_thickness_m": 0.32,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-25T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.3,
+        "fast_ice_thickness_m": 0.31,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-26T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.1,
+        "fast_ice_thickness_m": 0.31,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-27T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.9,
+        "fast_ice_thickness_m": 0.3,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-28T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.7,
+        "fast_ice_thickness_m": 0.3,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-29T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.5,
+        "fast_ice_thickness_m": 0.3,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-30T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.3,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-01-31T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.2,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-01T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.0,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-02T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.9,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-03T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.7,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-04T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.6,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-05T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.5,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-06T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.4,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-07T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.3,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-08T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.2,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-09T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.1,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-10T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.1,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-11T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.1,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-12T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.0,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-13T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.0,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-14T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.0,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-15T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.0,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-16T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.0,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-17T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.1,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-18T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.1,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-19T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.1,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-20T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.2,
+        "fast_ice_thickness_m": 0.27,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-21T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.3,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-22T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.4,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-23T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.5,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-24T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.6,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-25T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.7,
+        "fast_ice_thickness_m": 0.28,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-26T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 15.9,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-27T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.0,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-02-28T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.2,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-01T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.3,
+        "fast_ice_thickness_m": 0.29,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-02T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.5,
+        "fast_ice_thickness_m": 0.3,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-03T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.7,
+        "fast_ice_thickness_m": 0.3,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-04T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 16.9,
+        "fast_ice_thickness_m": 0.3,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-05T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.1,
+        "fast_ice_thickness_m": 0.31,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-06T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.3,
+        "fast_ice_thickness_m": 0.31,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-07T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.6,
+        "fast_ice_thickness_m": 0.32,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-08T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 17.8,
+        "fast_ice_thickness_m": 0.32,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-09T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.1,
+        "fast_ice_thickness_m": 0.33,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-10T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.4,
+        "fast_ice_thickness_m": 0.33,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-11T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.6,
+        "fast_ice_thickness_m": 0.33,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-12T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 18.9,
+        "fast_ice_thickness_m": 0.34,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-13T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 19.2,
+        "fast_ice_thickness_m": 0.35,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-14T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 19.6,
+        "fast_ice_thickness_m": 0.35,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-15T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 19.9,
+        "fast_ice_thickness_m": 0.36,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-16T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 20.2,
+        "fast_ice_thickness_m": 0.36,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-17T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 20.6,
+        "fast_ice_thickness_m": 0.37,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-18T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 20.9,
+        "fast_ice_thickness_m": 0.38,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-19T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 21.3,
+        "fast_ice_thickness_m": 0.38,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-20T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 21.7,
+        "fast_ice_thickness_m": 0.39,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-21T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 22.0,
+        "fast_ice_thickness_m": 0.4,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-22T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 22.4,
+        "fast_ice_thickness_m": 0.4,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-23T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 22.8,
+        "fast_ice_thickness_m": 0.41,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-24T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 23.3,
+        "fast_ice_thickness_m": 0.42,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-25T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 23.7,
+        "fast_ice_thickness_m": 0.43,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-26T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 24.1,
+        "fast_ice_thickness_m": 0.43,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-27T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 24.6,
+        "fast_ice_thickness_m": 0.44,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "OPEN_WATER",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-28T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 25.0,
+        "fast_ice_thickness_m": 0.45,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-29T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 25.5,
+        "fast_ice_thickness_m": 0.46,
+        "polynya_presence": true,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-30T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 25.9,
+        "fast_ice_thickness_m": 0.47,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      },
+      {
+        "timestamp": "2025-03-31T00:00:00+00:00",
+        "region": "Prydz Bay & Princess Astrid Coast",
+        "sea_ice_concentration_pct": 26.4,
+        "fast_ice_thickness_m": 0.48,
+        "polynya_presence": false,
+        "navigation_risk_level": "LOW",
+        "vessel_access_status": "ICE_ESCORT_REQUIRED",
+        "provenance_type": "PUBLIC_EXTERNAL"
+      }
+    ]
+  }
+}

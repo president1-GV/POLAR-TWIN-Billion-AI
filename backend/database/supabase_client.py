@@ -140,3 +140,6 @@ class SupabaseClient:
 
 # Global singleton client
 supabase_client = SupabaseClient()
+
+def get_supabase_client() -> SupabaseClient:
+    return supabase_client
