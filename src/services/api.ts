@@ -293,8 +293,9 @@ export const api = {
           health_score: 95.0,
           criticality: 'CRITICAL',
           location_desc: 'Power House Bay 1',
-          coordinates_3d: { x: -10, y: 1.5, z: -6 },
+          coordinates_3d: { x: -21.0, y: 1.65, z: -8.0 },
           current_state: { load_pct: 68.0, power_output_kw: 85.0, rpm: 1500, exhaust_temp_c: 360.0, vibration_mms: 1.9, oil_pressure_bar: 4.4, fuel_flow_lph: 24.2 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -307,8 +308,9 @@ export const api = {
           health_score: 94.5,
           criticality: 'CRITICAL',
           location_desc: 'Power House Bay 2',
-          coordinates_3d: { x: -7, y: 1.5, z: -6 },
+          coordinates_3d: { x: -16.0, y: 1.65, z: -8.0 },
           current_state: { load_pct: 52.0, power_output_kw: 65.0, rpm: 1500, exhaust_temp_c: 340.0, vibration_mms: 1.7, oil_pressure_bar: 4.5, fuel_flow_lph: 20.0 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -321,8 +323,9 @@ export const api = {
           health_score: 98.0,
           criticality: 'HIGH',
           location_desc: 'Power House Bay 3',
-          coordinates_3d: { x: -4, y: 1.5, z: -6 },
+          coordinates_3d: { x: -11.0, y: 1.65, z: -8.0 },
           current_state: { load_pct: 0.0, status: 'HOT_STANDBY', rpm: 0, exhaust_temp_c: 22.0 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -335,8 +338,9 @@ export const api = {
           health_score: 91.0,
           criticality: 'MEDIUM',
           location_desc: 'North Moraine Ridge',
-          coordinates_3d: { x: 16, y: 8, z: -14 },
+          coordinates_3d: { x: 16.0, y: 10.0, z: -16.0 },
           current_state: { output_kw: 11.2, rotor_rpm: 64.0, wind_speed_ms: 14.5 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -349,8 +353,9 @@ export const api = {
           health_score: 97.5,
           criticality: 'CRITICAL',
           location_desc: 'Central Control Block',
-          coordinates_3d: { x: -2, y: 1.5, z: 0 },
+          coordinates_3d: { x: -2.0, y: 1.8, z: 0.0 },
           current_state: { grid_freq_hz: 49.98, voltage_v: 415.0, total_demand_kw: 160.0 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -363,8 +368,9 @@ export const api = {
           health_score: 93.0,
           criticality: 'CRITICAL',
           location_desc: 'Thermal Plant Annex',
-          coordinates_3d: { x: -5, y: 1.5, z: 2 },
+          coordinates_3d: { x: -8.0, y: 1.65, z: 8.0 },
           current_state: { water_supply_temp_c: 72.0, return_temp_c: 58.0, thermal_output_kw: 110.0 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -377,8 +383,9 @@ export const api = {
           health_score: 94.0,
           criticality: 'CRITICAL',
           location_desc: 'Lake Priyadarshini Shore',
-          coordinates_3d: { x: 18, y: 0.5, z: 8 },
+          coordinates_3d: { x: 18.0, y: 1.35, z: 8.0 },
           current_state: { intake_temp_c: 1.8, flow_rate_lpm: 85.0, heat_trace_status: 'ACTIVE' },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -391,8 +398,9 @@ export const api = {
           health_score: 96.0,
           criticality: 'HIGH',
           location_desc: 'Utility Wing',
-          coordinates_3d: { x: 6, y: 1.5, z: 4 },
+          coordinates_3d: { x: 8.0, y: 1.75, z: 6.0 },
           current_state: { level_pct: 78.5, volume_litres: 23550, water_temp_c: 12.0 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -405,8 +413,9 @@ export const api = {
           health_score: 98.0,
           criticality: 'CRITICAL',
           location_desc: 'Fuel Farm Pad',
-          coordinates_3d: { x: -16, y: 1.2, z: 10 },
+          coordinates_3d: { x: -18.0, y: 2.3, z: 10.0 },
           current_state: { level_litres: 58200, capacity_litres: 75000, temp_c: -14.0 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -419,8 +428,9 @@ export const api = {
           health_score: 96.5,
           criticality: 'HIGH',
           location_desc: 'Comms Tower Hill',
-          coordinates_3d: { x: 12, y: 6, z: -4 },
+          coordinates_3d: { x: 12.0, y: 8.8, z: -6.0 },
           current_state: { signal_quality_db: 13.9, link_status: 'ONLINE', uplink_kbps: 1536 },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -433,8 +443,9 @@ export const api = {
           health_score: 99.0,
           criticality: 'MEDIUM',
           location_desc: 'Isolated Non-Magnetic Hut',
-          coordinates_3d: { x: -14, y: 1.2, z: -14 },
+          coordinates_3d: { x: -14.0, y: 1.45, z: -16.0 },
           current_state: { magnetic_field_nt: 42150.0, seismic_noise: 'LOW' },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         },
         {
@@ -447,8 +458,9 @@ export const api = {
           health_score: 95.0,
           criticality: 'LOW',
           location_desc: 'Heavy Logistics Pad',
-          coordinates_3d: { x: 10, y: 1.5, z: 14 },
+          coordinates_3d: { x: 10.0, y: 2.0, z: 16.0 },
           current_state: { vehicles_ready: 4, heater_active: true },
+          geometry_confidence: 'VERIFIED',
           source_type: 'PHYSICS_SYNTHETIC',
         }
       ];
@@ -908,6 +920,82 @@ export const api = {
         source_type: 'PHYSICS_SYNTHETIC',
         description: '24-hour predictive thermodynamic building loss and solar radiation model',
       },
+    };
+  },
+
+  /**
+   * 4b. Real-Time Supabase WebSocket Subscription for Live Physical Telemetry Stream
+   * Connects to Supabase Realtime channel for postgres_changes or falls back to periodic polling in air-gapped mode.
+   */
+  subscribeToStationTelemetry(
+    stationId: string,
+    onData: (data: any) => void
+  ): () => void {
+    let ws: WebSocket | null = null;
+    let pollInterval: any = null;
+    let isCleanedUp = false;
+
+    if (SUPABASE_ANON_KEY && typeof window !== 'undefined' && typeof WebSocket !== 'undefined') {
+      try {
+        const wsUrl = `wss://${new URL(SUPABASE_URL).hostname}/realtime/v1/websocket?apikey=${SUPABASE_ANON_KEY}&vsn=1.0.0`;
+        ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => {
+          if (isCleanedUp) {
+            ws?.close();
+            return;
+          }
+          const joinMsg = {
+            topic: `realtime:public:energy_readings:station_id=eq.${stationId}`,
+            event: 'phx_join',
+            payload: {},
+            ref: '1',
+          };
+          ws.send(JSON.stringify(joinMsg));
+
+          const heartbeat = setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({ topic: 'phoenix', event: 'heartbeat', payload: {}, ref: 'hb' }));
+            } else {
+              clearInterval(heartbeat);
+            }
+          }, 25000);
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.event === 'INSERT' || msg.event === 'UPDATE') {
+              onData(msg.payload?.record || msg.payload);
+            }
+          } catch (_) {}
+        };
+
+        ws.onerror = (e) => {
+          console.warn('Supabase Realtime WebSocket error, fallback to periodic fetch:', e);
+        };
+      } catch (err) {
+        console.warn('Failed to establish Supabase Realtime connection:', err);
+      }
+    }
+
+    // High-reliability polling fallback to ensure continuous telemetry in air-gap/offline modes
+    pollInterval = setInterval(async () => {
+      if (isCleanedUp) return;
+      try {
+        const liveEnergy = await api.getEnergyStatus(stationId);
+        onData(liveEnergy);
+      } catch (_) {}
+    }, 5000);
+
+    return () => {
+      isCleanedUp = true;
+      if (ws) {
+        try { ws.close(); } catch (_) {}
+      }
+      if (pollInterval) {
+        clearInterval(pollInterval);
+      }
     };
   },
 
