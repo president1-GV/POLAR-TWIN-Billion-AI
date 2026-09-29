@@ -104,9 +104,13 @@ export const App: React.FC = () => {
 
   const unreadCount = alerts.filter((a) => a.status === 'ACTIVE').length;
 
-  // If user navigates to login or is unauthenticated, render dedicated Login screen
   if (currentScreen === 'login') {
-    return <LoginPage onLoginSuccess={() => setCurrentScreen('command-center')} />;
+    return (
+      <LoginPage 
+        onLoginSuccess={() => setCurrentScreen('command-center')} 
+        onReturnHome={() => setCurrentScreen('command-center')}
+      />
+    );
   }
 
   return (

@@ -1,7 +1,8 @@
 // ============================================================================
 // POLAR-TWIN: Mission Operations Authentication Screen
-// SIH 26060 — Indian Antarctic Research Stations (Bharati & Maitri)
+// POLAR-TWIN — Indian Antarctic Research Stations (Bharati & Maitri)
 // NCPOR / Ministry of Earth Sciences • High-Security Antarctic Command
+// Fully Accessible & High-Contrast Adaptive Theme (Light & Dark)
 // ============================================================================
 
 import React, { useState } from 'react';
@@ -18,18 +19,21 @@ import {
   CheckCircle2, 
   Server,
   Zap,
-  ArrowRight
+  ArrowRight,
+  ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { ROLE_CREDENTIALS } from '../../services/api';
 import { PolarRole, getRoleMeta } from '../../services/rbac';
+import { ThemeSwitcher } from '../common/ThemeSwitcher';
 import polarTwinIcon from '../../assets/polar-twin-icon.png';
 
 interface LoginPageProps {
   onLoginSuccess?: () => void;
+  onReturnHome?: () => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onReturnHome }) => {
   const { login, isAirGapped } = useAuth();
   const [username, setUsername] = useState('operator.sharma');
   const [password, setPassword] = useState('PolarOps@2026!');
@@ -80,15 +84,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-polar-950 bg-gradient-to-b from-polar-950 via-[#07111D] to-[#040810] text-polar-text-primary flex flex-col justify-between p-4 sm:p-8 font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="min-h-screen bg-polar-base text-polar-text-primary flex flex-col justify-between p-4 sm:p-8 font-sans selection:bg-cyan-500/30 selection:text-cyan-200 transition-colors">
       {/* Top Bar / Government Header */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-polar-border/60 pb-4">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-polar-border pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-lg bg-polar-bg/80 border-2 border-polar-cyan/60 flex items-center justify-center shadow-lg shadow-cyan-500/20 ring-2 ring-polar-cyan/25 overflow-hidden p-0.5">
+          <div className="w-11 h-11 rounded-lg bg-polar-surface border-2 border-polar-cyan/60 flex items-center justify-center shadow-md shadow-cyan-500/10 ring-1 ring-polar-cyan/25 overflow-hidden p-0.5 shrink-0">
             <img 
               src={polarTwinIcon} 
               alt="POLAR-TWIN Mission Logo" 
-              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" 
+              className="w-full h-full object-contain" 
             />
           </div>
           <div>
@@ -96,7 +100,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               <span className="font-extrabold tracking-wider text-base text-polar-text-primary">
                 POLAR<span className="text-polar-cyan">-TWIN</span>
               </span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-300 border border-cyan-800/40">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30 font-bold">
                 MISSION OPS
               </span>
             </div>
@@ -106,17 +110,35 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
 
-        {/* Real-time System Status Pills */}
-        <div className="flex items-center gap-3 text-xs">
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-md bg-polar-surface/80 border border-polar-border">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-polar-text-muted text-[11px]">SUPABASE UPLINK:</span>
-            <span className="font-mono text-emerald-400 font-semibold text-[11px]">ACTIVE</span>
+        {/* Real-time System Status Pills, Navigation & Theme Toggle */}
+        <div className="flex items-center gap-2 sm:gap-3 text-xs flex-wrap">
+          {onReturnHome && (
+            <button
+              type="button"
+              onClick={onReturnHome}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-polar-surface hover:bg-polar-elevated border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs font-semibold transition-colors shadow-sm"
+              title="Return to Executive Situational Command Center"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-polar-cyan" />
+              <span>Return to Dashboard</span>
+            </button>
+          )}
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-polar-surface border border-polar-border shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-polar-text-muted text-[11px] font-medium">UPLINK:</span>
+            <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold text-[11px]">ACTIVE</span>
           </div>
-          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md bg-polar-surface/80 border border-polar-border">
-            <Server className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-polar-text-muted text-[11px]">DB HOST:</span>
-            <span className="font-mono text-polar-text-secondary text-[11px]">fpoxnocbznagepusczkk</span>
+
+          <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-polar-surface border border-polar-border shadow-sm">
+            <Server className="w-3.5 h-3.5 text-polar-cyan" />
+            <span className="text-polar-text-muted text-[11px] font-medium">HOST:</span>
+            <span className="font-mono text-polar-text-secondary text-[11px] font-semibold">fpoxnocbznagepusczkk</span>
+          </div>
+
+          {/* Theme Switcher */}
+          <div className="shrink-0">
+            <ThemeSwitcher />
           </div>
         </div>
       </header>
@@ -127,88 +149,90 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
           {/* Left Hero / Operational Context (5 cols) */}
           <div className="lg:col-span-5 space-y-6">
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400 text-xs font-bold">
                 <Radio className="w-3.5 h-3.5 animate-pulse" />
                 <span>MISSION COMMAND CENTER</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-polar-text-primary leading-tight">
                 Autonomous Digital Twin & Telemetry Portal
               </h1>
-              <p className="text-xs text-polar-text-muted leading-relaxed">
+              <p className="text-xs text-polar-text-muted leading-relaxed font-medium">
                 Zero-Trust authenticated access for Indian Antarctic Expedition personnel at Bharati (Larsemann Hills) and Maitri (Schirmacher Oasis).
               </p>
             </div>
 
             {/* Station Status Cards */}
             <div className="space-y-3">
-              <div className="p-3 rounded-lg bg-polar-card/60 border border-polar-border flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-cyan-400" />
+              <div className="p-3.5 rounded-xl bg-polar-card border border-polar-border flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse shrink-0" />
                   <div>
                     <p className="text-xs font-bold text-polar-text-primary">Bharati Station</p>
                     <p className="text-[10px] text-polar-text-muted font-mono">69°24'S, 76°11'E • Larsemann Hills</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                   ONLINE
                 </span>
               </div>
 
-              <div className="p-3 rounded-lg bg-polar-card/60 border border-polar-border flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-400" />
+              <div className="p-3.5 rounded-xl bg-polar-card border border-polar-border flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse shrink-0" />
                   <div>
                     <p className="text-xs font-bold text-polar-text-primary">Maitri Station</p>
                     <p className="text-[10px] text-polar-text-muted font-mono">70°45'S, 11°44'E • Schirmacher Oasis</p>
                   </div>
                 </div>
-                <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
                   ONLINE
                 </span>
               </div>
             </div>
 
             {/* Quick Evaluation Presets */}
-            <div className="p-3.5 rounded-lg bg-polar-surface/50 border border-polar-border/80 space-y-2.5">
+            <div className="p-4 rounded-xl bg-polar-card border border-polar-border shadow-sm space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-polar-text-muted uppercase tracking-wider flex items-center gap-1.5">
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-[11px] font-bold text-polar-text-secondary uppercase tracking-wider flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-amber-500" />
                   Quick Personnel Access Presets
                 </span>
-                <span className="text-[9px] font-mono text-cyan-400">ONE-CLICK</span>
+                <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+                  ONE-CLICK
+                </span>
               </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="grid grid-cols-2 gap-2.5 text-xs">
                 <button
                   type="button"
                   onClick={() => handleQuickPreset('OPERATOR')}
-                  className="px-2.5 py-1.5 rounded bg-polar-card hover:bg-polar-card/80 border border-cyan-500/30 text-left hover:border-cyan-400 transition-colors"
+                  className="p-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-left transition-colors group shadow-sm"
                 >
-                  <p className="font-bold text-cyan-300 text-[11px]">Duty Operator</p>
-                  <p className="text-[9px] text-polar-text-muted">V. Sharma (Bharati)</p>
+                  <p className="font-bold text-cyan-700 dark:text-cyan-300 text-[11px] group-hover:text-cyan-600 dark:group-hover:text-cyan-200">Duty Operator</p>
+                  <p className="text-[9px] text-polar-text-muted font-medium">V. Sharma (Bharati)</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickPreset('ENGINEER')}
-                  className="px-2.5 py-1.5 rounded bg-polar-card hover:bg-polar-card/80 border border-amber-500/30 text-left hover:border-amber-400 transition-colors"
+                  className="p-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-left transition-colors group shadow-sm"
                 >
-                  <p className="font-bold text-amber-300 text-[11px]">Base Engineer</p>
-                  <p className="text-[9px] text-polar-text-muted">A. Deshmukh (Bharati)</p>
+                  <p className="font-bold text-amber-700 dark:text-amber-300 text-[11px] group-hover:text-amber-600 dark:group-hover:text-amber-200">Base Engineer</p>
+                  <p className="text-[9px] text-polar-text-muted font-medium">A. Deshmukh (Bharati)</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickPreset('SUPERVISOR')}
-                  className="px-2.5 py-1.5 rounded bg-polar-card hover:bg-polar-card/80 border border-purple-500/30 text-left hover:border-purple-400 transition-colors"
+                  className="p-2.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-left transition-colors group shadow-sm"
                 >
-                  <p className="font-bold text-purple-300 text-[11px]">Expedition Cmdr</p>
-                  <p className="text-[9px] text-polar-text-muted">Col. R. Nair (MFA: 123456)</p>
+                  <p className="font-bold text-purple-700 dark:text-purple-300 text-[11px] group-hover:text-purple-600 dark:group-hover:text-purple-200">Expedition Cmdr</p>
+                  <p className="text-[9px] text-polar-text-muted font-medium">Col. R. Nair (MFA: 123456)</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleQuickPreset('ADMIN')}
-                  className="px-2.5 py-1.5 rounded bg-polar-card hover:bg-polar-card/80 border border-rose-500/30 text-left hover:border-rose-400 transition-colors"
+                  className="p-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-left transition-colors group shadow-sm"
                 >
-                  <p className="font-bold text-rose-300 text-[11px]">Mission Control</p>
-                  <p className="text-[9px] text-polar-text-muted">NCPOR Admin (Root)</p>
+                  <p className="font-bold text-rose-700 dark:text-rose-300 text-[11px] group-hover:text-rose-600 dark:group-hover:text-rose-200">Mission Control</p>
+                  <p className="text-[9px] text-polar-text-muted font-medium">NCPOR Admin (Root)</p>
                 </button>
               </div>
             </div>
@@ -216,21 +240,19 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
           {/* Right Form Card (7 cols) */}
           <div className="lg:col-span-7">
-            <div className="bg-polar-card/90 backdrop-blur-xl border border-polar-border rounded-xl p-6 sm:p-8 shadow-2xl shadow-cyan-950/30 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="flex items-center justify-between border-b border-polar-border/80 pb-4 mb-6">
+            <div className="bg-polar-card border border-polar-border rounded-2xl p-6 sm:p-8 shadow-xl shadow-slate-900/5 dark:shadow-cyan-950/40 relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-polar-border pb-4 mb-6">
                 <div>
-                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    <ShieldCheck className="w-5 h-5 text-polar-cyan" />
+                  <h2 className="text-lg font-bold text-polar-text-primary flex items-center gap-2">
+                    <ShieldCheck className="w-5 h-5 text-polar-cyan shrink-0" />
                     Station Identity Verification
                   </h2>
-                  <p className="text-xs text-polar-text-muted">
+                  <p className="text-xs text-polar-text-muted mt-0.5">
                     Authenticate via Supabase Cloud IAM or Air-Gapped Station SCADA
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-polar-surface text-polar-text-muted border border-polar-border">
+                <div className="text-right shrink-0">
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-polar-surface text-polar-text-muted border border-polar-border font-bold">
                     ZERO-TRUST v2.4
                   </span>
                 </div>
@@ -238,16 +260,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
               {/* Error Callout */}
               {errorMessage && (
-                <div className="mb-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-200">
-                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="mb-4 p-3 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in duration-200 font-medium">
+                  <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-rose-500" />
                   <span>{errorMessage}</span>
                 </div>
               )}
 
               {/* Success Callout */}
               {successNotice && (
-                <div className="mb-4 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2.5 animate-in fade-in duration-200">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
+                <div className="mb-4 p-3 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2.5 animate-in fade-in duration-200 font-medium">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
                   <span>{successNotice}</span>
                 </div>
               )}
@@ -255,7 +277,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Station Officer ID / Username */}
                 <div>
-                  <label className="block text-xs font-semibold text-polar-text-secondary mb-1.5">
+                  <label className="block text-xs font-bold text-polar-text-primary mb-1.5">
                     Officer Username / Station Email
                   </label>
                   <div className="relative">
@@ -265,7 +287,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="e.g. operator.sharma or commander@polar.gov.in"
-                      className="w-full pl-9 pr-3 py-2 bg-polar-base border border-polar-border rounded-lg text-xs text-polar-text-primary placeholder:text-polar-text-muted/60 focus:outline-none focus:border-polar-cyan focus:ring-1 focus:ring-polar-cyan transition-colors"
+                      className="w-full pl-9 pr-3 py-2.5 bg-polar-input border border-polar-border focus:border-polar-cyan rounded-lg text-xs text-polar-text-primary placeholder:text-polar-text-muted/60 focus:outline-none focus:ring-1 focus:ring-polar-cyan transition-colors shadow-sm"
                       required
                     />
                   </div>
@@ -273,7 +295,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
                 {/* Password Input */}
                 <div>
-                  <label className="block text-xs font-semibold text-polar-text-secondary mb-1.5">
+                  <label className="block text-xs font-bold text-polar-text-primary mb-1.5">
                     Security Passcode
                   </label>
                   <div className="relative">
@@ -283,13 +305,13 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter operational passcode"
-                      className="w-full pl-9 pr-10 py-2 bg-polar-base border border-polar-border rounded-lg text-xs text-polar-text-primary placeholder:text-polar-text-muted/60 focus:outline-none focus:border-polar-cyan focus:ring-1 focus:ring-polar-cyan transition-colors font-mono"
+                      className="w-full pl-9 pr-10 py-2.5 bg-polar-input border border-polar-border focus:border-polar-cyan rounded-lg text-xs text-polar-text-primary placeholder:text-polar-text-muted/60 focus:outline-none focus:ring-1 focus:ring-polar-cyan transition-colors font-mono shadow-sm"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-polar-text-muted hover:text-polar-text-primary transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-polar-text-muted hover:text-polar-text-primary transition-colors p-1"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -299,10 +321,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 {/* Optional MFA Token (for Commander and Admin) */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-polar-text-secondary">
+                    <label className="text-xs font-bold text-polar-text-primary">
                       TOTP 2FA Token (Commander / Admin)
                     </label>
-                    <span className="text-[10px] text-polar-text-muted">Default: 123456</span>
+                    <span className="text-[10px] text-polar-text-muted font-mono font-medium">Default: 123456</span>
                   </div>
                   <div className="relative">
                     <Key className="w-4 h-4 text-polar-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
@@ -312,38 +334,38 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                       onChange={(e) => setMfaCode(e.target.value)}
                       maxLength={6}
                       placeholder="6-digit TOTP code"
-                      className="w-full pl-9 pr-3 py-2 bg-polar-base border border-polar-border rounded-lg text-xs text-polar-text-primary placeholder:text-polar-text-muted/60 focus:outline-none focus:border-polar-cyan focus:ring-1 focus:ring-polar-cyan transition-colors font-mono tracking-widest"
+                      className="w-full pl-9 pr-3 py-2.5 bg-polar-input border border-polar-border focus:border-polar-cyan rounded-lg text-xs text-polar-text-primary placeholder:text-polar-text-muted/60 focus:outline-none focus:ring-1 focus:ring-polar-cyan transition-colors font-mono tracking-widest shadow-sm"
                     />
                   </div>
                 </div>
 
                 {/* Session Persistence Toggle */}
                 <div className="flex items-center justify-between pt-1">
-                  <label className="flex items-center gap-2 cursor-pointer text-xs text-polar-text-secondary select-none">
+                  <label className="flex items-center gap-2 cursor-pointer text-xs text-polar-text-secondary select-none font-medium">
                     <input
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded bg-polar-base border-polar-border text-polar-cyan focus:ring-polar-cyan/30"
+                      className="rounded bg-polar-input border-polar-border text-polar-cyan focus:ring-polar-cyan/30"
                     />
                     <span>Persist encrypted session token</span>
                   </label>
-                  <span className="text-[11px] text-polar-text-muted font-mono">TTL: 8 Hours</span>
+                  <span className="text-[11px] text-polar-text-muted font-mono font-medium">TTL: 8 Hours</span>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className={`w-full mt-2 py-2.5 px-4 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all duration-200 ${
+                  className={`w-full mt-3 py-3 px-4 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer shadow-lg ${
                     isSubmitting
                       ? 'bg-polar-surface text-polar-text-muted cursor-wait'
-                      : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-polar-950 font-bold shadow-lg shadow-cyan-500/20 active:scale-[0.99]'
+                      : 'bg-cyan-600 hover:bg-cyan-500 text-white shadow-cyan-600/25 active:scale-[0.99]'
                   }`}
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-cyan-400/30 border-t-cyan-400 rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       <span>AUTHENTICATING STATION UPLINK...</span>
                     </>
                   ) : (
@@ -356,8 +378,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               </form>
 
               {/* Bottom Security Classification Banner */}
-              <div className="mt-6 pt-4 border-t border-polar-border/60 text-center text-[10px] text-polar-text-muted space-y-1">
-                <p className="font-semibold tracking-wider text-polar-text-secondary">
+              <div className="mt-6 pt-4 border-t border-polar-border text-center text-[10px] text-polar-text-muted space-y-1">
+                <p className="font-bold tracking-wider text-polar-text-secondary">
                   GOVERNMENT OF INDIA • MINISTRY OF EARTH SCIENCES
                 </p>
                 <p>
@@ -370,7 +392,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       </main>
 
       {/* Footer System Line */}
-      <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-polar-border/60 pt-4 text-[11px] text-polar-text-muted font-mono">
+      <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-polar-border pt-4 text-[11px] text-polar-text-muted font-mono">
         <div>
           POLAR-TWIN DIGITAL TWIN ARCHITECTURE • NCPOR • MoES, GOI
         </div>
