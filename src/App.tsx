@@ -134,6 +134,7 @@ export const App: React.FC = () => {
           <ErrorBoundary key={currentScreen} fallbackTitle={`MISSION VIEW SUBSYSTEM: ${currentScreen.toUpperCase()}`}>
             {currentScreen === 'command-center' && (
               <ExecutiveCommandCenter
+                currentStationId={currentStationId}
                 onNavigate={setCurrentScreen}
                 onSelectStation={setCurrentStationId}
               />

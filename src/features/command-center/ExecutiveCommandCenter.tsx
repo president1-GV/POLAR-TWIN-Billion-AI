@@ -36,17 +36,29 @@ import { MissionSummary } from '../../components/ui/MissionSummary';
 import { CommandButton } from '../../components/ui/CommandButton';
 
 interface Props {
+  currentStationId?: string;
   onNavigate: (screen: any) => void;
   onSelectStation: (stationId: string) => void;
 }
 
-export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectStation }) => {
+export const ExecutiveCommandCenter: React.FC<Props> = ({ 
+  currentStationId = 'station_bharati',
+  onNavigate, 
+  onSelectStation 
+}) => {
   const [stations, setStations] = useState<any[]>([]);
-  const [activeStationId, setActiveStationId] = useState<string>('station_bharati');
+  const [activeStationId, setActiveStationId] = useState<string>(currentStationId);
   const [loading, setLoading] = useState(true);
   const [centerViewMode, setCenterViewMode] = useState<'3D_TWIN' | 'MAP'>('3D_TWIN');
   const [drawerStation, setDrawerStation] = useState<any | null>(null);
   const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
+
+  // Synchronize internal station state whenever currentStationId changes externally
+  useEffect(() => {
+    if (currentStationId && currentStationId !== activeStationId) {
+      setActiveStationId(currentStationId);
+    }
+  }, [currentStationId]);
 
   useEffect(() => {
     loadData();
@@ -66,14 +78,23 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
     }
   };
 
+  const isBharati = activeStationId === 'station_bharati';
   const selectedStationObj = stations.find((s) => s.id === activeStationId) || stations[0];
 
-  // Historical sparkline telemetry buffer
-  const powerSparkline = [378, 382, 385, 380, 391, 395, 394, 395];
-  const fuelSparkline = [189.5, 189.1, 188.4, 187.9, 187.2, 186.8, 186.5, 186.3];
-  const waterSparkline = [3100, 3150, 3180, 3190, 3200, 3210, 3195, 3200];
+  // Historical sparkline telemetry buffer (reacts dynamically to activeStationId)
+  const powerSparkline = isBharati 
+    ? [378, 382, 385, 380, 391, 395, 394, 395]
+    : [152, 155, 158, 160, 159, 160, 160, 160];
+  const fuelSparkline = isBharati 
+    ? [189.5, 189.1, 188.4, 187.9, 187.2, 186.8, 186.5, 186.3]
+    : [146.2, 145.8, 145.0, 144.5, 143.9, 143.4, 143.0, 142.8];
+  const waterSparkline = isBharati 
+    ? [3100, 3150, 3180, 3190, 3200, 3210, 3195, 3200]
+    : [2100, 2120, 2140, 2150, 2150, 2150, 2150, 2150];
   const satSparkline = [99.2, 99.5, 99.7, 99.8, 99.8, 99.8, 99.8, 99.8];
-  const healthSparkline = [97.0, 97.2, 97.2, 97.4, 97.4, 97.4, 97.4, 97.4];
+  const healthSparkline = isBharati 
+    ? [97.0, 97.2, 97.2, 97.4, 97.4, 97.4, 97.4, 97.4]
+    : [87.5, 87.8, 88.0, 88.2, 88.2, 88.2, 88.2, 88.2];
 
   if (loading && stations.length === 0) {
     return (
@@ -157,21 +178,21 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
       <MissionSummary
         activeStationsCount={2}
         totalStationsCount={2}
-        microgridStatus="NOMINAL • 395 kW"
-        waterStatus="OPTIMAL • 3,200 L/d"
-        fuelStatus="HEALTHY • 186.3 DAYS"
+        microgridStatus={isBharati ? "NOMINAL • 395 kW" : "NOMINAL • 160 kW"}
+        waterStatus={isBharati ? "OPTIMAL • 3,200 L/d" : "STABLE • 2,150 L/d"}
+        fuelStatus={isBharati ? "HEALTHY • 186.3 DAYS" : "STABLE • 142.8 DAYS"}
         connectivityStatus="ONLINE • GSAT-11 (640ms)"
-        weatherStatus="-24.2°C • 18.4 m/s KATABATIC"
+        weatherStatus={isBharati ? "-24.2°C • 18.4 m/s KATABATIC" : "-28.5°C • 21.0 m/s BLIZZARD"}
       />
 
       {/* 3. CRITICAL TELEMETRY METRIC STRIP (Phase 6 & 7) */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3.5 overflow-hidden">
         <TelemetryMetric
           label="Power Demand"
-          value="395.0"
+          value={isBharati ? "395.0" : "160.0"}
           unit="kW"
           status="NORMAL"
-          trend="+3.2% vs 24h"
+          trend={isBharati ? "+3.2% vs 24h" : "+1.8% vs 24h"}
           trendDirection="up"
           timestamp="14:32:08 UTC"
           sparklineData={powerSparkline}
@@ -182,10 +203,10 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
         <TelemetryMetric
           label="Polar Fuel Runway"
-          value="186.3"
+          value={isBharati ? "186.3" : "142.8"}
           unit="DAYS"
           status="NORMAL"
-          trend="-0.4% vs 24h"
+          trend={isBharati ? "-0.4% vs 24h" : "-0.3% vs 24h"}
           trendDirection="down"
           timestamp="14:32:08 UTC"
           sparklineData={fuelSparkline}
@@ -196,10 +217,10 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
         <TelemetryMetric
           label="Water Production"
-          value="3,200"
+          value={isBharati ? "3,200" : "2,150"}
           unit="L/day"
           status="NORMAL"
-          trend="+1.1% vs 24h"
+          trend={isBharati ? "+1.1% vs 24h" : "+0.8% vs 24h"}
           trendDirection="up"
           timestamp="14:32:08 UTC"
           sparklineData={waterSparkline}
@@ -224,10 +245,10 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
         <TelemetryMetric
           label="Station Health"
-          value="97.4"
+          value={isBharati ? "97.4" : "88.2"}
           unit="%"
-          status="NOMINAL"
-          trend="+0.0% vs 24h"
+          status={isBharati ? "NOMINAL" : "ACCEPTABLE"}
+          trend={isBharati ? "+0.0% vs 24h" : "-0.5% vs 24h"}
           trendDirection="neutral"
           timestamp="14:32:08 UTC"
           sparklineData={healthSparkline}
@@ -294,6 +315,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
           {centerViewMode === '3D_TWIN' ? (
             <div className="h-[520px]">
               <Station3DViewer 
+                key={activeStationId}
                 stationId={activeStationId} 
                 onNavigateToSimulation={(_key) => onNavigate('simulation')}
               />
@@ -319,14 +341,23 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
       {/* 5. DUAL STATION OPERATIONAL CARDS */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {stations.map((st) => {
-          const isBharati = st.id === 'station_bharati';
+          const isStationBharati = st.id === 'station_bharati';
+          const isSelected = st.id === activeStationId;
           const env = st.environment || {};
           const health = st.overall_health_score || 96.5;
 
           return (
             <div
               key={st.id}
-              className="bg-polar-card border border-polar-border hover:border-polar-border-strong transition-colors rounded-md flex flex-col justify-between shadow-sm font-mono"
+              onClick={() => {
+                setActiveStationId(st.id);
+                onSelectStation(st.id);
+              }}
+              className={`bg-polar-card border transition-all duration-200 rounded-md flex flex-col justify-between shadow-sm font-mono cursor-pointer ${
+                isSelected 
+                  ? 'border-polar-cyan/60 ring-2 ring-polar-cyan/25 shadow-md shadow-cyan-500/10' 
+                  : 'border-polar-border hover:border-polar-border-strong opacity-85 hover:opacity-100'
+              }`}
             >
               {/* Header */}
               <div className="px-4 py-3 bg-polar-surface border-b border-polar-border flex items-center justify-between text-xs">
