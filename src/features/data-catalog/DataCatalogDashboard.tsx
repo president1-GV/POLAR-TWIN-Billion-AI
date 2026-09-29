@@ -258,7 +258,7 @@ export const DataCatalogDashboard: React.FC = () => {
             </h1>
             <span className="px-2.5 py-0.5 text-[10px] font-mono font-semibold rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
               <ShieldCheck className="w-3 h-3 text-emerald-500" />
-              SIH 26060 REPRODUCIBLE
+              AUDIT VERIFIED PROVENANCE
             </span>
           </div>
           <p className="text-xs text-polar-text-secondary font-mono mt-1">

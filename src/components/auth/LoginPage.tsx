@@ -97,7 +97,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
                 POLAR<span className="text-polar-cyan">-TWIN</span>
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-300 border border-cyan-800/40">
-                SIH 26060
+                MISSION OPS
               </span>
             </div>
             <p className="text-[11px] text-polar-text-muted">
@@ -173,7 +173,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-semibold text-polar-text-muted uppercase tracking-wider flex items-center gap-1.5">
                   <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  SIH Quick Evaluator Presets
+                  Quick Personnel Access Presets
                 </span>
                 <span className="text-[9px] font-mono text-cyan-400">ONE-CLICK</span>
               </div>
@@ -372,7 +372,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
       {/* Footer System Line */}
       <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-polar-border/60 pt-4 text-[11px] text-polar-text-muted font-mono">
         <div>
-          POLAR-TWIN DIGITAL TWIN ARCHITECTURE • SIH 26060 • NCPOR GOA
+          POLAR-TWIN DIGITAL TWIN ARCHITECTURE • NCPOR • MoES, GOI
         </div>
         <div className="flex items-center gap-4">
           <span>LATENCY: 42ms</span>

@@ -76,7 +76,7 @@ export const KillerDemoPanel: React.FC<Props> = ({ onNavigateToTwin }) => {
           <div>
             <div className="flex items-center gap-2 text-xs text-polar-cyan font-bold uppercase tracking-wider mb-1">
               <span className="w-2 h-2 rounded-full bg-polar-cyan animate-pulse" />
-              <span>SIH 26060 MASTER DEMONSTRATION HARNESS</span>
+              <span>MISSION SYSTEM DEMONSTRATION HARNESS</span>
             </div>
             <h2 className="text-xl font-bold text-polar-text-primary tracking-tight font-sans">
               CLOSED-LOOP DIGITAL TWIN SYSTEM DEMONSTRATION

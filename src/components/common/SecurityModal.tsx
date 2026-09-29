@@ -113,7 +113,7 @@ export const SecurityModal: React.FC<SecurityModalProps> = ({
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                SIH 26060 Defense-in-Depth Identity & Access Management Guard
+                Zero-Trust Defense-in-Depth Identity & Access Management Guard
               </p>
             </div>
           </div>

@@ -85,109 +85,110 @@ export const Header: React.FC<HeaderProps> = ({
   const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-polar-surface border-b border-polar-border px-3 sm:px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors overflow-hidden">
+    <header className="h-16 bg-polar-surface border-b border-polar-border px-3 sm:px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors w-full">
       {/* LEFT: Branding & First-Class Station Context */}
-      <div className="flex items-center gap-3 sm:gap-4 shrink-0">
-        {/* Brand Identity */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-9 h-9 rounded-lg bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-md ring-1 ring-polar-cyan/30 shrink-0 overflow-hidden">
+      <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+        {/* Brand Identity arranged cleanly inside dedicated professional border */}
+        <div className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0">
+          <div className="w-8 h-8 rounded-md bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-sm ring-1 ring-polar-cyan/25 shrink-0 overflow-hidden">
             <img 
               src={polarTwinIcon} 
               alt="POLAR-TWIN Mission Logo" 
               className="w-full h-full object-contain" 
             />
           </div>
-          <div className="flex flex-col justify-center shrink-0 min-w-0">
-            <div className="flex items-center gap-1.5 whitespace-nowrap leading-tight">
-              <span className="font-extrabold text-sm tracking-wider text-polar-text-primary whitespace-nowrap inline-block">
-                POLAR<span className="text-polar-cyan">-TWIN</span>
+          <div className="flex flex-col justify-center shrink-0">
+            <div className="flex items-center gap-2 whitespace-nowrap leading-none">
+              <span className="font-extrabold text-sm sm:text-base tracking-wider text-polar-text-primary whitespace-nowrap inline-flex items-center">
+                POLAR<span className="text-polar-cyan">&#8209;TWIN</span>
               </span>
-              <span className="text-[9px] px-1 py-0.5 rounded bg-polar-elevated text-polar-text-muted border border-polar-border font-mono font-semibold shrink-0">
-                SIH 26060
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono font-bold tracking-wider uppercase shrink-0">
+                NCPOR
               </span>
             </div>
-            <p className="text-[10px] text-polar-text-muted tracking-tight font-sans whitespace-nowrap mt-0.5 hidden sm:block">
-              Indian Antarctic Operations <span className="text-polar-text-muted/60">•</span> NCPOR
+            <p className="text-[10px] text-polar-text-muted tracking-tight font-sans whitespace-nowrap mt-1 hidden sm:block">
+              Indian Antarctic Operations
             </p>
           </div>
         </div>
 
         {/* Vertical Divider */}
-        <div className="h-6 border-l border-polar-border hidden sm:block" />
+        <div className="h-6 border-l border-polar-border hidden sm:block shrink-0" />
 
         {/* First-Class Station Selector */}
         <div className="hidden sm:flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
           <button
             onClick={() => onStationChange('station_bharati')}
-            className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            title="Bharati Station • Larsemann Hills (69.408° S, 76.187° E)"
+            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
               isBharati
                 ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
                 : 'text-polar-text-muted hover:text-polar-text-primary'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-polar-cyan' : 'bg-slate-400 dark:bg-slate-600'}`} />
-            <span>BHARATI</span>
-            <span className="text-[10px] text-polar-text-muted hidden 2xl:inline">• Larsemann Hills</span>
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
+            <span className="whitespace-nowrap">BHARATI</span>
           </button>
           <button
             onClick={() => onStationChange('station_maitri')}
-            className={`px-2.5 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            title="Maitri Station • Schirmacher Oasis (70.766° S, 11.740° E)"
+            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
               !isBharati
                 ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
                 : 'text-polar-text-muted hover:text-polar-text-primary'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-polar-cyan' : 'bg-slate-400 dark:bg-slate-600'}`} />
-            <span>MAITRI</span>
-            <span className="text-[10px] text-polar-text-muted hidden 2xl:inline">• Schirmacher Oasis</span>
+            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
+            <span className="whitespace-nowrap">MAITRI</span>
           </button>
         </div>
       </div>
 
-      {/* CENTER: Primary Operational State (Shown on wide monitors) */}
+      {/* CENTER: Primary Operational State (Shown on wide monitors >= 2xl to prevent squishing) */}
       <div className="hidden 2xl:flex items-center gap-3 shrink-0">
         <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-polar-base border border-polar-border text-xs whitespace-nowrap">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-polar-text-secondary font-medium">OPERATIONAL STATE:</span>
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span className="text-polar-text-secondary font-medium whitespace-nowrap">OPERATIONAL STATE:</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold whitespace-nowrap">
             {unreadAlertsCount > 0 ? `${unreadAlertsCount} ACTIVE ADVISORIES` : 'ALL SYSTEMS NOMINAL'}
           </span>
           <span className="text-polar-text-muted">|</span>
-          <span className="text-polar-text-muted text-[11px]">
+          <span className="text-polar-text-muted text-[11px] whitespace-nowrap">
             {isBharati ? '69.408° S, 76.187° E' : '70.766° S, 11.740° E'}
           </span>
         </div>
       </div>
 
       {/* RIGHT: System Health, Satellite Link, Alerts, Theme, RBAC, Clock */}
-      <div className="flex items-center gap-2 shrink-0">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
         {/* System Health / Zero-Trust Security */}
         <button
           onClick={() => setIsSecurityOpen(true)}
           title="System Health & Zero-Trust Access Controls"
-          className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-polar-base border border-polar-border hover:border-polar-border-active text-polar-text-secondary text-xs transition-colors shrink-0"
+          className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border hover:border-polar-border-strong text-polar-text-secondary text-xs transition-colors shrink-0 whitespace-nowrap"
         >
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="hidden xl:inline text-polar-text-muted">HEALTH:</span>
-          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">98.4%</span>
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+          <span className="hidden 2xl:inline text-polar-text-muted font-medium whitespace-nowrap">HEALTH:</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">98.4%</span>
         </button>
 
         {/* Satellite Link Toggle */}
         <button
           onClick={onLinkToggle}
           title="Toggle Satellite Link state to test Edge Offline Buffering and Replay Sync"
-          className={`flex items-center gap-1.5 px-2 py-1 rounded-md border text-xs transition-colors shrink-0 ${currLink.bg}`}
+          className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md border text-xs transition-colors shrink-0 whitespace-nowrap ${currLink.bg}`}
         >
-          <span className={`w-2 h-2 rounded-full ${currLink.dot}`} />
-          <Radio className="w-3.5 h-3.5" />
-          <span className="font-semibold hidden lg:inline">{currLink.label}</span>
+          <span className={`w-2 h-2 rounded-full shrink-0 ${currLink.dot}`} />
+          <Radio className="w-3.5 h-3.5 shrink-0" />
+          <span className="font-bold hidden xl:inline whitespace-nowrap">{currLink.label}</span>
         </button>
 
         {/* Alerts Trigger */}
         <button
           onClick={onOpenAlerts}
           title="Open Operational Alerts Drawer"
-          className="relative p-1.5 rounded-md bg-polar-base border border-polar-border text-polar-text-secondary hover:text-polar-text-primary hover:border-polar-border-active transition-colors shrink-0"
+          aria-label={`Operational Alerts: ${unreadAlertsCount} active`}
+          className="relative p-1.5 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border text-polar-text-secondary hover:text-polar-text-primary transition-colors shrink-0 flex items-center justify-center w-8 h-8"
         >
           <Bell className="w-4 h-4" />
           {unreadAlertsCount > 0 && (
@@ -198,27 +199,31 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Global Light / Dark / System Theme Switcher */}
-        <ThemeSwitcher />
+        <div className="shrink-0">
+          <ThemeSwitcher />
+        </div>
 
         {/* RBAC Operator Role Switcher Dropdown */}
-        <RoleSelector activeRole={activeRole} onRoleChange={onRoleChange} />
+        <div className="shrink-0">
+          <RoleSelector activeRole={activeRole} onRoleChange={onRoleChange} />
+        </div>
 
         {/* Authentication Login / Station Gateway Trigger */}
         {onOpenLogin && (
           <button
             onClick={onOpenLogin}
             title="Station Authentication & Identity Verification Portal"
-            className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-polar-base hover:bg-polar-surface border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors shrink-0 whitespace-nowrap"
           >
-            <LogIn className="w-3.5 h-3.5 text-polar-cyan" />
-            <span className="hidden xl:inline text-[11px] font-semibold">LOGIN</span>
+            <LogIn className="w-3.5 h-3.5 text-polar-cyan shrink-0" />
+            <span className="hidden sm:inline text-[11px] font-semibold whitespace-nowrap">LOGIN</span>
           </button>
         )}
 
         {/* Scientific UTC Clock */}
-        <div className="hidden md:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2 py-1 rounded-md border border-polar-border shrink-0">
-          <Clock className="w-3.5 h-3.5 text-polar-text-muted" />
-          <span className="font-semibold text-polar-text-primary">{utcTime || '12:00:00 UTC'}</span>
+        <div className="hidden lg:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2.5 py-1 rounded-md border border-polar-border shrink-0 whitespace-nowrap min-w-[105px]">
+          <Clock className="w-3.5 h-3.5 text-polar-text-muted shrink-0" />
+          <span className="font-bold text-polar-text-primary font-mono whitespace-nowrap">{utcTime || '12:00:00 UTC'}</span>
         </div>
       </div>
 
