@@ -22,6 +22,7 @@ export class MaitriStationBuilder {
     this.buildGeomagneticLaboratory();
     this.buildVehicleGarageAndLogistics();
     this.buildTrestleNetwork();
+    this.buildMissionControlMonolith();
   }
 
   private getAsset(id: string): StationAsset | undefined {
@@ -98,6 +99,35 @@ export class MaitriStationBuilder {
         mainGroup.add(win);
       }
     });
+
+    // ==========================================
+    // OFFICIAL POLAR-TWIN MISSION CREST ON ENTRANCE
+    // ==========================================
+    const crestGroup = new THREE.Group();
+    crestGroup.name = 'MAITRI_POLAR_TWIN_CREST';
+
+    const bezel = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.3, 1.3, 0.1, 32),
+      this.materials.structuralSteel
+    );
+    bezel.rotation.x = Math.PI / 2;
+    bezel.position.set(0, 3.6, 5.06);
+    crestGroup.add(bezel);
+
+    const logoDisc = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.18, 1.18, 0.12, 32),
+      this.materials.missionLogoBadge
+    );
+    logoDisc.rotation.x = Math.PI / 2;
+    logoDisc.position.set(0, 3.6, 5.08);
+    crestGroup.add(logoDisc);
+
+    const crestSpot = new THREE.PointLight(0x00E5FF, 0.8, 8);
+    crestSpot.position.set(0, 3.8, 6.2);
+    crestGroup.add(crestSpot);
+
+    this.registerInteractive('maitri_mission_crest', crestGroup);
+    mainGroup.add(crestGroup);
 
     // Central Switchgear & Bus inside Central Block (MA-PDB-01)
     const pdbGroup = new THREE.Group();
@@ -545,6 +575,61 @@ export class MaitriStationBuilder {
     });
 
     this.group.add(trestle);
+  }
+
+  /**
+   * 10. POLAR-TWIN Official Mission Control Monolith for Maitri
+   */
+  private buildMissionControlMonolith(): void {
+    const monolithGroup = new THREE.Group();
+    monolithGroup.name = 'MAITRI_MISSION_MONOLITH';
+    monolithGroup.position.set(-12, 0, 14);
+
+    const plinth = new THREE.Mesh(
+      new THREE.BoxGeometry(3.4, 0.5, 2.0),
+      this.materials.moraineRock
+    );
+    plinth.position.set(0, 0.25, 0);
+    plinth.receiveShadow = true;
+    monolithGroup.add(plinth);
+
+    const stele = new THREE.Mesh(
+      new THREE.BoxGeometry(2.6, 4.0, 0.4),
+      this.materials.structuralSteel
+    );
+    stele.position.set(0, 2.25, 0);
+    stele.castShadow = true;
+    monolithGroup.add(stele);
+
+    const orangeBand = new THREE.Mesh(
+      new THREE.BoxGeometry(2.62, 0.3, 0.42),
+      this.materials.maitriOrangeHull
+    );
+    orangeBand.position.set(0, 4.1, 0);
+    monolithGroup.add(orangeBand);
+
+    const frontLogo = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.05, 1.05, 0.08, 32),
+      this.materials.missionLogoBadge
+    );
+    frontLogo.rotation.x = Math.PI / 2;
+    frontLogo.position.set(0, 2.4, 0.24);
+    monolithGroup.add(frontLogo);
+
+    const backLogo = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.05, 1.05, 0.08, 32),
+      this.materials.missionLogoBadge
+    );
+    backLogo.rotation.x = -Math.PI / 2;
+    backLogo.position.set(0, 2.4, -0.24);
+    monolithGroup.add(backLogo);
+
+    const uplight = new THREE.PointLight(0x00E5FF, 1.2, 10);
+    uplight.position.set(0, 4.5, 0);
+    monolithGroup.add(uplight);
+
+    this.registerInteractive('maitri_mission_monolith', monolithGroup);
+    this.group.add(monolithGroup);
   }
 
   public updateAnimation(deltaSeconds: number): void {

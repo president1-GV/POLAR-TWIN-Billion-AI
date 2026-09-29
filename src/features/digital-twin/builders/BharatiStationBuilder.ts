@@ -20,6 +20,7 @@ export class BharatiStationBuilder {
     this.buildScienceLab();
     this.buildLogisticsAndVehicles();
     this.buildPipeTrestleNetwork();
+    this.buildMissionControlMonolith();
   }
 
   private getAsset(id: string): StationAsset | undefined {
@@ -154,6 +155,39 @@ export class BharatiStationBuilder {
     stairRail.position.set(0, (stiltHeight + 0.5) / 2, 9.8);
     stairRail.rotation.x = -Math.PI / 5;
     habGroup.add(stairRail);
+
+    // ==========================================
+    // OFFICIAL POLAR-TWIN MISSION EMBLEM PLAQUE
+    // ==========================================
+    const emblemGroup = new THREE.Group();
+    emblemGroup.name = 'POLAR_TWIN_FACADE_EMBLEM';
+
+    // Structural Bezel Ring (Galvanized Aerospace Steel with Cyan Accents)
+    const bezel = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.65, 1.65, 0.12, 32),
+      this.materials.structuralSteel
+    );
+    bezel.rotation.x = Math.PI / 2;
+    bezel.position.set(0, stiltHeight + 4.2, 6.06);
+    emblemGroup.add(bezel);
+
+    // High-Resolution POLAR-TWIN Mission Logo Medallion
+    const logoDisc = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.5, 1.5, 0.14, 32),
+      this.materials.missionLogoBadge
+    );
+    logoDisc.rotation.x = Math.PI / 2;
+    logoDisc.position.set(0, stiltHeight + 4.2, 6.08);
+    logoDisc.castShadow = true;
+    emblemGroup.add(logoDisc);
+
+    // Illuminating Twilight Spotlight
+    const emblemSpot = new THREE.PointLight(0x00E5FF, 1.0, 9);
+    emblemSpot.position.set(0, stiltHeight + 4.4, 7.2);
+    emblemGroup.add(emblemSpot);
+
+    this.registerInteractive('bh_mission_emblem', emblemGroup);
+    habGroup.add(emblemGroup);
 
     // Rooftop Solar PV Arrays (BH-PV-01)
     const solarGroup = new THREE.Group();
@@ -804,6 +838,76 @@ export class BharatiStationBuilder {
       stanchion.position.set(pt.x, pt.y / 2, pt.z);
       parent.add(stanchion);
     }
+  }
+
+  /**
+   * 9. POLAR-TWIN Official Mission Control Monolith
+   * Stands prominently at the entrance road approach connecting helipad & main base
+   */
+  private buildMissionControlMonolith(): void {
+    const monolithGroup = new THREE.Group();
+    monolithGroup.name = 'POLAR_TWIN_MISSION_MONOLITH';
+    monolithGroup.position.set(-14, 0, 14);
+
+    // Concrete & Moraine Rock Foundation Base
+    const plinth = new THREE.Mesh(
+      new THREE.BoxGeometry(3.6, 0.6, 2.2),
+      this.materials.moraineRock
+    );
+    plinth.position.set(0, 0.3, 0);
+    plinth.receiveShadow = true;
+    monolithGroup.add(plinth);
+
+    // Stepped Structural Steel Pedestal
+    const stepPedestal = new THREE.Mesh(
+      new THREE.BoxGeometry(3.0, 0.4, 1.6),
+      this.materials.structuralSteel
+    );
+    stepPedestal.position.set(0, 0.8, 0);
+    monolithGroup.add(stepPedestal);
+
+    // Aerospace Brushed Titanium Vertical Stele / Pylon
+    const stele = new THREE.Mesh(
+      new THREE.BoxGeometry(2.8, 4.4, 0.45),
+      this.materials.structuralSteel
+    );
+    stele.position.set(0, 3.2, 0);
+    stele.castShadow = true;
+    monolithGroup.add(stele);
+
+    // High-Visibility Orange Trim Band
+    const orangeBand = new THREE.Mesh(
+      new THREE.BoxGeometry(2.82, 0.3, 0.47),
+      this.materials.bharatiHullAccent
+    );
+    orangeBand.position.set(0, 5.2, 0);
+    monolithGroup.add(orangeBand);
+
+    // Front-Facing POLAR-TWIN Logo Medallion
+    const frontLogo = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.15, 1.15, 0.08, 32),
+      this.materials.missionLogoBadge
+    );
+    frontLogo.rotation.x = Math.PI / 2;
+    frontLogo.position.set(0, 3.4, 0.28);
+    monolithGroup.add(frontLogo);
+
+    // Rear-Facing POLAR-TWIN Logo Medallion
+    const backLogo = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.15, 1.15, 0.08, 32),
+      this.materials.missionLogoBadge
+    );
+    backLogo.rotation.x = -Math.PI / 2;
+    backLogo.position.set(0, 3.4, -0.28);
+    monolithGroup.add(backLogo);
+
+    // Upward Night-Illumination Uplight
+    const uplight = new THREE.PointLight(0x00E5FF, 1.4, 12);
+    uplight.position.set(0, 5.6, 0);
+    monolithGroup.add(uplight);
+
+    this.registerInteractive('bh_mission_monolith', monolithGroup);
+    this.group.add(monolithGroup);
   }
 
   public updateBeacons(): void {

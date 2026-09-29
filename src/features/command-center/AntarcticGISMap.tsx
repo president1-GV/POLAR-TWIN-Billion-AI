@@ -14,6 +14,7 @@ import {
   Plane
 } from 'lucide-react';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Props {
   selectedStationId?: string;
@@ -26,6 +27,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
   onSelectStation,
   onNavigateToTwin,
 }) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [showSeaIce, setShowSeaIce] = useState(true);
   const [showWinds, setShowWinds] = useState(true);
   const [showLogistics, setShowLogistics] = useState(true);
@@ -91,15 +94,15 @@ export const AntarcticGISMap: React.FC<Props> = ({
   const activeSt = stations.find(s => s.id === selectedStationId) || stations[0];
 
   return (
-    <div className="bg-[#07111D] border-t border-[#1E293B] overflow-hidden font-mono select-none">
+    <div className="bg-polar-base border-t border-polar-border overflow-hidden font-mono select-none">
       {/* GIS Header Toolbar */}
-      <div className="bg-[#0A1422] border-b border-[#1E293B] px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+      <div className="bg-polar-surface border-b border-polar-border px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2.5">
-          <Compass className="w-4 h-4 text-[#38BDF8]" />
-          <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+          <Compass className="w-4 h-4 text-polar-cyan" />
+          <span className="font-bold text-polar-text-primary uppercase tracking-wider text-[11px]">
             POLAR GEOSPATIAL INTELLIGENCE PLATFORM
           </span>
-          <span className="text-[10px] px-2 py-0.5 rounded bg-[#050A12] text-slate-400 border border-[#1E293B]">
+          <span className="text-[10px] px-2 py-0.5 rounded bg-polar-card text-polar-text-secondary border border-polar-border">
             EPSG:3031 Polar Stereographic
           </span>
         </div>
@@ -111,8 +114,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
               onClick={() => setShowSeaIce(!showSeaIce)}
               className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showSeaIce 
-                  ? 'bg-sky-950/60 border-sky-500/40 text-sky-300' 
-                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  ? 'bg-sky-500/20 border-sky-500/40 text-sky-600 dark:text-sky-300 font-semibold' 
+                  : 'bg-polar-card border-polar-border text-polar-text-muted hover:text-polar-text-primary'
               }`}
             >
               <Layers className="w-2.5 h-2.5" />
@@ -122,8 +125,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
               onClick={() => setShowWinds(!showWinds)}
               className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showWinds 
-                  ? 'bg-blue-950/60 border-blue-500/40 text-blue-300' 
-                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  ? 'bg-blue-500/20 border-blue-500/40 text-blue-600 dark:text-blue-300 font-semibold' 
+                  : 'bg-polar-card border-polar-border text-polar-text-muted hover:text-polar-text-primary'
               }`}
             >
               <Wind className="w-2.5 h-2.5" />
@@ -133,8 +136,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
               onClick={() => setShowLogistics(!showLogistics)}
               className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showLogistics 
-                  ? 'bg-amber-950/60 border-amber-500/40 text-amber-300' 
-                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  ? 'bg-amber-500/20 border-amber-500/40 text-amber-600 dark:text-amber-300 font-semibold' 
+                  : 'bg-polar-card border-polar-border text-polar-text-muted hover:text-polar-text-primary'
               }`}
             >
               <Ship className="w-2.5 h-2.5" />
@@ -144,8 +147,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
               onClick={() => setShowSatellite(!showSatellite)}
               className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showSatellite 
-                  ? 'bg-purple-950/60 border-purple-500/40 text-purple-300' 
-                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  ? 'bg-purple-500/20 border-purple-500/40 text-purple-600 dark:text-purple-300 font-semibold' 
+                  : 'bg-polar-card border-polar-border text-polar-text-muted hover:text-polar-text-primary'
               }`}
             >
               <Radio className="w-2.5 h-2.5" />
@@ -155,8 +158,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
               onClick={() => setShowInfrastructure(!showInfrastructure)}
               className={`px-2 py-0.5 rounded border transition-colors flex items-center gap-1 text-[10px] ${
                 showInfrastructure 
-                  ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300' 
-                  : 'bg-[#050A12] border-[#1E293B] text-slate-500 hover:text-slate-300'
+                  ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-600 dark:text-emerald-300 font-semibold' 
+                  : 'bg-polar-card border-polar-border text-polar-text-muted hover:text-polar-text-primary'
               }`}
             >
               <Plane className="w-2.5 h-2.5" />
@@ -165,25 +168,25 @@ export const AntarcticGISMap: React.FC<Props> = ({
           </div>
 
           {/* Zoom controls */}
-          <div className="hidden sm:flex items-center bg-[#050A12] rounded border border-[#1E293B] p-0.5">
+          <div className="hidden sm:flex items-center bg-polar-card rounded border border-polar-border p-0.5">
             <button
               onClick={handleZoomIn}
               title="Zoom In"
-              className="p-1 text-slate-400 hover:text-white transition-colors"
+              className="p-1 text-polar-text-muted hover:text-polar-text-primary transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleZoomOut}
               title="Zoom Out"
-              className="p-1 text-slate-400 hover:text-white transition-colors border-l border-r border-[#1E293B]"
+              className="p-1 text-polar-text-muted hover:text-polar-text-primary transition-colors border-l border-r border-polar-border"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={handleResetZoom}
               title="Reset Zoom"
-              className="p-1 text-slate-400 hover:text-white transition-colors text-[10px] px-1.5"
+              className="p-1 text-polar-text-muted hover:text-polar-text-primary transition-colors text-[10px] px-1.5"
             >
               <RotateCcw className="w-3 h-3" />
             </button>
@@ -194,7 +197,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
       </div>
 
       {/* Map Canvas / SVG Viewport */}
-      <div className="relative w-full h-[400px] bg-[#050A12] flex items-center justify-center overflow-hidden">
+      <div className="relative w-full h-[400px] bg-polar-base flex items-center justify-center overflow-hidden">
         <svg
           viewBox="0 0 800 460"
           className="w-full h-full select-none transition-transform duration-300 ease-out"
@@ -203,16 +206,16 @@ export const AntarcticGISMap: React.FC<Props> = ({
           <defs>
             {/* Scientific Continent Shader */}
             <radialGradient id="continentGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#0B1A2F" stopOpacity="0.9" />
-              <stop offset="60%" stopColor="#07111D" stopOpacity="0.8" />
-              <stop offset="100%" stopColor="#050A12" stopOpacity="0.4" />
+              <stop offset="0%" stopColor={isDark ? "#0B1A2F" : "#FFFFFF"} stopOpacity={isDark ? "0.9" : "0.95"} />
+              <stop offset="60%" stopColor={isDark ? "#07111D" : "#F8FAFC"} stopOpacity={isDark ? "0.8" : "0.9"} />
+              <stop offset="100%" stopColor={isDark ? "#050A12" : "#E2E8F0"} stopOpacity={isDark ? "0.4" : "0.6"} />
             </radialGradient>
             <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#F59E0B" stopOpacity="0.75" />
-              <stop offset="100%" stopColor="#38BDF8" stopOpacity="0.75" />
+              <stop offset="100%" stopColor={isDark ? "#38BDF8" : "#0284C7"} stopOpacity="0.75" />
             </linearGradient>
             <pattern id="gridPattern" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" strokeWidth="0.5" strokeOpacity="0.3" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke={isDark ? "#1E293B" : "#CBD5E1"} strokeWidth="0.5" strokeOpacity={isDark ? "0.3" : "0.5"} />
             </pattern>
           </defs>
 
@@ -220,13 +223,13 @@ export const AntarcticGISMap: React.FC<Props> = ({
           <rect width="800" height="460" fill="url(#gridPattern)" />
 
           {/* Latitude Concentric Rings (60°S, 70°S, 80°S) */}
-          <circle cx="400" cy="270" r="230" fill="none" stroke="#26354A" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.4" />
-          <circle cx="400" cy="270" r="160" fill="none" stroke="#26354A" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.5" />
-          <circle cx="400" cy="270" r="90" fill="none" stroke="#26354A" strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.6" />
-          <circle cx="400" cy="270" r="3" fill="#38BDF8" opacity="0.6" />
-          <text x="408" y="274" fill="#94A3B8" fontSize="8" fontFamily="monospace" opacity="0.7">90°S SOUTH POLE</text>
-          <text x="565" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">80°S</text>
-          <text x="635" y="274" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">70°S</text>
+          <circle cx="400" cy="270" r="230" fill="none" stroke={isDark ? "#26354A" : "#CBD5E1"} strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.5" />
+          <circle cx="400" cy="270" r="160" fill="none" stroke={isDark ? "#26354A" : "#CBD5E1"} strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.6" />
+          <circle cx="400" cy="270" r="90" fill="none" stroke={isDark ? "#26354A" : "#CBD5E1"} strokeWidth="0.75" strokeDasharray="3 4" strokeOpacity="0.7" />
+          <circle cx="400" cy="270" r="3" fill={isDark ? "#38BDF8" : "#0284C7"} opacity="0.6" />
+          <text x="408" y="274" fill={isDark ? "#94A3B8" : "#64748B"} fontSize="8" fontFamily="monospace" opacity="0.8">90°S SOUTH POLE</text>
+          <text x="565" y="274" fill={isDark ? "#64748B" : "#94A3B8"} fontSize="8" fontFamily="monospace" opacity="0.7">80°S</text>
+          <text x="635" y="274" fill={isDark ? "#64748B" : "#94A3B8"} fontSize="8" fontFamily="monospace" opacity="0.7">70°S</text>
 
           {/* Sea Ice Margin */}
           {showSeaIce && (
@@ -245,33 +248,33 @@ export const AntarcticGISMap: React.FC<Props> = ({
           <path
             d="M 180 230 C 210 170, 310 150, 400 160 C 470 150, 550 170, 600 210 C 660 250, 670 320, 580 360 C 510 390, 440 370, 360 380 C 260 370, 190 320, 170 270 C 160 250, 170 240, 180 230 Z"
             fill="url(#continentGlow)"
-            stroke="#38BDF8"
+            stroke={isDark ? "#38BDF8" : "#0284C7"}
             strokeWidth="1.2"
-            strokeOpacity="0.45"
+            strokeOpacity={isDark ? "0.45" : "0.75"}
           />
 
           {/* Antarctic Peninsula Extension */}
           <path
             d="M 230 180 Q 190 120, 180 80 Q 195 90, 220 130 Q 245 160, 250 180 Z"
-            fill="#07111D"
-            stroke="#38BDF8"
+            fill={isDark ? "#07111D" : "#E2E8F0"}
+            stroke={isDark ? "#38BDF8" : "#0284C7"}
             strokeWidth="1"
-            strokeOpacity="0.35"
+            strokeOpacity={isDark ? "0.35" : "0.6"}
           />
-          <text x="130" y="85" fill="#64748B" fontSize="8" fontFamily="monospace">ANTARCTIC PENINSULA</text>
+          <text x="130" y="85" fill={isDark ? "#64748B" : "#475569"} fontSize="8" fontFamily="monospace">ANTARCTIC PENINSULA</text>
 
           {/* Ice Shelves */}
           <path d="M 330 360 Q 400 380, 450 360" fill="none" stroke="#60A5FA" strokeWidth="1" strokeDasharray="2 3" strokeOpacity="0.3" />
-          <text x="350" y="395" fill="#64748B" fontSize="8" fontFamily="monospace" opacity="0.6">ROSS ICE SHELF</text>
+          <text x="350" y="395" fill={isDark ? "#64748B" : "#475569"} fontSize="8" fontFamily="monospace" opacity="0.7">ROSS ICE SHELF</text>
 
           {/* Katabatic Wind Vectors */}
           {showWinds && (
-            <g stroke="#38BDF8" strokeWidth="0.8" strokeOpacity="0.3" fill="none">
+            <g stroke={isDark ? "#38BDF8" : "#0284C7"} strokeWidth="0.8" strokeOpacity="0.35" fill="none">
               <path d="M 400 270 Q 470 250, 540 240" strokeDasharray="3 3" />
               <path d="M 400 270 Q 330 240, 280 225" strokeDasharray="3 3" />
               <path d="M 400 270 Q 410 320, 420 360" strokeDasharray="3 3" />
               <path d="M 400 270 Q 360 310, 300 350" strokeDasharray="3 3" />
-              <text x="470" y="240" fill="#38BDF8" fontSize="8" fontFamily="monospace" opacity="0.5">KATABATIC DRAINAGE →</text>
+              <text x="470" y="240" fill={isDark ? "#38BDF8" : "#0284C7"} fontSize="8" fontFamily="monospace" opacity="0.6">KATABATIC DRAINAGE →</text>
             </g>
           )}
 
@@ -339,7 +342,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
                     cy={st.cy}
                     r="12"
                     fill="none"
-                    stroke="#38BDF8"
+                    stroke={isDark ? "#38BDF8" : "#0284C7"}
                     strokeWidth="1.2"
                     strokeDasharray="2 2"
                     className="animate-spin"
@@ -352,8 +355,8 @@ export const AntarcticGISMap: React.FC<Props> = ({
                   cx={st.cx}
                   cy={st.cy}
                   r={isSelected ? '5' : '4'}
-                  fill={isDG ? '#64748B' : isSelected ? '#38BDF8' : '#10B981'}
-                  stroke="#050A12"
+                  fill={isDG ? '#64748B' : isSelected ? (isDark ? '#38BDF8' : '#0284C7') : '#10B981'}
+                  stroke={isDark ? "#050A12" : "#FFFFFF"}
                   strokeWidth="1.5"
                 />
 
@@ -364,7 +367,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
                     cy={st.cy}
                     r="9"
                     fill="none"
-                    stroke={isSelected ? '#38BDF8' : '#10B981'}
+                    stroke={isSelected ? (isDark ? '#38BDF8' : '#0284C7') : '#10B981'}
                     strokeWidth="0.8"
                     opacity="0.4"
                   />
@@ -375,7 +378,7 @@ export const AntarcticGISMap: React.FC<Props> = ({
                   x={st.cx + (st.cx > 400 ? 12 : -12)}
                   y={st.cy + 4}
                   textAnchor={st.cx > 400 ? 'start' : 'end'}
-                  fill={isSelected ? '#FFFFFF' : '#94A3B8'}
+                  fill={isSelected ? (isDark ? '#FFFFFF' : '#0F172A') : (isDark ? '#94A3B8' : '#475569')}
                   fontSize={isSelected ? '10' : '9'}
                   fontWeight={isSelected ? 'bold' : 'normal'}
                   fontFamily="monospace"
@@ -389,23 +392,23 @@ export const AntarcticGISMap: React.FC<Props> = ({
 
         {/* Floating Quick Inspection Card */}
         {activeSt && (
-          <div className="absolute bottom-3 left-3 bg-[#07111D]/95 border border-[#1E293B] rounded-md p-3 shadow-xl backdrop-blur-sm max-w-xs text-xs space-y-1.5 z-20">
-            <div className="flex items-center justify-between border-b border-[#1E293B] pb-1.5">
-              <span className="font-bold text-white uppercase text-[11px]">{activeSt.name}</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 font-semibold">
+          <div className="absolute bottom-3 left-3 bg-polar-surface/95 border border-polar-border rounded-md p-3 shadow-xl backdrop-blur-sm max-w-xs text-xs space-y-1.5 z-20">
+            <div className="flex items-center justify-between border-b border-polar-border pb-1.5">
+              <span className="font-bold text-polar-text-primary uppercase text-[11px]">{activeSt.name}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 font-semibold">
                 {activeSt.status}
               </span>
             </div>
-            <div className="text-[10px] text-slate-400 space-y-0.5">
-              <div>Coords: <strong className="text-slate-200">{activeSt.coords}</strong></div>
-              <div>Elevation: <strong className="text-slate-200">{activeSt.elevation}</strong></div>
-              <div>Air Temp: <strong className="text-sky-300">{activeSt.temp}°C</strong> | Wind: <strong className="text-sky-300">{activeSt.wind}</strong></div>
-              <div>Microgrid: <strong className="text-amber-300">{activeSt.power}</strong> | Health: <strong className="text-emerald-400">{activeSt.health}%</strong></div>
+            <div className="text-[10px] text-polar-text-muted space-y-0.5">
+              <div>Coords: <strong className="text-polar-text-primary">{activeSt.coords}</strong></div>
+              <div>Elevation: <strong className="text-polar-text-primary">{activeSt.elevation}</strong></div>
+              <div>Air Temp: <strong className="text-sky-600 dark:text-sky-300">{activeSt.temp}°C</strong> | Wind: <strong className="text-sky-600 dark:text-sky-300">{activeSt.wind}</strong></div>
+              <div>Microgrid: <strong className="text-amber-600 dark:text-amber-300">{activeSt.power}</strong> | Health: <strong className="text-emerald-600 dark:text-emerald-400">{activeSt.health}%</strong></div>
             </div>
-            <div className="pt-1.5 border-t border-[#1E293B] flex items-center justify-between">
+            <div className="pt-1.5 border-t border-polar-border flex items-center justify-between">
               <button
                 onClick={() => onNavigateToTwin(activeSt.id)}
-                className="text-[10px] text-[#38BDF8] hover:underline flex items-center gap-1 font-semibold"
+                className="text-[10px] text-polar-cyan hover:underline flex items-center gap-1 font-semibold"
               >
                 <span>Launch 3D Digital Twin</span>
                 <ExternalLink className="w-3 h-3" />

@@ -26,10 +26,10 @@ export const CommandButton: React.FC<Props> = ({
   }[size];
 
   const variantClasses = {
-    primary: 'bg-[#38BDF8] hover:bg-[#0284C7] active:bg-[#0369A1] text-slate-950 font-bold border border-transparent shadow-sm',
-    secondary: 'bg-[#0A1422] hover:bg-[#0D1726] active:bg-[#07111D] text-slate-200 border border-[#1E293B] hover:border-[#38BDF8]/50 font-medium shadow-sm',
-    tertiary: 'bg-transparent hover:bg-[#0A1422] text-slate-400 hover:text-slate-100 font-medium border border-transparent',
-    danger: 'bg-rose-950/80 hover:bg-rose-900 active:bg-rose-950 text-rose-200 border border-rose-500/40 font-medium shadow-sm',
+    primary: 'bg-polar-cyan hover:brightness-105 active:brightness-95 text-white dark:text-slate-950 font-bold border border-transparent shadow-sm',
+    secondary: 'bg-polar-elevated hover:bg-polar-hover text-polar-text-primary border border-polar-border hover:border-polar-border-active font-medium shadow-sm',
+    tertiary: 'bg-transparent hover:bg-polar-elevated text-polar-text-muted hover:text-polar-text-primary font-medium border border-transparent',
+    danger: 'bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30 font-medium shadow-sm',
   }[variant];
 
   return (

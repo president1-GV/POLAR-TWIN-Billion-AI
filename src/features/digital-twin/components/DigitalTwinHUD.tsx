@@ -9,9 +9,13 @@ import {
   Radio, 
   Ruler, 
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { ProvenanceBadge } from '../../../components/common/ProvenanceBadge';
+import polarTwinIcon from '../../../assets/polar-twin-icon.png';
+import { useTheme } from '../../../context/ThemeContext';
 
 interface Props {
   stationId: string;
@@ -38,41 +42,68 @@ export const DigitalTwinHUD: React.FC<Props> = ({
   healthScore = 96.5,
   generationKw = 185.0,
 }) => {
+  const { isDark, toggleTheme } = useTheme();
   const isBharati = stationId === 'station_bharati';
 
   return (
     <div className="absolute top-4 left-4 z-20 space-y-2 pointer-events-none font-mono select-none">
       {/* Primary Station Telemetry Banner */}
-      <div className="bg-[#0B1220]/95 border border-[#1E293B] p-3 rounded-xl shadow-2xl pointer-events-auto backdrop-blur-md max-w-md">
+      <div className="bg-polar-surface/95 border border-polar-border p-3 rounded-xl shadow-2xl pointer-events-auto backdrop-blur-md max-w-md">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs text-cyan-400 font-bold tracking-wider">
-            <Layers className="w-4 h-4 text-cyan-400" />
+          <div className="flex items-center gap-2 text-xs text-polar-cyan font-bold tracking-wider">
+            <Layers className="w-4 h-4 text-polar-cyan" />
             <span>3D PHYSICAL DIGITAL TWIN</span>
           </div>
-          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#111827] text-slate-400 border border-[#1E293B]">
-            {visualMode} MODE
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={toggleTheme}
+              title={isDark ? "Switch 3D Model to Polar Daylight (Light Mode)" : "Switch 3D Model to Polar Night (Dark Mode)"}
+              className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded bg-polar-card hover:bg-polar-hover text-polar-text-secondary hover:text-polar-text-primary border border-polar-border transition-colors cursor-pointer"
+            >
+              {isDark ? (
+                <>
+                  <Sun className="w-3 h-3 text-amber-500" />
+                  <span className="hidden sm:inline">Light</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="w-3 h-3 text-polar-cyan" />
+                  <span className="hidden sm:inline">Dark</span>
+                </>
+              )}
+            </button>
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-polar-card text-polar-text-secondary border border-polar-border">
+              {visualMode} MODE
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1E293B]">
-          <div>
-            <h1 className="text-sm font-bold text-white tracking-wide">
-              {isBharati ? 'BHARATI ANTARCTIC STATION' : 'MAITRI ANTARCTIC STATION'}
-            </h1>
-            <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-0.5">
-              <span className="flex items-center gap-1">
-                <Compass className="w-3 h-3 text-cyan-400" />
-                {isBharati ? '69°24′28″S 76°11′14″E' : '70°45′58″S 11°44′02″E'}
-              </span>
-              <span>•</span>
-              <span>{isBharati ? 'Larsemann Hills' : 'Schirmacher Oasis'}</span>
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-polar-border">
+          <div className="flex items-center gap-3">
+            <img 
+              src={polarTwinIcon} 
+              alt="POLAR-TWIN" 
+              className="w-11 h-11 rounded-full object-contain border border-polar-cyan/60 shadow-md ring-2 ring-polar-cyan/20 shrink-0" 
+            />
+            <div>
+              <h1 className="text-sm font-bold text-polar-text-primary tracking-wide">
+                {isBharati ? 'BHARATI ANTARCTIC STATION' : 'MAITRI ANTARCTIC STATION'}
+              </h1>
+              <div className="flex items-center gap-2 text-[10px] text-polar-text-secondary mt-0.5">
+                <span className="flex items-center gap-1">
+                  <Compass className="w-3 h-3 text-polar-cyan" />
+                  {isBharati ? '69°24′28″S 76°11′14″E' : '70°45′58″S 11°44′02″E'}
+                </span>
+                <span>•</span>
+                <span>{isBharati ? 'Larsemann Hills' : 'Schirmacher Oasis'}</span>
+              </div>
             </div>
           </div>
 
           <div className="text-right">
-            <span className="text-[10px] text-slate-500 uppercase block">Twin Health</span>
+            <span className="text-[10px] text-polar-text-muted uppercase block">Twin Health</span>
             <span className={`text-sm font-bold ${
-              healthScore > 80 ? 'text-emerald-400' : 'text-amber-400'
+              healthScore > 80 ? 'text-emerald-500 dark:text-emerald-400' : 'text-amber-500 dark:text-amber-400'
             }`}>
               {healthScore}%
             </span>
@@ -80,34 +111,34 @@ export const DigitalTwinHUD: React.FC<Props> = ({
         </div>
 
         {/* Real-Time Facility Summary KPIs */}
-        <div className="grid grid-cols-3 gap-2 mt-3 pt-2 border-t border-[#1E293B] text-[11px]">
-          <div className="bg-[#111827] p-1.5 rounded border border-[#1E293B]">
-            <span className="text-[9px] text-slate-500 uppercase block">Grid Power</span>
-            <span className="font-bold text-cyan-400">{generationKw} kW</span>
+        <div className="grid grid-cols-3 gap-2 mt-3 pt-2 border-t border-polar-border text-[11px]">
+          <div className="bg-polar-card p-1.5 rounded border border-polar-border">
+            <span className="text-[9px] text-polar-text-muted uppercase block">Grid Power</span>
+            <span className="font-bold text-polar-cyan">{generationKw} kW</span>
           </div>
-          <div className="bg-[#111827] p-1.5 rounded border border-[#1E293B]">
-            <span className="text-[9px] text-slate-500 uppercase block">Envelope</span>
-            <span className="font-bold text-emerald-400">+21.2°C</span>
+          <div className="bg-polar-card p-1.5 rounded border border-polar-border">
+            <span className="text-[9px] text-polar-text-muted uppercase block">Envelope</span>
+            <span className="font-bold text-emerald-500 dark:text-emerald-400">+21.2°C</span>
           </div>
-          <div className="bg-[#111827] p-1.5 rounded border border-[#1E293B]">
-            <span className="text-[9px] text-slate-500 uppercase block">Sat Uplink</span>
-            <span className="font-bold text-emerald-400">14.8 dB</span>
+          <div className="bg-polar-card p-1.5 rounded border border-polar-border">
+            <span className="text-[9px] text-polar-text-muted uppercase block">Sat Uplink</span>
+            <span className="font-bold text-emerald-500 dark:text-emerald-400">14.8 dB</span>
           </div>
         </div>
 
         {/* Restrained Operational Status Legend */}
-        <div className="flex items-center gap-3 mt-3 pt-2 border-t border-[#1E293B] text-[10px] text-slate-400">
+        <div className="flex items-center gap-3 mt-3 pt-2 border-t border-polar-border text-[10px] text-polar-text-secondary">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" /> NORMAL
+            <span className="w-2 h-2 rounded-full bg-emerald-500" /> NORMAL
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-400" /> WARNING
+            <span className="w-2 h-2 rounded-full bg-amber-500" /> WARNING
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-rose-500" /> CRITICAL
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-slate-500" /> OFFLINE
+            <span className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500" /> OFFLINE
           </span>
         </div>
       </div>

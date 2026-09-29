@@ -8,8 +8,13 @@ export class AntarcticEnvironment {
   public gridHelper!: THREE.GridHelper;
   public snowParticles?: THREE.Points;
   public humanScaleAvatar?: THREE.Group;
+  private hemiLight!: THREE.HemisphereLight;
+  private sunLight!: THREE.DirectionalLight;
+  private rimLight!: THREE.DirectionalLight;
+  private coreLight!: THREE.PointLight;
   private particlePositions?: Float32Array;
   private particleVelocities?: Float32Array;
+  private nunatakMat?: THREE.MeshStandardMaterial;
 
   constructor(
     private scene: THREE.Scene,
@@ -32,34 +37,34 @@ export class AntarcticEnvironment {
     this.scene.fog = new THREE.FogExp2(0x060E1A, 0.0075);
 
     // 2. Ambient Hemisphere Light: Cold crisp sky and deep permafrost ground
-    const hemiLight = new THREE.HemisphereLight(0xBAE6FD, 0x0F172A, 0.85);
-    hemiLight.position.set(0, 50, 0);
-    this.group.add(hemiLight);
+    this.hemiLight = new THREE.HemisphereLight(0xBAE6FD, 0x0F172A, 0.85);
+    this.hemiLight.position.set(0, 50, 0);
+    this.group.add(this.hemiLight);
 
     // 3. Key Light: Low-angle Antarctic Sun (Larsemann / Schirmacher latitude ~70°S)
-    const sunLight = new THREE.DirectionalLight(0xFFF7ED, 1.5);
-    sunLight.position.set(45, 32, 28);
-    sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 5;
-    sunLight.shadow.camera.far = 160;
-    sunLight.shadow.camera.left = -45;
-    sunLight.shadow.camera.right = 45;
-    sunLight.shadow.camera.top = 45;
-    sunLight.shadow.camera.bottom = -45;
-    sunLight.shadow.bias = -0.0004;
-    this.group.add(sunLight);
+    this.sunLight = new THREE.DirectionalLight(0xFFF7ED, 1.5);
+    this.sunLight.position.set(45, 32, 28);
+    this.sunLight.castShadow = true;
+    this.sunLight.shadow.mapSize.width = 2048;
+    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.camera.near = 5;
+    this.sunLight.shadow.camera.far = 160;
+    this.sunLight.shadow.camera.left = -45;
+    this.sunLight.shadow.camera.right = 45;
+    this.sunLight.shadow.camera.top = 45;
+    this.sunLight.shadow.camera.bottom = -45;
+    this.sunLight.shadow.bias = -0.0004;
+    this.group.add(this.sunLight);
 
     // 4. Subtle Rim / Backlight for structural depth
-    const rimLight = new THREE.DirectionalLight(0x38BDF8, 0.55);
-    rimLight.position.set(-35, 20, -35);
-    this.group.add(rimLight);
+    this.rimLight = new THREE.DirectionalLight(0x38BDF8, 0.55);
+    this.rimLight.position.set(-35, 20, -35);
+    this.group.add(this.rimLight);
 
     // 5. Localized Warm Mission Lighting for station operational core
-    const coreLight = new THREE.PointLight(0xFDE68A, 0.6, 50, 1.2);
-    coreLight.position.set(0, 8, 0);
-    this.group.add(coreLight);
+    this.coreLight = new THREE.PointLight(0xFDE68A, 0.6, 50, 1.2);
+    this.coreLight.position.set(0, 8, 0);
+    this.group.add(this.coreLight);
   }
 
   private buildTerrain(): void {
@@ -140,7 +145,7 @@ export class AntarcticEnvironment {
   private buildHorizonFeatures(): void {
     // Distant nunataks & ice shelf cliffs around the perimeter (eliminates black void)
     const horizonGroup = new THREE.Group();
-    const nunatakMat = new THREE.MeshStandardMaterial({
+    this.nunatakMat = new THREE.MeshStandardMaterial({
       color: 0x1E293B,
       roughness: 0.95,
       metalness: 0.1,
@@ -156,7 +161,7 @@ export class AntarcticEnvironment {
 
     nunatakCoords.forEach(c => {
       const geo = new THREE.ConeGeometry(c.radius, c.height, 7);
-      const mesh = new THREE.Mesh(geo, nunatakMat);
+      const mesh = new THREE.Mesh(geo, this.nunatakMat);
       mesh.position.set(c.x, c.height / 2 - 3, c.z);
       mesh.rotation.y = Math.random() * Math.PI;
       mesh.castShadow = false;
@@ -280,10 +285,91 @@ export class AntarcticEnvironment {
     if (this.humanScaleAvatar) this.humanScaleAvatar.visible = visible;
   }
 
+  public updateTheme(isDark: boolean): void {
+    const currentGridVisible = this.gridHelper ? this.gridHelper.visible : true;
+    if (this.gridHelper) {
+      this.group.remove(this.gridHelper);
+      this.gridHelper.geometry.dispose();
+    }
+    const centerColor = isDark ? 0x22D3EE : 0x0284C7;
+    const gridColor = isDark ? 0x1E293B : 0x94A3B8;
+    this.gridHelper = new THREE.GridHelper(120, 24, centerColor, gridColor);
+    this.gridHelper.position.y = 0.05;
+    (this.gridHelper.material as THREE.Material).transparent = true;
+    (this.gridHelper.material as THREE.Material).opacity = isDark ? 0.35 : 0.45;
+    this.gridHelper.visible = currentGridVisible;
+    this.group.add(this.gridHelper);
+
+    if (isDark) {
+      this.scene.background = new THREE.Color(0x060E1A);
+      if (this.scene.fog instanceof THREE.FogExp2) {
+        this.scene.fog.color.setHex(0x060E1A);
+        this.scene.fog.density = 0.0075;
+      }
+      if (this.hemiLight) {
+        this.hemiLight.color.setHex(0xBAE6FD);
+        this.hemiLight.groundColor.setHex(0x0F172A);
+        this.hemiLight.intensity = 0.85;
+      }
+      if (this.sunLight) {
+        this.sunLight.color.setHex(0xFFF7ED);
+        this.sunLight.intensity = 1.5;
+      }
+      if (this.rimLight) {
+        this.rimLight.color.setHex(0x38BDF8);
+        this.rimLight.intensity = 0.55;
+      }
+      if (this.coreLight) {
+        this.coreLight.intensity = 0.6;
+      }
+      if (this.snowParticles) {
+        (this.snowParticles.material as THREE.PointsMaterial).color.setHex(0xE2EEF8);
+        (this.snowParticles.material as THREE.PointsMaterial).opacity = 0.65;
+      }
+    } else {
+      this.scene.background = new THREE.Color(0xD9E6F2);
+      if (this.scene.fog instanceof THREE.FogExp2) {
+        this.scene.fog.color.setHex(0xD9E6F2);
+        this.scene.fog.density = 0.0065;
+      }
+      if (this.hemiLight) {
+        this.hemiLight.color.setHex(0xFFFFFF);
+        this.hemiLight.groundColor.setHex(0xC3D5E8);
+        this.hemiLight.intensity = 1.25;
+      }
+      if (this.sunLight) {
+        this.sunLight.color.setHex(0xFFFFFF);
+        this.sunLight.intensity = 1.85;
+      }
+      if (this.rimLight) {
+        this.rimLight.color.setHex(0x0284C7);
+        this.rimLight.intensity = 0.4;
+      }
+      if (this.coreLight) {
+        this.coreLight.intensity = 0.45;
+      }
+      if (this.snowParticles) {
+        (this.snowParticles.material as THREE.PointsMaterial).color.setHex(0x64748B);
+        (this.snowParticles.material as THREE.PointsMaterial).opacity = 0.7;
+      }
+    }
+
+    if (this.nunatakMat) {
+      this.nunatakMat.color.setHex(isDark ? 0x1E293B : 0x475569);
+    }
+    if (this.materials.snowTerrain) {
+      this.materials.snowTerrain.color.setHex(isDark ? 0xE2EEF8 : 0xF8FAFC);
+    }
+    if (this.materials.wireframeEngineering) {
+      this.materials.wireframeEngineering.color.setHex(isDark ? 0x06B6D4 : 0x0284C7);
+    }
+  }
+
   public dispose(): void {
     this.scene.remove(this.group);
     if (this.terrainMesh) this.terrainMesh.geometry.dispose();
     if (this.iceMesh) this.iceMesh.geometry.dispose();
     if (this.snowParticles) this.snowParticles.geometry.dispose();
+    if (this.nunatakMat) this.nunatakMat.dispose();
   }
 }

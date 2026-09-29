@@ -21,6 +21,7 @@ import { EquipmentInspector } from './components/EquipmentInspector';
 import { WhatIfSimulationModal } from './components/WhatIfSimulationModal';
 import { DigitalTwinHUD } from './components/DigitalTwinHUD';
 import { TwinAssetLabel } from '../../components/ui/TwinAssetLabel';
+import { useTheme } from '../../context/ThemeContext';
 
 interface Props {
   stationId: string;
@@ -28,6 +29,8 @@ interface Props {
 }
 
 export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimulation }) => {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const mountRef = useRef<HTMLDivElement>(null);
   const [assets, setAssets] = useState<StationAsset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<StationAsset | null>(null);
@@ -244,6 +247,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     materialsRef.current = materials;
 
     const environment = new AntarcticEnvironment(scene, materials, stationId);
+    environment.updateTheme(isDark);
     environment.setGridVisible(gridVisible);
     environment.setSnowVisible(snowVisible);
     environment.setHumanScaleVisible(humanScaleVisible);
@@ -481,6 +485,13 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     if (environmentRef.current) environmentRef.current.setHumanScaleVisible(humanScaleVisible);
   }, [humanScaleVisible]);
 
+  // Synchronize Theme Changes (Light / Dark Antarctic atmosphere, lighting, and grid)
+  useEffect(() => {
+    if (environmentRef.current) {
+      environmentRef.current.updateTheme(isDark);
+    }
+  }, [isDark]);
+
   // Toggle Measurement Tool
   const handleToggleMeasuring = () => {
     setMeasuringActive(prev => {
@@ -501,7 +512,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
   };
 
   return (
-    <div className="relative w-full h-full min-h-[480px] bg-[#050A12] overflow-hidden flex font-mono select-none">
+    <div className="relative w-full h-full min-h-[480px] bg-polar-base overflow-hidden flex font-mono select-none">
       {/* 3D WebGL Canvas Mount */}
       <div 
         ref={mountRef} 

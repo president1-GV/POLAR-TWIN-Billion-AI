@@ -13,21 +13,20 @@ import { DataCatalogDashboard } from './features/data-catalog/DataCatalogDashboa
 import { KillerDemoPanel } from './features/demo/KillerDemoPanel';
 import { AlertsDrawer } from './features/alerts/AlertsDrawer';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { LoginPage } from './components/auth/LoginPage';
+import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LinkStatus, Alert } from './types';
 import { api } from './services/api';
+import { useAuth } from './context/AuthContext';
+import { PolarRole } from './services/rbac';
 
 export const App: React.FC = () => {
+  const { role, switchRole, isAuthenticated } = useAuth();
   const [currentStationId, setCurrentStationId] = useState<string>('station_bharati');
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('command-center');
   const [linkStatus, setLinkStatus] = useState<LinkStatus>('ONLINE');
-  const [activeRole, setActiveRole] = useState<string>('OPERATOR');
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isAlertsOpen, setIsAlertsOpen] = useState<boolean>(false);
-
-  useEffect(() => {
-    // Initialize authenticated Zero-Trust session for initial duty role
-    api.switchRole(activeRole).catch(console.error);
-  }, []);
 
   useEffect(() => {
     loadAlerts();
@@ -40,9 +39,8 @@ export const App: React.FC = () => {
   }, [currentStationId]);
 
   const handleRoleChange = async (newRole: string) => {
-    setActiveRole(newRole);
     try {
-      await api.switchRole(newRole);
+      await switchRole(newRole as PolarRole);
     } catch (e) {
       console.error('Failed to switch role authentication:', e);
     }
@@ -88,7 +86,7 @@ export const App: React.FC = () => {
 
   const handleAcknowledgeAlert = async (alertId: string) => {
     try {
-      await api.acknowledgeAlert(alertId, `Acknowledged by ${activeRole}`);
+      await api.acknowledgeAlert(alertId, `Acknowledged by ${role}`);
       loadAlerts();
     } catch (e) {
       console.error('Failed to acknowledge alert:', e);
@@ -97,7 +95,7 @@ export const App: React.FC = () => {
 
   const handleResolveAlert = async (alertId: string) => {
     try {
-      await api.resolveAlert(alertId, `Resolved by ${activeRole}`);
+      await api.resolveAlert(alertId, `Resolved by ${role}`);
       loadAlerts();
     } catch (e) {
       console.error('Failed to resolve alert:', e);
@@ -106,8 +104,13 @@ export const App: React.FC = () => {
 
   const unreadCount = alerts.filter((a) => a.status === 'ACTIVE').length;
 
+  // If user navigates to login or is unauthenticated, render dedicated Login screen
+  if (currentScreen === 'login') {
+    return <LoginPage onLoginSuccess={() => setCurrentScreen('command-center')} />;
+  }
+
   return (
-    <div className="min-h-screen bg-polar-950 flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-polar-base text-polar-text-primary flex flex-col font-sans select-none">
       {/* Header */}
       <Header
         currentStationId={currentStationId}
@@ -116,8 +119,9 @@ export const App: React.FC = () => {
         onLinkToggle={handleLinkToggle}
         unreadAlertsCount={unreadCount}
         onOpenAlerts={() => setIsAlertsOpen(true)}
-        activeRole={activeRole}
+        activeRole={role}
         onRoleChange={handleRoleChange}
+        onOpenLogin={() => setCurrentScreen('login')}
       />
 
       {/* Main Body */}
@@ -126,7 +130,7 @@ export const App: React.FC = () => {
         <Sidebar currentScreen={currentScreen} onScreenChange={setCurrentScreen} />
 
         {/* Dynamic Viewport */}
-        <main className="flex-1 overflow-y-auto bg-polar-950 polar-grid">
+        <main className="flex-1 overflow-y-auto bg-polar-base polar-grid">
           <ErrorBoundary key={currentScreen} fallbackTitle={`MISSION VIEW SUBSYSTEM: ${currentScreen.toUpperCase()}`}>
             {currentScreen === 'command-center' && (
               <ExecutiveCommandCenter
@@ -157,10 +161,16 @@ export const App: React.FC = () => {
             )}
 
             {currentScreen === 'simulation' && (
-              <EmergencySimulator stationId={currentStationId} />
+              <ProtectedRoute screenId="simulation" onNavigateHome={() => setCurrentScreen('command-center')}>
+                <EmergencySimulator stationId={currentStationId} />
+              </ProtectedRoute>
             )}
 
-            {currentScreen === 'edge' && <EdgeMonitor />}
+            {currentScreen === 'edge' && (
+              <ProtectedRoute screenId="edge" onNavigateHome={() => setCurrentScreen('command-center')}>
+                <EdgeMonitor />
+              </ProtectedRoute>
+            )}
 
             {currentScreen === 'analytics' && <AnalyticsDashboard />}
 

@@ -31,23 +31,23 @@ export const StatusBadge: React.FC<Props> = ({
   showIcon = true,
   className = '',
 }) => {
-  const norm = status.toUpperCase().trim();
+  const norm = (status || 'UNKNOWN').toUpperCase().trim();
 
-  const isHealthy = ['ONLINE', 'OPERATIONAL', 'NOMINAL', 'SYNCED', 'NORMAL', 'ACTIVE'].includes(norm);
-  const isWarning = ['DEGRADED', 'ATTENTION', 'LOW RESERVE', 'STALE DATA', 'WARNING', 'WATCH'].includes(norm);
-  const isCritical = ['OFFLINE', 'FAILURE', 'CRITICAL', 'NO TELEMETRY', 'FAILED'].includes(norm);
+  const isHealthy = ['ONLINE', 'OPERATIONAL', 'NOMINAL', 'SYNCED', 'NORMAL', 'ACTIVE', 'VERIFIED_VALID'].includes(norm);
+  const isWarning = ['DEGRADED', 'ATTENTION', 'LOW RESERVE', 'STALE DATA', 'WARNING', 'WATCH', 'MEDIUM'].includes(norm);
+  const isCritical = ['OFFLINE', 'FAILURE', 'CRITICAL', 'NO TELEMETRY', 'FAILED', 'HIGH'].includes(norm);
 
-  let colorClasses = 'bg-slate-800/80 text-slate-300 border-slate-700';
+  let colorClasses = 'bg-slate-100 text-slate-700 border-slate-300 dark:bg-slate-800/80 dark:text-slate-300 dark:border-slate-700';
   let Icon = HelpCircle;
 
   if (isHealthy) {
-    colorClasses = 'bg-emerald-950/70 text-emerald-300 border-emerald-500/40';
+    colorClasses = 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-500/40';
     Icon = CheckCircle2;
   } else if (isWarning) {
-    colorClasses = 'bg-amber-950/70 text-amber-300 border-amber-500/40';
+    colorClasses = 'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-500/40';
     Icon = AlertTriangle;
   } else if (isCritical) {
-    colorClasses = 'bg-rose-950/70 text-rose-300 border-rose-500/50';
+    colorClasses = 'bg-rose-50 text-rose-800 border-rose-300 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-500/50';
     Icon = XCircle;
   }
 

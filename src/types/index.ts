@@ -125,3 +125,23 @@ export interface EdgeStatus {
   local_alerts: any[];
   hardware_specification: string;
 }
+
+export interface UserProfile {
+  id: string;
+  email?: string;
+  username: string;
+  display_name: string;
+  role: string;
+  station_id: string;
+  mfa_enabled?: boolean;
+  avatar_url?: string;
+  created_at?: string;
+  last_login?: string;
+}
+
+export interface AuthSession {
+  token: string;
+  user: UserProfile;
+  expires_at?: number;
+}
+

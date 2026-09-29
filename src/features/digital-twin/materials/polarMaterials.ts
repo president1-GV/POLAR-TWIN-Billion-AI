@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import polarTwinIcon from '../../../assets/polar-twin-icon.png';
 
 export interface PolarMaterialLibrary {
   // Environmental Materials
@@ -63,6 +64,9 @@ export interface PolarMaterialLibrary {
   // Interactive Selection Highlights
   selectedOutline: THREE.MeshBasicMaterial;
   hoverHighlight: THREE.MeshStandardMaterial;
+
+  // National Mission Identity & Insignia
+  missionLogoBadge: THREE.MeshStandardMaterial;
 }
 
 /**
@@ -396,6 +400,22 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
     roughness: 0.3,
   });
 
+  // National Polar Mission Logo Badge Material
+  const textureLoader = new THREE.TextureLoader();
+  const iconTexture = textureLoader.load(polarTwinIcon);
+  iconTexture.colorSpace = THREE.SRGBColorSpace;
+
+  const missionLogoBadge = new THREE.MeshStandardMaterial({
+    map: iconTexture,
+    roughness: 0.25,
+    metalness: 0.15,
+    transparent: true,
+    alphaTest: 0.05,
+    emissive: new THREE.Color(0xFFFFFF),
+    emissiveMap: iconTexture,
+    emissiveIntensity: 0.28,
+  });
+
   return {
     snowTerrain,
     iceSurface,
@@ -446,5 +466,6 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
     thermalHot,
     selectedOutline,
     hoverHighlight,
+    missionLogoBadge,
   };
 }

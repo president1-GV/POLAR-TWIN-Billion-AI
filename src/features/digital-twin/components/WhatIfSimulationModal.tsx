@@ -179,29 +179,29 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm font-mono select-none">
-      <div className="w-full max-w-3xl bg-[#0B1220] border border-[#1E293B] rounded-xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm font-mono select-none">
+      <div className="w-full max-w-3xl bg-polar-surface border border-polar-border rounded-xl shadow-2xl flex flex-col overflow-hidden max-h-[90vh]">
         {/* Header */}
-        <div className="p-4 bg-[#111827] border-b border-[#1E293B] flex items-center justify-between">
+        <div className="p-4 bg-polar-card border-b border-polar-border flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-950/60 border border-amber-500/40 rounded-lg text-amber-400">
+            <div className="p-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-500 dark:text-amber-400">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-white tracking-wider">
+                <span className="text-xs font-bold text-polar-text-primary tracking-wider">
                   PHYSICAL WHAT-IF CASCADE SIMULATOR
                 </span>
                 <ProvenanceBadge type="PHYSICS_SYNTHETIC" />
               </div>
-              <p className="text-[11px] text-slate-400 font-sans mt-0.5">
+              <p className="text-[11px] text-polar-text-muted font-sans mt-0.5">
                 First-principles coupled thermodynamic & electrical failure propagation modeling.
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-[#1E293B] transition-colors"
+            className="text-polar-text-muted hover:text-polar-text-primary p-1.5 rounded-lg hover:bg-polar-hover transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -211,7 +211,7 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
         <div className="p-5 overflow-y-auto space-y-5 flex-1">
           {/* Scenario Selector */}
           <div>
-            <label className="text-[11px] text-slate-400 uppercase tracking-wider block mb-2 font-bold">
+            <label className="text-[11px] text-polar-text-muted uppercase tracking-wider block mb-2 font-bold">
               Select Failure Scenario:
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
@@ -224,30 +224,30 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
                   }}
                   className={`p-3 rounded-lg border text-left transition-all ${
                     selectedScenarioIndex === idx
-                      ? 'bg-cyan-950/40 border-cyan-500/50 text-cyan-300 shadow-md ring-1 ring-cyan-500/30'
-                      : 'bg-[#111827] border-[#1E293B] text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                      ? 'bg-polar-cyan/15 border-polar-cyan text-polar-cyan shadow-md ring-1 ring-polar-cyan/30'
+                      : 'bg-polar-card border-polar-border text-polar-text-secondary hover:text-polar-text-primary hover:border-polar-border-strong'
                   }`}
                 >
-                  <span className="text-[10px] text-slate-500 uppercase block">Scenario {idx + 1}</span>
-                  <span className="text-xs font-bold block mt-1 line-clamp-2 text-slate-100">{s.title}</span>
+                  <span className="text-[10px] text-polar-text-muted uppercase block">Scenario {idx + 1}</span>
+                  <span className="text-xs font-bold block mt-1 line-clamp-2 text-polar-text-primary">{s.title}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Scenario Description */}
-          <div className="bg-[#111827] p-3 rounded-lg border border-[#1E293B] text-xs text-slate-300">
+          <div className="bg-polar-card p-3 rounded-lg border border-polar-border text-xs text-polar-text-secondary">
             {currentScenario.description}
           </div>
 
           {/* Timeline Slider / Step Selector */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] text-slate-400 uppercase tracking-wider font-bold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-cyan-400" />
+              <span className="text-[11px] text-polar-text-muted uppercase tracking-wider font-bold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-polar-cyan" />
                 Cascading Progression Timeline:
               </span>
-              <span className="text-xs text-cyan-400 font-bold bg-[#111827] px-2 py-0.5 rounded border border-[#1E293B]">
+              <span className="text-xs text-polar-cyan font-bold bg-polar-card px-2 py-0.5 rounded border border-polar-border">
                 {currentStep.timeLabel}
               </span>
             </div>
@@ -260,15 +260,15 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
                   className={`p-2.5 rounded-lg border text-left transition-all ${
                     selectedStepIndex === sIdx
                       ? st.systemStatus === 'EMERGENCY'
-                        ? 'bg-rose-950/60 border-rose-500 text-rose-300 ring-1 ring-rose-500/40'
-                        : 'bg-amber-950/60 border-amber-500 text-amber-300 ring-1 ring-amber-500/40'
-                      : 'bg-[#111827] border-[#1E293B] text-slate-400 hover:border-slate-600'
+                        ? 'bg-rose-500/20 border-rose-500 text-rose-500 dark:text-rose-300 ring-1 ring-rose-500/40'
+                        : 'bg-amber-500/20 border-amber-500 text-amber-600 dark:text-amber-300 ring-1 ring-amber-500/40'
+                      : 'bg-polar-card border-polar-border text-polar-text-secondary hover:border-polar-border-strong'
                   }`}
                 >
-                  <span className="text-[10px] text-slate-500 block uppercase">Hour +{st.timeOffsetHours}</span>
+                  <span className="text-[10px] text-polar-text-muted block uppercase">Hour +{st.timeOffsetHours}</span>
                   <span className="text-xs font-bold block mt-0.5">{st.timeLabel.split(' ')[2]}</span>
-                  <span className={`text-[10px] font-semibold mt-1 inline-block px-1.5 py-0.2 rounded ${
-                    st.systemStatus === 'EMERGENCY' ? 'bg-rose-900/60 text-rose-300' : 'bg-amber-900/60 text-amber-300'
+                  <span className={`text-[10px] font-semibold mt-1 inline-block px-1.5 py-0.5 rounded ${
+                    st.systemStatus === 'EMERGENCY' ? 'bg-rose-500/10 text-rose-600 dark:text-rose-300 border border-rose-500/20' : 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-500/20'
                   }`}>
                     {st.systemStatus}
                   </span>
@@ -279,39 +279,39 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
 
           {/* Dynamic Metrics Projection Card */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="bg-[#111827] p-3 rounded-lg border border-[#1E293B] flex items-center gap-3">
-              <div className="p-2 rounded bg-rose-950/50 border border-rose-500/30 text-rose-400">
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border flex items-center gap-3">
+              <div className="p-2 rounded bg-rose-500/10 border border-rose-500/30 text-rose-500 dark:text-rose-400">
                 <Zap className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 uppercase block">Grid Deficit</span>
-                <span className="text-base font-bold text-rose-400">
+                <span className="text-[10px] text-polar-text-muted uppercase block">Grid Deficit</span>
+                <span className="text-base font-bold text-rose-500 dark:text-rose-400">
                   {currentStep.powerDeficitKw > 0 ? `-${currentStep.powerDeficitKw} kW` : 'BALANCED'}
                 </span>
               </div>
             </div>
 
-            <div className="bg-[#111827] p-3 rounded-lg border border-[#1E293B] flex items-center gap-3">
-              <div className="p-2 rounded bg-amber-950/50 border border-amber-500/30 text-amber-400">
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border flex items-center gap-3">
+              <div className="p-2 rounded bg-amber-500/10 border border-amber-500/30 text-amber-500 dark:text-amber-400">
                 <Thermometer className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 uppercase block">Indoor Habitat Temp</span>
+                <span className="text-[10px] text-polar-text-muted uppercase block">Indoor Habitat Temp</span>
                 <span className={`text-base font-bold ${
-                  currentStep.indoorTempC <= 5 ? 'text-rose-400 animate-pulse' : 'text-amber-400'
+                  currentStep.indoorTempC <= 5 ? 'text-rose-500 dark:text-rose-400 animate-pulse' : 'text-amber-500 dark:text-amber-400'
                 }`}>
                   {currentStep.indoorTempC.toFixed(1)} °C
                 </span>
               </div>
             </div>
 
-            <div className="bg-[#111827] p-3 rounded-lg border border-[#1E293B] flex items-center gap-3">
-              <div className="p-2 rounded bg-sky-950/50 border border-sky-500/30 text-sky-400">
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border flex items-center gap-3">
+              <div className="p-2 rounded bg-sky-500/10 border border-sky-500/30 text-sky-500 dark:text-sky-400">
                 <Droplet className="w-5 h-5" />
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 uppercase block">Potable Water Reserves</span>
-                <span className="text-base font-bold text-sky-400">
+                <span className="text-[10px] text-polar-text-muted uppercase block">Potable Water Reserves</span>
+                <span className="text-base font-bold text-sky-500 dark:text-sky-400">
                   {currentStep.waterRemainingLiters.toLocaleString()} L
                 </span>
               </div>
@@ -320,21 +320,21 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
 
           {/* Failure Summary & Emergency Protocol */}
           <div className="space-y-3">
-            <div className="bg-[#111827] p-3.5 rounded-lg border border-[#1E293B]">
-              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider block mb-1">
+            <div className="bg-polar-card p-3.5 rounded-lg border border-polar-border">
+              <span className="text-[10px] text-polar-text-muted uppercase font-bold tracking-wider block mb-1">
                 Downstream Cascade Physics:
               </span>
-              <p className="text-xs text-slate-200 leading-relaxed font-sans">
+              <p className="text-xs text-polar-text-secondary leading-relaxed font-sans">
                 {currentStep.summary}
               </p>
             </div>
 
-            <div className="bg-amber-950/20 p-3.5 rounded-lg border border-amber-500/30">
-              <span className="text-[10px] text-amber-400 uppercase font-bold tracking-wider block mb-1 flex items-center gap-1.5">
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            <div className="bg-amber-500/10 p-3.5 rounded-lg border border-amber-500/30">
+              <span className="text-[10px] text-amber-600 dark:text-amber-400 uppercase font-bold tracking-wider block mb-1 flex items-center gap-1.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                 Recommended Operational Mitigation:
               </span>
-              <p className="text-xs text-amber-200/90 leading-relaxed font-sans">
+              <p className="text-xs text-amber-700 dark:text-amber-200/90 leading-relaxed font-sans">
                 {currentStep.recommendedAction}
               </p>
             </div>
@@ -342,10 +342,10 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-[#111827] border-t border-[#1E293B] flex items-center justify-between">
+        <div className="p-4 bg-polar-card border-t border-polar-border flex items-center justify-between">
           <button
             onClick={handleReset}
-            className="px-3.5 py-2 bg-[#1E293B] hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-semibold flex items-center gap-2 transition-colors"
+            className="px-3.5 py-2 bg-polar-elevated hover:bg-polar-hover text-polar-text-secondary hover:text-polar-text-primary rounded-lg text-xs font-semibold flex items-center gap-2 border border-polar-border transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
             <span>Reset Simulation</span>
@@ -354,7 +354,7 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 bg-transparent hover:bg-[#1E293B] text-slate-300 rounded-lg text-xs transition-colors"
+              className="px-4 py-2 bg-transparent hover:bg-polar-hover text-polar-text-secondary rounded-lg text-xs transition-colors"
             >
               Cancel
             </button>
@@ -363,7 +363,7 @@ export const WhatIfSimulationModal: React.FC<Props> = ({
                 handleApply();
                 onClose();
               }}
-              className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-cyan-900/30 transition-all"
+              className="px-5 py-2 bg-polar-cyan hover:opacity-90 text-white rounded-lg text-xs font-bold flex items-center gap-2 shadow-lg shadow-polar-cyan/30 transition-all"
             >
               <Play className="w-4 h-4 fill-white" />
               <span>Drive 3D Digital Twin</span>

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -8,34 +9,43 @@ export default {
     extend: {
       colors: {
         polar: {
-          base: '#050A12',
-          surface: '#07111D',
-          elevated: '#0A1422',
-          card: '#0D1726',
-          border: '#1E293B',
-          'border-active': '#26354A',
+          base: 'var(--bg-base)',
+          surface: 'var(--bg-surface)',
+          elevated: 'var(--bg-elevated)',
+          card: 'var(--bg-card)',
+          'card-subtle': 'var(--bg-card-subtle)',
+          input: 'var(--bg-input)',
+          hover: 'var(--bg-hover)',
+          border: 'var(--border-subtle)',
+          'border-active': 'var(--border-default)',
+          'border-strong': 'var(--border-strong)',
           
-          // Semantic Colors
-          cyan: '#22D3EE',
-          'ice-cyan': '#38BDF8',
-          'polar-blue': '#60A5FA',
-          ice: '#E2F1FF',
-          healthy: '#10B981',
-          warning: '#F59E0B',
-          critical: '#EF4444',
-          offline: '#64748B',
-          muted: '#94A3B8',
+          // Typography
+          'text-primary': 'var(--text-primary)',
+          'text-secondary': 'var(--text-secondary)',
+          'text-muted': 'var(--text-muted)',
+          'text-disabled': 'var(--text-disabled)',
 
-          // Compatibility Palette
-          950: '#050A12',
-          900: '#07111D',
-          850: '#0A1422',
-          800: '#0D1726',
-          750: '#1E293B',
-          700: '#26354A',
-          600: '#1E293B',
-          500: '#38BDF8',
-          400: '#60A5FA',
+          // Semantic Colors
+          cyan: 'var(--accent-primary)',
+          'ice-cyan': 'var(--accent-secondary)',
+          'polar-blue': 'var(--accent-primary)',
+          healthy: 'var(--status-healthy)',
+          warning: 'var(--status-warning)',
+          critical: 'var(--status-critical)',
+          offline: 'var(--status-offline)',
+          muted: 'var(--text-muted)',
+
+          // Compatibility Palette mapped to semantic tokens
+          950: 'var(--bg-base)',
+          900: 'var(--bg-surface)',
+          850: 'var(--bg-elevated)',
+          800: 'var(--bg-card)',
+          750: 'var(--border-subtle)',
+          700: 'var(--border-default)',
+          600: 'var(--border-strong)',
+          500: 'var(--accent-primary)',
+          400: 'var(--accent-secondary)',
         }
       },
       fontFamily: {

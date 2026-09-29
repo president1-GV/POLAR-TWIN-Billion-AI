@@ -28,6 +28,7 @@ import { AntarcticGISMap } from './AntarcticGISMap';
 import { Station3DViewer } from '../digital-twin/Station3DViewer';
 import { StatusBadge } from '../../components/ui/StatusBadge';
 import { DataFreshness } from '../../components/ui/DataFreshness';
+import polarTwinIcon from '../../assets/polar-twin-icon.png';
 import { StationDrawer } from '../../components/ui/StationDrawer';
 import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { TelemetryMetric } from '../../components/ui/TelemetryMetric';
@@ -85,21 +86,28 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
   return (
     <div className="p-6 space-y-6 max-w-[1680px] mx-auto font-sans select-none">
       {/* 1. COMMAND CENTER HERO BAR */}
-      <section className="bg-[#07111D] border border-[#1E293B] rounded-md p-5 shadow-sm">
+      <section className="bg-polar-card border border-polar-border rounded-md p-5 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-[11px] font-mono text-[#38BDF8] font-bold uppercase tracking-widest mb-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>POLAR-TWIN • ANTARCTIC MISSION OPERATIONS</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">MoES / NCPOR</span>
+          <div className="flex items-start sm:items-center gap-4">
+            <img 
+              src={polarTwinIcon} 
+              alt="POLAR-TWIN" 
+              className="w-16 h-16 rounded-full object-contain border-2 border-polar-cyan/60 shadow-xl ring-4 ring-polar-cyan/20 shrink-0 hidden sm:block bg-polar-bg/40 p-0.5" 
+            />
+            <div>
+              <div className="flex items-center gap-2 text-[11px] font-mono text-polar-cyan font-bold uppercase tracking-widest mb-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>POLAR-TWIN • ANTARCTIC MISSION OPERATIONS</span>
+                <span className="text-polar-border">|</span>
+                <span className="text-polar-text-secondary">MoES / NCPOR</span>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-polar-text-primary tracking-tight font-mono">
+                EXECUTIVE SITUATIONAL COMMAND CENTER
+              </h1>
+              <p className="text-xs text-polar-text-secondary mt-1 max-w-3xl leading-relaxed font-mono">
+                Autonomous digital-twin intelligence, coupled thermodynamics, and operational resilience console for Bharati & Maitri Antarctic research bases.
+              </p>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight font-mono">
-              EXECUTIVE SITUATIONAL COMMAND CENTER
-            </h1>
-            <p className="text-xs text-slate-400 mt-1 max-w-3xl leading-relaxed font-mono">
-              Autonomous digital-twin intelligence, coupled thermodynamics, and operational resilience console for Bharati & Maitri Antarctic research bases.
-            </p>
           </div>
 
           {/* Quick Actions */}
@@ -122,25 +130,25 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
         </div>
 
         {/* Global Operational Status Sub-Strip */}
-        <div className="mt-4 pt-3 border-t border-[#1E293B] grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+        <div className="mt-4 pt-3 border-t border-polar-border grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 uppercase text-[10px]">Data Freshness:</span>
+            <span className="text-polar-text-muted uppercase text-[10px]">Data Freshness:</span>
             <DataFreshness lastUpdatedTimestamp={lastSyncTime} isLive={true} />
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 uppercase text-[10px]">Active Stations:</span>
-            <span className="text-emerald-400 font-semibold">2 / 2 OPERATIONAL</span>
+            <span className="text-polar-text-muted uppercase text-[10px]">Active Stations:</span>
+            <span className="text-emerald-500 dark:text-emerald-400 font-semibold">2 / 2 OPERATIONAL</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 uppercase text-[10px]">Telemetry Link:</span>
-            <span className="text-slate-200 font-semibold flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="text-polar-text-muted uppercase text-[10px]">Telemetry Link:</span>
+            <span className="text-polar-text-secondary font-semibold flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
               GSAT-11 / INMARSAT NOMINAL
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-slate-500 uppercase text-[10px]">Database Host:</span>
-            <span className="text-emerald-400 font-semibold">Supabase Cloud</span>
+            <span className="text-polar-text-muted uppercase text-[10px]">Database Host:</span>
+            <span className="text-emerald-500 dark:text-emerald-400 font-semibold">Supabase Cloud</span>
           </div>
         </div>
       </section>
@@ -230,29 +238,29 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
       </section>
 
       {/* 4. CENTRAL OPERATIONAL VISUALIZATION: DIGITAL TWIN / GEOSPATIAL MAP */}
-      <section className="bg-[#07111D] border border-[#1E293B] rounded-md overflow-hidden shadow-sm">
+      <section className="bg-polar-card border border-polar-border rounded-md overflow-hidden shadow-sm">
         {/* Visualization Toolbar */}
-        <div className="px-4 py-3 bg-[#0A1422] border-b border-[#1E293B] flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
+        <div className="px-4 py-3 bg-polar-surface border-b border-polar-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono">
           <div className="flex items-center gap-2.5 text-xs">
-            <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
-            <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+            <span className="w-2 h-2 rounded-full bg-polar-cyan" />
+            <span className="font-bold text-polar-text-primary uppercase tracking-wider text-[11px]">
               PRIMARY OPERATIONAL DIGITAL TWIN VIEWPORT
             </span>
-            <span className="text-slate-600">|</span>
-            <span className="text-slate-400 text-[11px]">
-              Target: <strong className="text-white">{selectedStationObj?.name}</strong>
+            <span className="text-polar-border">|</span>
+            <span className="text-polar-text-secondary text-[11px]">
+              Target: <strong className="text-polar-text-primary">{selectedStationObj?.name}</strong>
             </span>
           </div>
 
           {/* View Mode Toggle: 3D Twin (Centerpiece) vs Geospatial Map */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center bg-[#050A12] p-0.5 rounded border border-[#1E293B] text-xs">
+            <div className="flex items-center bg-polar-elevated p-0.5 rounded border border-polar-border text-xs">
               <button
                 onClick={() => setCenterViewMode('3D_TWIN')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
                   centerViewMode === '3D_TWIN'
-                    ? 'bg-[#1E293B] text-[#38BDF8] font-semibold shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-polar-card text-polar-cyan font-semibold shadow-sm border border-polar-border'
+                    : 'text-polar-text-muted hover:text-polar-text-primary'
                 }`}
               >
                 <Box className="w-3.5 h-3.5" />
@@ -262,8 +270,8 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
                 onClick={() => setCenterViewMode('MAP')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded transition-colors ${
                   centerViewMode === 'MAP'
-                    ? 'bg-[#1E293B] text-[#38BDF8] font-semibold shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-polar-card text-polar-cyan font-semibold shadow-sm border border-polar-border'
+                    : 'text-polar-text-muted hover:text-polar-text-primary'
                 }`}
               >
                 <MapIcon className="w-3.5 h-3.5" />
@@ -273,7 +281,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
             <button
               onClick={() => onNavigate('digital-twin')}
-              className="hidden md:flex items-center gap-1 text-[11px] text-slate-400 hover:text-[#38BDF8] transition-colors px-2 py-1"
+              className="hidden md:flex items-center gap-1 text-[11px] text-polar-text-secondary hover:text-polar-cyan transition-colors px-2 py-1"
             >
               <span>Full Screen 3D</span>
               <ExternalLink className="w-3 h-3" />
@@ -318,14 +326,14 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
           return (
             <div
               key={st.id}
-              className="bg-[#07111D] border border-[#1E293B] hover:border-[#26354A] transition-colors rounded-md flex flex-col justify-between shadow-sm font-mono"
+              className="bg-polar-card border border-polar-border hover:border-polar-border-strong transition-colors rounded-md flex flex-col justify-between shadow-sm font-mono"
             >
               {/* Header */}
-              <div className="px-4 py-3 bg-[#0A1422] border-b border-[#1E293B] flex items-center justify-between text-xs">
+              <div className="px-4 py-3 bg-polar-surface border-b border-polar-border flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
-                  <span className="text-white font-bold tracking-wider uppercase">{st.name}</span>
-                  <span className="text-slate-400 text-[11px]">({st.station_code})</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                  <span className="text-polar-text-primary font-bold tracking-wider uppercase">{st.name}</span>
+                  <span className="text-polar-text-muted text-[11px]">({st.station_code})</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <ProvenanceBadge type="LIVE_NCPOR" provider="NCPOR" />
@@ -336,56 +344,56 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
               {/* Body */}
               <div className="p-4 space-y-4">
                 {/* Location Bar */}
-                <div className="flex items-center justify-between text-xs text-slate-400 border-b border-[#1E293B] pb-2.5">
+                <div className="flex items-center justify-between text-xs text-polar-text-secondary border-b border-polar-border pb-2.5">
                   <div>
-                    <span className="text-slate-500">Region: </span>
-                    <span className="text-slate-200">{st.region}</span>
+                    <span className="text-polar-text-muted">Region: </span>
+                    <span className="text-polar-text-primary">{st.region}</span>
                   </div>
                   <div>
-                    <span className="text-slate-500">Coordinates: </span>
-                    <span className="text-[#38BDF8]">
+                    <span className="text-polar-text-muted">Coordinates: </span>
+                    <span className="text-polar-cyan">
                       {st.latitude.toFixed(3)}° S, {st.longitude.toFixed(3)}° E
                     </span>
                   </div>
                 </div>
 
                 {/* Weather Telemetry Strip */}
-                <div className="grid grid-cols-3 gap-2.5 bg-[#050A12] p-3 rounded border border-[#1E293B]">
+                <div className="grid grid-cols-3 gap-2.5 bg-polar-elevated p-3 rounded border border-polar-border">
                   <div>
-                    <div className="text-[10px] text-slate-500 flex items-center gap-1 uppercase">
-                      <Thermometer className="w-3 h-3 text-[#38BDF8]" />
+                    <div className="text-[10px] text-polar-text-muted flex items-center gap-1 uppercase">
+                      <Thermometer className="w-3 h-3 text-polar-cyan" />
                       Air Temp
                     </div>
-                    <div className="text-base font-bold text-white mt-0.5">
+                    <div className="text-base font-bold text-polar-text-primary mt-0.5">
                       {env.temperature_c ?? -18.5} °C
                     </div>
-                    <div className="text-[10px] text-slate-400">
+                    <div className="text-[10px] text-polar-text-muted">
                       Chill: {env.apparent_temp_c ?? -29.0} °C
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-[10px] text-slate-500 flex items-center gap-1 uppercase">
-                      <Wind className="w-3 h-3 text-sky-400" />
+                    <div className="text-[10px] text-polar-text-muted flex items-center gap-1 uppercase">
+                      <Wind className="w-3 h-3 text-sky-500 dark:text-sky-400" />
                       Wind Speed
                     </div>
-                    <div className="text-base font-bold text-white mt-0.5">
+                    <div className="text-base font-bold text-polar-text-primary mt-0.5">
                       {env.wind_speed_ms ?? 11.2} m/s
                     </div>
-                    <div className="text-[10px] text-slate-400">
+                    <div className="text-[10px] text-polar-text-muted">
                       Gust: {env.wind_gust_ms ?? 16.5} m/s
                     </div>
                   </div>
 
                   <div>
-                    <div className="text-[10px] text-slate-500 flex items-center gap-1 uppercase">
-                      <Activity className="w-3 h-3 text-emerald-400" />
+                    <div className="text-[10px] text-polar-text-muted flex items-center gap-1 uppercase">
+                      <Activity className="w-3 h-3 text-emerald-500 dark:text-emerald-400" />
                       Pressure
                     </div>
-                    <div className="text-base font-bold text-white mt-0.5">
+                    <div className="text-base font-bold text-polar-text-primary mt-0.5">
                       {env.pressure_msl_hpa ?? 988.4} hPa
                     </div>
-                    <div className="text-[10px] text-slate-400">
+                    <div className="text-[10px] text-polar-text-muted">
                       Humidity: {env.humidity_pct ?? 65}%
                     </div>
                   </div>
@@ -393,45 +401,45 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
 
                 {/* Key Subsystem Metrics */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
-                    <span className="text-[10px] text-slate-500 uppercase block">Generation</span>
-                    <span className="text-sm font-bold text-white mt-0.5 block">
+                  <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
+                    <span className="text-[10px] text-polar-text-muted uppercase block">Generation</span>
+                    <span className="text-sm font-bold text-polar-text-primary mt-0.5 block">
                       {isBharati ? '185.0' : '160.0'} kW
                     </span>
-                    <span className="text-[9px] text-slate-400">3x Volvo Gensets</span>
+                    <span className="text-[9px] text-polar-text-muted">3x Volvo Gensets</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
-                    <span className="text-[10px] text-slate-500 uppercase block">Fuel Autonomy</span>
-                    <span className="text-sm font-bold text-emerald-400 mt-0.5 block">
+                  <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
+                    <span className="text-[10px] text-polar-text-muted uppercase block">Fuel Autonomy</span>
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">
                       {isBharati ? '192.4' : '178.1'} d
                     </span>
-                    <span className="text-[9px] text-slate-400">Polar ATF / Jet-A1</span>
+                    <span className="text-[9px] text-polar-text-muted">Polar ATF / Jet-A1</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
-                    <span className="text-[10px] text-slate-500 uppercase block">Indoor Temp</span>
-                    <span className="text-sm font-bold text-white mt-0.5 block">
+                  <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
+                    <span className="text-[10px] text-polar-text-muted uppercase block">Indoor Temp</span>
+                    <span className="text-sm font-bold text-polar-text-primary mt-0.5 block">
                       +21.2 °C
                     </span>
-                    <span className="text-[9px] text-slate-400">HVAC Loop Target</span>
+                    <span className="text-[9px] text-polar-text-muted">HVAC Loop Target</span>
                   </div>
 
-                  <div className="p-2.5 bg-[#0A1422] rounded border border-[#1E293B]">
-                    <span className="text-[10px] text-slate-500 uppercase block">Sat Uptime</span>
-                    <span className="text-sm font-bold text-emerald-400 mt-0.5 block">
+                  <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
+                    <span className="text-[10px] text-polar-text-muted uppercase block">Sat Uptime</span>
+                    <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">
                       99.8%
                     </span>
-                    <span className="text-[9px] text-slate-400">C-Band / Inmarsat</span>
+                    <span className="text-[9px] text-polar-text-muted">C-Band / Inmarsat</span>
                   </div>
                 </div>
               </div>
 
               {/* Footer Actions */}
-              <div className="px-4 py-3 bg-[#0A1422] border-t border-[#1E293B] flex items-center justify-between">
+              <div className="px-4 py-3 bg-polar-surface border-t border-polar-border flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-slate-400">Health Index:</span>
-                  <span className="text-xs font-bold text-emerald-400">{health}%</span>
+                  <span className="text-[11px] text-polar-text-muted">Health Index:</span>
+                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{health}%</span>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -441,7 +449,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
                       setActiveStationId(st.id);
                       onSelectStation(st.id);
                     }}
-                    className="px-2.5 py-1 text-[11px] bg-[#1E293B] hover:bg-slate-700 text-slate-200 rounded font-medium transition-colors"
+                    className="px-2.5 py-1 text-[11px] bg-polar-elevated hover:bg-polar-hover text-polar-text-secondary hover:text-polar-text-primary rounded font-medium border border-polar-border transition-colors"
                   >
                     Inspect Station
                   </button>
@@ -451,7 +459,7 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({ onNavigate, onSelectSt
                       onSelectStation(st.id);
                       onNavigate('digital-twin');
                     }}
-                    className="px-2.5 py-1 text-[11px] bg-[#38BDF8] hover:bg-[#0284C7] text-slate-950 font-bold rounded transition-colors flex items-center gap-1"
+                    className="px-2.5 py-1 text-[11px] bg-polar-cyan hover:opacity-90 text-white font-bold rounded transition-colors flex items-center gap-1 shadow-sm"
                   >
                     <span>3D Twin</span>
                     <ChevronRight className="w-3.5 h-3.5" />

@@ -8,10 +8,15 @@ import {
   ShieldCheck, 
   Activity, 
   ChevronDown,
-  Compass
+  Compass,
+  LogIn,
+  LogOut
 } from 'lucide-react';
 import { LinkStatus } from '../../types';
 import { SecurityModal } from './SecurityModal';
+import { ThemeSwitcher } from './ThemeSwitcher';
+import { RoleSelector } from './RoleSelector';
+import polarTwinIcon from '../../assets/polar-twin-icon.png';
 
 interface HeaderProps {
   currentStationId: string;
@@ -23,6 +28,7 @@ interface HeaderProps {
   activeRole: string;
   onRoleChange: (role: string) => void;
   onOpenStationDrawer?: (stationId: string) => void;
+  onOpenLogin?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -35,6 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
   activeRole,
   onRoleChange,
   onOpenStationDrawer,
+  onOpenLogin,
 }) => {
   const [utcTime, setUtcTime] = useState('');
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
@@ -53,23 +60,23 @@ export const Header: React.FC<HeaderProps> = ({
 
   const linkConfigs: Record<LinkStatus, { bg: string; dot: string; label: string }> = {
     ONLINE: { 
-      bg: 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300 hover:bg-emerald-900/40', 
-      dot: 'bg-emerald-400', 
+      bg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-300 hover:bg-emerald-500/20', 
+      dot: 'bg-emerald-500', 
       label: 'SAT-LINK ONLINE' 
     },
     DEGRADED: { 
-      bg: 'bg-amber-950/40 border-amber-500/30 text-amber-300 hover:bg-amber-900/40', 
-      dot: 'bg-amber-400 animate-pulse', 
+      bg: 'bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-300 hover:bg-amber-500/20', 
+      dot: 'bg-amber-500 animate-pulse', 
       label: 'SAT-LINK DEGRADED' 
     },
     OFFLINE: { 
-      bg: 'bg-rose-950/40 border-rose-500/40 text-rose-300 hover:bg-rose-900/40', 
-      dot: 'bg-rose-400 animate-ping', 
+      bg: 'bg-rose-500/10 border-rose-500/40 text-rose-600 dark:text-rose-300 hover:bg-rose-500/20', 
+      dot: 'bg-rose-500 animate-ping', 
       label: 'EDGE OFFLINE MODE' 
     },
     SYNCING: { 
-      bg: 'bg-sky-950/40 border-sky-500/30 text-sky-300 hover:bg-sky-900/40', 
-      dot: 'bg-sky-400 animate-spin', 
+      bg: 'bg-sky-500/10 border-sky-500/30 text-sky-600 dark:text-sky-300 hover:bg-sky-500/20', 
+      dot: 'bg-sky-500 animate-spin', 
       label: 'STORE-AND-FORWARD SYNC' 
     },
   };
@@ -78,85 +85,89 @@ export const Header: React.FC<HeaderProps> = ({
   const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-[#07111D] border-b border-[#1E293B] px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono">
+    <header className="h-16 bg-polar-surface border-b border-polar-border px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors">
       {/* LEFT: Branding & First-Class Station Context */}
       <div className="flex items-center gap-4">
         {/* Brand Identity */}
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-md bg-[#0A1422] border border-[#38BDF8]/40 flex items-center justify-center text-[#38BDF8] shadow-sm">
-            <Shield className="w-4 h-4 text-[#38BDF8]" />
+          <div className="w-10 h-10 rounded-lg bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-lg ring-2 ring-polar-cyan/25 shrink-0 overflow-hidden">
+            <img 
+              src={polarTwinIcon} 
+              alt="POLAR-TWIN Mission Logo" 
+              className="w-full h-full object-contain" 
+            />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm tracking-wider text-white">POLAR-TWIN</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-[#0A1422] text-slate-400 border border-[#1E293B]">
+              <span className="font-bold text-sm tracking-wider text-polar-text-primary">POLAR-TWIN</span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-polar-elevated text-polar-text-muted border border-polar-border">
                 SIH 26060
               </span>
             </div>
-            <p className="text-[10px] text-slate-400 tracking-tight font-sans">
+            <p className="text-[10px] text-polar-text-muted tracking-tight font-sans">
               Indian Antarctic Research Operations • NCPOR
             </p>
           </div>
         </div>
 
         {/* Vertical Divider */}
-        <div className="h-7 border-l border-[#1E293B] hidden sm:block" />
+        <div className="h-7 border-l border-polar-border hidden sm:block" />
 
         {/* First-Class Station Selector */}
-        <div className="hidden sm:flex items-center bg-[#050A12] rounded-lg p-1 border border-[#1E293B]">
+        <div className="hidden sm:flex items-center bg-polar-base rounded-lg p-1 border border-polar-border">
           <button
             onClick={() => onStationChange('station_bharati')}
             className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
               isBharati
-                ? 'bg-[#1E293B] text-[#38BDF8] border border-[#38BDF8]/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
+                : 'text-polar-text-muted hover:text-polar-text-primary'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-[#38BDF8]' : 'bg-slate-600'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${isBharati ? 'bg-polar-cyan' : 'bg-slate-400 dark:bg-slate-600'}`} />
             <span>BHARATI</span>
-            <span className="text-[10px] text-slate-500 hidden md:inline">• Larsemann Hills</span>
+            <span className="text-[10px] text-polar-text-muted hidden md:inline">• Larsemann Hills</span>
           </button>
           <button
             onClick={() => onStationChange('station_maitri')}
             className={`px-3 py-1 rounded-md text-xs font-semibold transition-all flex items-center gap-1.5 ${
               !isBharati
-                ? 'bg-[#1E293B] text-[#38BDF8] border border-[#38BDF8]/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
+                : 'text-polar-text-muted hover:text-polar-text-primary'
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-[#38BDF8]' : 'bg-slate-600'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${!isBharati ? 'bg-polar-cyan' : 'bg-slate-400 dark:bg-slate-600'}`} />
             <span>MAITRI</span>
-            <span className="text-[10px] text-slate-500 hidden md:inline">• Schirmacher Oasis</span>
+            <span className="text-[10px] text-polar-text-muted hidden md:inline">• Schirmacher Oasis</span>
           </button>
         </div>
       </div>
 
       {/* CENTER: Primary Operational State */}
       <div className="hidden xl:flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#050A12] border border-[#1E293B] text-xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-300 font-medium">OPERATIONAL STATE:</span>
-          <span className="text-emerald-400 font-semibold">
+        <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-polar-base border border-polar-border text-xs">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="text-polar-text-secondary font-medium">OPERATIONAL STATE:</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
             {unreadAlertsCount > 0 ? `${unreadAlertsCount} ACTIVE ADVISORIES` : 'ALL SYSTEMS NOMINAL'}
           </span>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-400 text-[11px]">
+          <span className="text-polar-text-muted">|</span>
+          <span className="text-polar-text-muted text-[11px]">
             {isBharati ? '69.408° S, 76.187° E' : '70.766° S, 11.740° E'}
           </span>
         </div>
       </div>
 
-      {/* RIGHT: System Health, Satellite Link, Alerts, RBAC, Clock */}
-      <div className="flex items-center gap-3">
+      {/* RIGHT: System Health, Satellite Link, Alerts, Theme, RBAC, Clock */}
+      <div className="flex items-center gap-2.5">
         {/* System Health / Zero-Trust Security */}
         <button
           onClick={() => setIsSecurityOpen(true)}
           title="System Health & Zero-Trust Access Controls"
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#050A12] border border-[#1E293B] hover:border-slate-700 text-slate-300 text-xs transition-colors"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-polar-base border border-polar-border hover:border-polar-border-active text-polar-text-secondary text-xs transition-colors"
         >
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="hidden lg:inline text-slate-400">HEALTH:</span>
-          <span className="text-emerald-400 font-semibold">98.4%</span>
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="hidden lg:inline text-polar-text-muted">HEALTH:</span>
+          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">98.4%</span>
         </button>
 
         {/* Satellite Link Toggle */}
@@ -174,7 +185,7 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onOpenAlerts}
           title="Open Operational Alerts Drawer"
-          className="relative p-2 rounded-md bg-[#050A12] border border-[#1E293B] text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
+          className="relative p-2 rounded-md bg-polar-base border border-polar-border text-polar-text-secondary hover:text-polar-text-primary hover:border-polar-border-active transition-colors"
         >
           <Bell className="w-4 h-4" />
           {unreadAlertsCount > 0 && (
@@ -184,27 +195,28 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </button>
 
-        {/* RBAC Operator Role Switcher */}
-        <div className="flex items-center gap-1.5 bg-[#050A12] border border-[#1E293B] px-2.5 py-1 rounded-md">
-          <User className="w-3.5 h-3.5 text-[#38BDF8]" />
-          <select
-            value={activeRole}
-            onChange={(e) => onRoleChange(e.target.value)}
-            className="bg-transparent text-xs text-slate-200 outline-none cursor-pointer pr-1"
+        {/* Global Light / Dark / System Theme Switcher */}
+        <ThemeSwitcher />
+
+        {/* RBAC Operator Role Switcher Dropdown */}
+        <RoleSelector activeRole={activeRole} onRoleChange={onRoleChange} />
+
+        {/* Authentication Login / Station Gateway Trigger */}
+        {onOpenLogin && (
+          <button
+            onClick={onOpenLogin}
+            title="Station Authentication & Identity Verification Portal"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-polar-base hover:bg-polar-surface border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors"
           >
-            <option value="OPERATOR" className="bg-[#07111D]">OPERATOR (Duty)</option>
-            <option value="ENGINEER" className="bg-[#07111D]">ENGINEER (Base)</option>
-            <option value="SUPERVISOR" className="bg-[#07111D]">COMMANDER (NCPOR)</option>
-            <option value="ANALYST" className="bg-[#07111D]">ANALYST (Science)</option>
-            <option value="VIEWER" className="bg-[#07111D]">VIEWER (Read-Only)</option>
-            <option value="ADMIN" className="bg-[#07111D]">ADMIN (Mission Ctrl)</option>
-          </select>
-        </div>
+            <LogIn className="w-3.5 h-3.5 text-polar-cyan" />
+            <span className="hidden xl:inline text-[11px] font-semibold">LOGIN</span>
+          </button>
+        )}
 
         {/* Scientific UTC Clock */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-300 bg-[#050A12] px-2.5 py-1 rounded-md border border-[#1E293B]">
-          <Clock className="w-3.5 h-3.5 text-slate-400" />
-          <span className="font-semibold text-white">{utcTime || '12:00:00 UTC'}</span>
+        <div className="hidden sm:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2.5 py-1 rounded-md border border-polar-border">
+          <Clock className="w-3.5 h-3.5 text-polar-text-muted" />
+          <span className="font-semibold text-polar-text-primary">{utcTime || '12:00:00 UTC'}</span>
         </div>
       </div>
 

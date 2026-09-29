@@ -36,20 +36,20 @@ export const DataFreshness: React.FC<Props> = ({
 
   if (isSimulation) {
     return (
-      <div className={`inline-flex items-center gap-1.5 text-[11px] font-mono text-purple-400 bg-purple-950/50 border border-purple-500/30 px-2 py-0.5 rounded ${className}`}>
-        <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+      <div className={`inline-flex items-center gap-1.5 text-[11px] font-mono text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 border border-purple-300 dark:border-purple-500/30 px-2 py-0.5 rounded ${className}`}>
+        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 dark:bg-purple-400" />
         <span className="font-semibold tracking-wider">SIMULATION</span>
-        <span className="text-slate-400 text-[10px]">(What-If Model)</span>
+        <span className="text-slate-500 dark:text-slate-400 text-[10px]">(What-If Model)</span>
       </div>
     );
   }
 
   if (isSynthetic) {
     return (
-      <div className={`inline-flex items-center gap-1.5 text-[11px] font-mono text-sky-400 bg-sky-950/50 border border-sky-500/30 px-2 py-0.5 rounded ${className}`}>
-        <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+      <div className={`inline-flex items-center gap-1.5 text-[11px] font-mono text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/50 border border-sky-300 dark:border-sky-500/30 px-2 py-0.5 rounded ${className}`}>
+        <span className="w-1.5 h-1.5 rounded-full bg-sky-500 dark:bg-sky-400" />
         <span className="font-semibold tracking-wider">SYNTHETIC</span>
-        <span className="text-slate-400 text-[10px]">(Physics Coupled)</span>
+        <span className="text-slate-500 dark:text-slate-400 text-[10px]">(Physics Coupled)</span>
       </div>
     );
   }
@@ -58,19 +58,19 @@ export const DataFreshness: React.FC<Props> = ({
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded border ${
+      className={`inline-flex items-center gap-1.5 text-[11px] font-mono px-2 py-0.5 rounded border transition-colors ${
         isStale
-          ? 'bg-amber-950/50 text-amber-300 border-amber-500/40'
-          : 'bg-emerald-950/50 text-emerald-300 border-emerald-500/40'
+          ? 'bg-amber-50 text-amber-800 border-amber-300 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-500/40'
+          : 'bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-500/40'
       } ${className}`}
     >
       <span
         className={`w-1.5 h-1.5 rounded-full ${
-          isStale ? 'bg-amber-400' : 'bg-emerald-400 animate-pulse'
+          isStale ? 'bg-amber-500 dark:bg-amber-400' : 'bg-emerald-500 dark:bg-emerald-400 animate-pulse'
         }`}
       />
       <span className="font-semibold tracking-wider">{isStale ? 'STALE' : 'LIVE'}</span>
-      <span className="text-slate-400 text-[10px]">
+      <span className="text-slate-500 dark:text-slate-400 text-[10px]">
         • {secondsAgo < 5 ? 'Just now' : `${secondsAgo}s ago`}
       </span>
     </div>
