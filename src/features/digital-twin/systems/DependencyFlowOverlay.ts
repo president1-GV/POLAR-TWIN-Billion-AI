@@ -31,7 +31,7 @@ export class DependencyFlowOverlay {
         type: 'FUEL',
         color: '#F59E0B', // Amber
         flowSpeed: 1.2,
-        points: [[22, 2.6, -14], [12, 2.0, -12], [0, 2.0, -8], [-18, 2.0, -4], [-23, 2.0, -4]],
+        points: [[36, 2.6, -26], [20, 2.0, -22], [-10, 2.0, -18], [-28, 2.0, -14], [-41, 2.0, -14]],
       },
       {
         id: 'flow_gen01_pdb',
@@ -40,7 +40,7 @@ export class DependencyFlowOverlay {
         type: 'POWER',
         color: '#22D3EE', // Electric Cyan
         flowSpeed: 2.0,
-        points: [[-23, 2.0, -4], [-18, 2.2, 0], [-18, 2.0, 4.6]],
+        points: [[-41, 2.0, -14], [-38, 2.0, -12], [-36, 2.0, -9.4]],
       },
       {
         id: 'flow_solar_pdb',
@@ -49,7 +49,7 @@ export class DependencyFlowOverlay {
         type: 'POWER',
         color: '#FACC15', // Yellow
         flowSpeed: 1.5,
-        points: [[0, 10.2, 0], [-10, 6.0, 2], [-18, 2.0, 4.6]],
+        points: [[0, 13.8, 0], [-15, 8.0, -5], [-36, 2.0, -9.4]],
       },
       {
         id: 'flow_bess_pdb',
@@ -58,7 +58,7 @@ export class DependencyFlowOverlay {
         type: 'POWER',
         color: '#38BDF8', // Sky Blue
         flowSpeed: 1.6,
-        points: [[-22.5, 2.0, 4.6], [-18, 2.0, 4.6]],
+        points: [[-41, 2.0, -9.4], [-36, 2.0, -9.4]],
       },
       {
         id: 'flow_pdb_hvac',
@@ -67,7 +67,7 @@ export class DependencyFlowOverlay {
         type: 'HEATING',
         color: '#FB923C', // Warm Orange
         flowSpeed: 1.4,
-        points: [[-18, 2.0, 4.6], [-12, 4.5, 2], [-8, 10.7, 0]],
+        points: [[-36, 2.0, -9.4], [-24, 6.0, -4], [-10, 14.4, 0]],
       },
       {
         id: 'flow_pdb_water',
@@ -76,7 +76,7 @@ export class DependencyFlowOverlay {
         type: 'WATER',
         color: '#0EA5E9', // Water Blue
         flowSpeed: 1.5,
-        points: [[-18, 2.0, 4.6], [-4, 2.0, 0], [6, 1.8, -4], [10, 1.8, -8]],
+        points: [[-36, 2.0, -9.4], [-18, 2.0, -16], [0, 2.0, -20], [12, 2.0, -24]],
       },
       {
         id: 'flow_pdb_comms',
@@ -85,7 +85,7 @@ export class DependencyFlowOverlay {
         type: 'COMMS',
         color: '#A855F7', // Violet
         flowSpeed: 1.8,
-        points: [[-18, 2.0, 4.6], [0, 2.5, 6], [8, 3.0, 7], [16, 3.0, 8]],
+        points: [[-36, 2.0, -9.4], [-10, 2.5, 6], [12, 4.0, 16], [32, 11.2, 24]],
       },
       {
         id: 'flow_pdb_lab',
@@ -94,7 +94,7 @@ export class DependencyFlowOverlay {
         type: 'POWER',
         color: '#10B981', // Emerald
         flowSpeed: 1.3,
-        points: [[-18, 2.0, 4.6], [-4, 4.5, 2], [4, 6.0, 3], [8, 7.2, 3.8]],
+        points: [[-36, 2.0, -9.4], [-24, 2.5, 6], [-12, 4.0, 20]],
       },
     ] : [
       {

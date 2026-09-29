@@ -45,7 +45,7 @@ function resolveInteractiveAsset(assetId: string, stationId: string, currentAsse
       health_score: 100,
       criticality: 'HIGH',
       location_desc: isBharati ? 'Central Aerodynamic Envelope Facade' : 'Main Living Block Primary Gantry Entrance',
-      coordinates_3d: isBharati ? { x: 0, y: 7.8, z: 6.14 } : { x: 0, y: 3.6, z: 5.12 },
+      coordinates_3d: isBharati ? { x: 0, y: 9.1, z: 12.14 } : { x: 0, y: 3.6, z: 5.12 },
       current_state: {
         programme: 'Indian Antarctic Programme',
         authority: 'National Centre for Polar and Ocean Research (NCPOR)',
@@ -70,7 +70,7 @@ function resolveInteractiveAsset(assetId: string, stationId: string, currentAsse
       health_score: 99.5,
       criticality: 'CRITICAL',
       location_desc: 'Station Operational Promenade',
-      coordinates_3d: isBharati ? { x: 12, y: 3.5, z: 22 } : { x: 14, y: 3.0, z: 18 },
+      coordinates_3d: isBharati ? { x: -16, y: 3.5, z: 18 } : { x: 14, y: 3.0, z: 18 },
       current_state: {
         gateway_role: 'POLAR-EDGE Zero-Trust Rugged Telemetry Gateway',
         acquisition_bus: '100 Hz Real-Time Sensor Stream',
@@ -230,15 +230,15 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     const isBharati = stationId === 'station_bharati';
     if (isBharati) {
       return {
-        OVERVIEW: { pos: new THREE.Vector3(38, 28, 42), look: new THREE.Vector3(0, 3, 0) },
-        MAIN_BUILDING: { pos: new THREE.Vector3(0, 12, 24), look: new THREE.Vector3(0, 5, 0) },
-        ENERGY: { pos: new THREE.Vector3(-26, 12, 12), look: new THREE.Vector3(-18, 2, -4) },
-        WATER: { pos: new THREE.Vector3(18, 8, 4), look: new THREE.Vector3(10, 2, -8) },
-        COMMS: { pos: new THREE.Vector3(24, 16, 18), look: new THREE.Vector3(16, 8, 8) },
-        FUEL: { pos: new THREE.Vector3(32, 12, -4), look: new THREE.Vector3(22, 2, -14) },
-        LOGISTICS: { pos: new THREE.Vector3(-26, 10, 28), look: new THREE.Vector3(-14, 2, 14) },
-        SCIENCE: { pos: new THREE.Vector3(14, 12, 16), look: new THREE.Vector3(8, 5, 4) },
-        RESET: { pos: new THREE.Vector3(38, 28, 42), look: new THREE.Vector3(0, 3, 0) },
+        OVERVIEW: { pos: new THREE.Vector3(52, 34, 48), look: new THREE.Vector3(0, 4, 0) },
+        MAIN_BUILDING: { pos: new THREE.Vector3(0, 18, 36), look: new THREE.Vector3(0, 6, 0) },
+        ENERGY: { pos: new THREE.Vector3(-48, 14, 2), look: new THREE.Vector3(-36, 2, -14) },
+        WATER: { pos: new THREE.Vector3(22, 12, -12), look: new THREE.Vector3(12, 2, -24) },
+        COMMS: { pos: new THREE.Vector3(42, 20, 36), look: new THREE.Vector3(32, 10, 24) },
+        FUEL: { pos: new THREE.Vector3(46, 14, -14), look: new THREE.Vector3(36, 2, -26) },
+        LOGISTICS: { pos: new THREE.Vector3(-46, 14, 36), look: new THREE.Vector3(-36, 2, 24) },
+        SCIENCE: { pos: new THREE.Vector3(-2, 14, 30), look: new THREE.Vector3(-12, 4, 20) },
+        RESET: { pos: new THREE.Vector3(52, 34, 48), look: new THREE.Vector3(0, 4, 0) },
       };
     } else {
       return {

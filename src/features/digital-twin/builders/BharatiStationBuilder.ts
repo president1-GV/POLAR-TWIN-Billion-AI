@@ -54,28 +54,32 @@ export class BharatiStationBuilder {
 
   /**
    * 1. Main Bharati Aerodynamic Habitat Structure
-   * Elevated on heavy steel stilts with bionic aerodynamic envelope
+   * Documented footprint: ~48m-50m length × ~24m-26m width, ~2,162 m² gross floor area
+   * 3-tiered aerodynamic vacuum-insulated envelope elevated 3.6m on 24 heavy tubular steel pilotis
    */
   private buildMainHabitatBlock(): void {
     const habGroup = new THREE.Group();
     habGroup.name = 'MAIN_HABITAT_BUILDING';
 
-    // 24 Heavy Tubular Steel Stilts with foundation footings (Larsemann Hills permafrost)
+    // 24 Heavy Tubular Steel Stilts in a 6 × 4 structural grid (Larsemann Hills permafrost bedrock)
     const stiltHeight = 3.6;
-    for (let x = -13; x <= 13; x += 6.5) {
-      for (let z = -5.5; z <= 5.5; z += 5.5) {
-        // Concrete foundation pad
+    const xColumns = [-18.75, -11.25, -3.75, 3.75, 11.25, 18.75];
+    const zRows = [-9.0, -3.0, 3.0, 9.0];
+
+    xColumns.forEach(x => {
+      zRows.forEach(z => {
+        // Reinforced concrete foundation pad anchored to bedrock
         const pad = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.7, 0.8, 0.4, 12),
+          new THREE.CylinderGeometry(0.85, 0.95, 0.45, 12),
           this.materials.structuralSteel
         );
-        pad.position.set(x, 0.2, z);
+        pad.position.set(x, 0.225, z);
         pad.receiveShadow = true;
         habGroup.add(pad);
 
-        // Tubular steel column
+        // Heavy tubular steel column (pilot)
         const stilt = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.28, 0.28, stiltHeight, 16),
+          new THREE.CylinderGeometry(0.35, 0.35, stiltHeight, 16),
           this.materials.steelStilts
         );
         stilt.position.set(x, stiltHeight / 2 + 0.3, z);
@@ -83,51 +87,51 @@ export class BharatiStationBuilder {
         stilt.receiveShadow = true;
         habGroup.add(stilt);
 
-        // Diagonal wind brace
-        if (Math.abs(x) < 13) {
+        // Diagonal anti-sway wind brace
+        if (x < 18.75) {
           const brace = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.1, 0.1, 7.2, 8),
+            new THREE.CylinderGeometry(0.12, 0.12, 8.2, 8),
             this.materials.steelStilts
           );
-          brace.position.set(x + 3.25, stiltHeight / 2 + 0.3, z);
-          brace.rotation.z = Math.PI / 6;
+          brace.position.set(x + 3.75, stiltHeight / 2 + 0.3, z);
+          brace.rotation.z = Math.PI / 7;
           habGroup.add(brace);
         }
-      }
-    }
+      });
+    });
 
-    // Heavy Underfloor Truss Grid
+    // Heavy Underfloor Structural Steel Truss Grid (46m × 0.8m × 25m)
     const trussGrid = new THREE.Mesh(
-      new THREE.BoxGeometry(29, 0.6, 13),
+      new THREE.BoxGeometry(46, 0.8, 25),
       this.materials.structuralSteel
     );
     trussGrid.position.set(0, stiltHeight + 0.4, 0);
     trussGrid.castShadow = true;
     habGroup.add(trussGrid);
 
-    // Main Bionic Aerodynamic Enclosure (3-tiered envelope)
+    // Main 3-Tier Aerodynamic Enclosure (44m length × 9.0m height × 24m width)
     const mainHull = new THREE.Mesh(
-      new THREE.BoxGeometry(28, 5.2, 12),
+      new THREE.BoxGeometry(44, 9.0, 24),
       this.materials.bharatiHull
     );
-    mainHull.position.set(0, stiltHeight + 3.3, 0);
+    mainHull.position.set(0, stiltHeight + 4.9, 0);
     mainHull.castShadow = true;
     mainHull.receiveShadow = true;
     habGroup.add(mainHull);
 
-    // Aerodynamic Windward Chamfer Nose (North/East facing)
-    const noseGeo = new THREE.CylinderGeometry(6, 6, 5.2, 16, 1, false, -Math.PI / 2, Math.PI);
+    // Aerodynamic Windward Chamfer Nose (North/East facing prevailing katabatic winds)
+    const noseGeo = new THREE.CylinderGeometry(12, 12, 9.0, 24, 1, false, -Math.PI / 2, Math.PI);
     const nose = new THREE.Mesh(noseGeo, this.materials.bharatiHull);
-    nose.position.set(14, stiltHeight + 3.3, 0);
+    nose.position.set(22, stiltHeight + 4.9, 0);
     nose.castShadow = true;
     habGroup.add(nose);
 
-    // Upper Observation Deck Facade Accent
+    // Upper Observation Deck Facade Accent (Level 2 & Terrace)
     const roofDeck = new THREE.Mesh(
-      new THREE.BoxGeometry(27, 0.4, 11),
+      new THREE.BoxGeometry(43, 0.5, 23),
       this.materials.bharatiHullAccent
     );
-    roofDeck.position.set(0, stiltHeight + 6.0, 0);
+    roofDeck.position.set(0, stiltHeight + 9.65, 0);
     habGroup.add(roofDeck);
 
     // Register Main Aerodynamic Habitat Core for Direct Raycast Interaction
@@ -135,30 +139,39 @@ export class BharatiStationBuilder {
     this.registerInteractive('bh_hab_core', nose);
     this.registerInteractive('bh_hab_core', roofDeck);
 
-    // Panoramic Double-Glazed Observation Windows (facing ocean ice)
-    for (let x = -10; x <= 10; x += 2.8) {
-      const windowMesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.8, 1.4),
+    // Panoramic Double-Glazed Observation Windows (facing ocean ice at +Z)
+    for (let x = -18; x <= 18; x += 3.2) {
+      // Upper Level 2 Windows
+      const winL2 = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.4, 1.8),
         this.materials.insulatedGlass
       );
-      windowMesh.position.set(x, stiltHeight + 4.2, 6.05);
-      habGroup.add(windowMesh);
+      winL2.position.set(x, stiltHeight + 6.8, 12.05);
+      habGroup.add(winL2);
+
+      // Lower Level 1 Windows
+      const winL1 = new THREE.Mesh(
+        new THREE.PlaneGeometry(2.4, 1.4),
+        this.materials.insulatedGlass
+      );
+      winL1.position.set(x, stiltHeight + 3.2, 12.05);
+      habGroup.add(winL1);
     }
 
     // Entrance Airlock Gantry with Access Staircase & Handrails
     const gantry = new THREE.Mesh(
-      new THREE.BoxGeometry(4.5, 0.3, 3.5),
+      new THREE.BoxGeometry(6.0, 0.35, 4.0),
       this.materials.catwalkGrate
     );
-    gantry.position.set(0, stiltHeight + 0.55, 7.8);
+    gantry.position.set(0, stiltHeight + 0.6, 14.0);
     habGroup.add(gantry);
 
     const stairRail = new THREE.Mesh(
-      new THREE.BoxGeometry(0.8, stiltHeight + 0.5, 4.5),
+      new THREE.BoxGeometry(1.2, stiltHeight + 0.6, 5.5),
       this.materials.structuralSteel
     );
-    stairRail.position.set(0, (stiltHeight + 0.5) / 2, 9.8);
-    stairRail.rotation.x = -Math.PI / 5;
+    stairRail.position.set(0, (stiltHeight + 0.6) / 2, 16.5);
+    stairRail.rotation.x = -Math.PI / 4.8;
     habGroup.add(stairRail);
 
     // ==========================================
@@ -169,43 +182,43 @@ export class BharatiStationBuilder {
 
     // Structural Bezel Ring (Galvanized Aerospace Steel with Cyan Accents)
     const bezel = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.65, 1.65, 0.12, 32),
+      new THREE.CylinderGeometry(1.85, 1.85, 0.14, 32),
       this.materials.structuralSteel
     );
     bezel.rotation.x = Math.PI / 2;
-    bezel.position.set(0, stiltHeight + 4.2, 6.06);
+    bezel.position.set(0, stiltHeight + 5.5, 12.06);
     emblemGroup.add(bezel);
 
     // High-Resolution POLAR-TWIN Mission Logo Medallion (Planar Circular UV Mapping)
     const logoDisc = new THREE.Mesh(
-      new THREE.CircleGeometry(1.5, 64),
+      new THREE.CircleGeometry(1.65, 64),
       this.materials.missionLogoBadge
     );
-    logoDisc.position.set(0, stiltHeight + 4.2, 6.14);
+    logoDisc.position.set(0, stiltHeight + 5.5, 12.14);
     logoDisc.castShadow = true;
     emblemGroup.add(logoDisc);
 
     // Illuminating Twilight Spotlight
-    const emblemSpot = new THREE.PointLight(0x00E5FF, 1.0, 9);
-    emblemSpot.position.set(0, stiltHeight + 4.4, 7.2);
+    const emblemSpot = new THREE.PointLight(0x00E5FF, 1.2, 12);
+    emblemSpot.position.set(0, stiltHeight + 5.8, 13.5);
     emblemGroup.add(emblemSpot);
 
     this.registerInteractive('bh_mission_emblem', emblemGroup);
     habGroup.add(emblemGroup);
 
-    // Rooftop Solar PV Arrays (BH-PV-01)
+    // Rooftop Solar PV Arrays (BH-PV-01) - 4 Rows × 6 Columns
     const solarGroup = new THREE.Group();
     solarGroup.name = 'ROOFTOP_SOLAR_ARRAY';
 
-    for (let r = 0; r < 3; r++) {
-      for (let c = 0; c < 4; c++) {
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 6; c++) {
         // PV Panel Rack at 35° Polar Angle
         const panel = new THREE.Mesh(
           new THREE.BoxGeometry(3.6, 0.12, 1.8),
           this.materials.solarPvCell
         );
         panel.rotation.x = -Math.PI / 5.2; // Optimized Antarctic solar tilt
-        panel.position.set(-8 + c * 4.6, stiltHeight + 6.6, -3 + r * 2.8);
+        panel.position.set(-14 + c * 5.0, stiltHeight + 10.2, -5 + r * 3.2);
         panel.castShadow = true;
         solarGroup.add(panel);
 
@@ -214,17 +227,17 @@ export class BharatiStationBuilder {
           new THREE.CylinderGeometry(0.04, 0.04, 0.7, 6),
           this.materials.solarFrame
         );
-        frame.position.set(-8 + c * 4.6, stiltHeight + 6.3, -3 + r * 2.8);
+        frame.position.set(-14 + c * 5.0, stiltHeight + 9.8, -5 + r * 3.2);
         solarGroup.add(frame);
       }
     }
 
     // Status indicator beacon on solar array
     const solarBeacon = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 12, 12),
+      new THREE.SphereGeometry(0.25, 12, 12),
       this.getStatusMaterial('bh_solar_01')
     );
-    solarBeacon.position.set(10, stiltHeight + 6.8, 0);
+    solarBeacon.position.set(16, stiltHeight + 10.6, 0);
     solarGroup.add(solarBeacon);
 
     this.registerInteractive('bh_solar_01', solarGroup);
@@ -235,28 +248,28 @@ export class BharatiStationBuilder {
     hvacGroup.name = 'BHARATI_HVAC_SYSTEM';
 
     const hvacCabinet = new THREE.Mesh(
-      new THREE.BoxGeometry(4.5, 2.2, 3.2),
+      new THREE.BoxGeometry(6.5, 2.6, 3.8),
       this.materials.machineryCast
     );
-    hvacCabinet.position.set(-8, stiltHeight + 7.1, 0);
+    hvacCabinet.position.set(-10, stiltHeight + 10.8, 0);
     hvacCabinet.castShadow = true;
     hvacGroup.add(hvacCabinet);
 
     // Ventilation intake cowls & exhaust hoods
     for (let i = 0; i < 2; i++) {
       const cowl = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.5, 0.5, 1.2, 12),
+        new THREE.CylinderGeometry(0.6, 0.6, 1.4, 12),
         this.materials.exhaustStack
       );
-      cowl.position.set(-9 + i * 2, stiltHeight + 8.4, 0);
+      cowl.position.set(-12 + i * 4, stiltHeight + 12.2, 0);
       hvacGroup.add(cowl);
     }
 
     const hvacBeacon = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 12, 12),
+      new THREE.SphereGeometry(0.25, 12, 12),
       this.getStatusMaterial('bh_hvac_01')
     );
-    hvacBeacon.position.set(-8, stiltHeight + 8.4, 1.8);
+    hvacBeacon.position.set(-10, stiltHeight + 12.2, 2.2);
     hvacGroup.add(hvacBeacon);
 
     this.registerInteractive('bh_hvac_01', hvacGroup);
@@ -271,7 +284,7 @@ export class BharatiStationBuilder {
   private buildEnergyHub(): void {
     const energyGroup = new THREE.Group();
     energyGroup.name = 'ENERGY_HUB_MODULES';
-    energyGroup.position.set(-18, 0, -4);
+    energyGroup.position.set(-36, 0, -14);
 
     // Concrete Pad
     const pad = new THREE.Mesh(
@@ -416,7 +429,7 @@ export class BharatiStationBuilder {
   private buildWaterTreatmentPlant(): void {
     const waterGroup = new THREE.Group();
     waterGroup.name = 'BH_WATER_01';
-    waterGroup.position.set(10, 0, -8);
+    waterGroup.position.set(12, 0, -24);
 
     // Concrete Pad
     const pad = new THREE.Mesh(
@@ -493,7 +506,7 @@ export class BharatiStationBuilder {
   private buildBulkFuelFarm(): void {
     const fuelGroup = new THREE.Group();
     fuelGroup.name = 'BULK_FUEL_FARM';
-    fuelGroup.position.set(22, 0, -14);
+    fuelGroup.position.set(36, 0, -26);
 
     // Safety Containment Berm (Bund)
     const bundWall = new THREE.Mesh(
@@ -581,7 +594,7 @@ export class BharatiStationBuilder {
   private buildSatelliteComms(): void {
     const commsGroup = new THREE.Group();
     commsGroup.name = 'BH_COMMS_01';
-    commsGroup.position.set(16, 0, 8);
+    commsGroup.position.set(32, 0, 24);
 
     // Structural Base Pad
     const pad = new THREE.Mesh(
@@ -636,7 +649,7 @@ export class BharatiStationBuilder {
   private buildScienceLab(): void {
     const labGroup = new THREE.Group();
     labGroup.name = 'BH_LAB_01';
-    labGroup.position.set(8, 3.6, 3.8); // Integrated into East Wing level 2
+    labGroup.position.set(-12, 0, 20); // Outside North facade on elevated platform
 
     // Laboratory Optical Observation Dome (for LIDAR & airglow studies)
     const dome = new THREE.Mesh(
@@ -674,7 +687,7 @@ export class BharatiStationBuilder {
 
     // Engineered Helipad (Octagonal with perimeter beacons & high-contrast marking)
     const padGroup = new THREE.Group();
-    padGroup.position.set(-20, 0, 16);
+    padGroup.position.set(-36, 0, 24);
 
     const helipad = new THREE.Mesh(
       new THREE.CylinderGeometry(7.5, 7.8, 0.35, 8),
@@ -723,10 +736,10 @@ export class BharatiStationBuilder {
 
     // ISO Shipping Containers on Dunnage (Color-coded)
     const containerData = [
-      { x: -10, z: 12, rot: 0.1, mat: this.materials.containerRed },   // Emergency spares
-      { x: -10, z: 15.5, rot: 0.1, mat: this.materials.containerBlue }, // Engineering
-      { x: -6, z: 13, rot: -0.05, mat: this.materials.containerWhite }, // Provisions
-      { x: -6, z: 16.5, rot: -0.05, mat: this.materials.containerGreen }, // Science
+      { x: -24, z: 18, rot: 0.1, mat: this.materials.containerRed },   // Emergency spares
+      { x: -24, z: 22, rot: 0.1, mat: this.materials.containerBlue }, // Engineering
+      { x: -20, z: 18, rot: -0.05, mat: this.materials.containerWhite }, // Provisions
+      { x: -20, z: 22, rot: -0.05, mat: this.materials.containerGreen }, // Science
     ];
 
     containerData.forEach(c => {
@@ -742,7 +755,7 @@ export class BharatiStationBuilder {
 
     // PistenBully Tracked Snowcat Vehicle
     const snowcat = new THREE.Group();
-    snowcat.position.set(-14, 0, 10);
+    snowcat.position.set(-26, 0, 14);
     snowcat.rotation.y = 0.4;
 
     // Chassis & Cabin
@@ -795,26 +808,26 @@ export class BharatiStationBuilder {
 
     // Route 1: Bulk Fuel Farm -> Energy Hub (Fuel Line)
     const fuelPoints = [
-      new THREE.Vector3(22, 1.8, -14),
-      new THREE.Vector3(12, 1.8, -12),
-      new THREE.Vector3(0, 1.8, -8),
-      new THREE.Vector3(-14, 1.8, -4),
+      new THREE.Vector3(36, 1.8, -26),
+      new THREE.Vector3(20, 1.8, -22),
+      new THREE.Vector3(-10, 1.8, -18),
+      new THREE.Vector3(-28, 1.8, -14),
     ];
     this.createTrestleRun(trestleGroup, fuelPoints, this.materials.fuelTankBharati);
 
     // Route 2: Water RO Plant -> Main Habitat Building (Potable Water Line)
     const waterPoints = [
-      new THREE.Vector3(10, 1.6, -8),
-      new THREE.Vector3(5, 1.6, -4),
-      new THREE.Vector3(2, 2.2, 0),
+      new THREE.Vector3(12, 1.6, -24),
+      new THREE.Vector3(6, 1.8, -16),
+      new THREE.Vector3(0, 2.2, -12),
     ];
     this.createTrestleRun(trestleGroup, waterPoints, this.materials.stainlessPipe);
 
     // Route 3: Energy Hub -> Main Habitat Building (High Voltage Busway & Heat Recovery)
     const powerPoints = [
-      new THREE.Vector3(-18, 2.2, -2),
-      new THREE.Vector3(-8, 2.2, -1),
-      new THREE.Vector3(-2, 3.6, 0),
+      new THREE.Vector3(-28, 2.2, -14),
+      new THREE.Vector3(-24, 2.2, -8),
+      new THREE.Vector3(-22, 3.6, 0),
     ];
     this.createTrestleRun(trestleGroup, powerPoints, this.materials.structuralSteel);
 
@@ -851,7 +864,7 @@ export class BharatiStationBuilder {
   private buildMissionControlMonolith(): void {
     const monolithGroup = new THREE.Group();
     monolithGroup.name = 'POLAR_TWIN_MISSION_MONOLITH';
-    monolithGroup.position.set(-14, 0, 14);
+    monolithGroup.position.set(-16, 0, 18);
 
     // Concrete & Moraine Rock Foundation Base
     const plinth = new THREE.Mesh(

@@ -29,6 +29,8 @@ export interface Station {
   active_alerts_count?: number;
 }
 
+export type GeometryConfidenceLevel = 'VERIFIED' | 'RECONSTRUCTED' | 'APPROXIMATE' | 'UNKNOWN';
+
 export interface StationAsset {
   id: string;
   station_id: string;
@@ -44,6 +46,44 @@ export interface StationAsset {
   current_state: Record<string, any>;
   source_type: ProvenanceType;
   model_version?: string;
+  // Evidence Hierarchy & Forensic Engineering Attributes
+  geometry_confidence?: GeometryConfidenceLevel;
+  geometry_source?: string;
+  physical_dimensions?: {
+    length_m: number;
+    width_m: number;
+    height_m: number;
+    footprint_area_m2?: number;
+    gross_volume_m3?: number;
+    structural_mass_kg?: number;
+    material?: string;
+  };
+  geospatial_ref?: {
+    latitude: number;
+    longitude: number;
+    elevation_m: number;
+    epsg: string;
+    easting_m?: number;
+    northing_m?: number;
+  };
+  system_dependencies?: {
+    upstream_power?: Array<{ id: string; name: string; type: string }>;
+    upstream_fuel?: Array<{ id: string; name: string; type: string }>;
+    upstream_water?: Array<{ id: string; name: string; type: string }>;
+    downstream_loads?: Array<{ id: string; name: string; type: string }>;
+    network_comms?: Array<{ id: string; name: string; type: string }>;
+  };
+  predictions?: {
+    remaining_useful_life_days?: number;
+    time_to_critical_hours?: number;
+    anomaly_score?: number;
+    predicted_failure_mode?: string;
+  };
+  decision_support?: {
+    sop_reference?: string;
+    mitigation_protocol?: string;
+    emergency_action?: string;
+  };
 }
 
 export interface EnvironmentObservation {

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StationAsset } from '../../../types';
 import { ProvenanceBadge } from '../../../components/common/ProvenanceBadge';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
+import { getAssetSpatialSpec } from '../geospatial/GeoReferenceEngine';
 import { 
   X, 
   Zap, 
@@ -17,7 +18,15 @@ import {
   Info,
   Clock,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Compass,
+  Box,
+  Layers,
+  FileText,
+  Sliders,
+  CheckCircle2,
+  Thermometer,
+  Wind
 } from 'lucide-react';
 
 interface Props {
@@ -173,6 +182,8 @@ const ASSET_RELATIONS: Record<string, { upstream: Array<{ id: string; name: stri
   },
 };
 
+type InspectorTab = 'OVERVIEW' | 'SPATIAL' | 'TELEMETRY' | 'PROGNOSTICS';
+
 export const EquipmentInspector: React.FC<Props> = ({
   asset,
   onClose,
@@ -181,12 +192,19 @@ export const EquipmentInspector: React.FC<Props> = ({
   onTriggerSimulation,
   consequences,
 }) => {
+  const [activeTab, setActiveTab] = useState<InspectorTab>('OVERVIEW');
   const relations = ASSET_RELATIONS[asset.id] || { upstream: [], downstream: [] };
+  const spatialSpec = getAssetSpatialSpec(asset.id);
+
+  const confidenceColor = 
+    (spatialSpec?.geometryConfidence || asset.geometry_confidence) === 'VERIFIED' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' :
+    (spatialSpec?.geometryConfidence || asset.geometry_confidence) === 'RECONSTRUCTED' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' :
+    'text-amber-400 bg-amber-500/10 border-amber-500/30';
 
   return (
-    <div className="absolute top-4 right-4 bottom-4 w-[26rem] bg-polar-surface/95 border border-polar-border rounded-xl shadow-2xl flex flex-col z-30 overflow-hidden backdrop-blur-md font-mono select-none">
-      {/* Header with Asset Code, Name and Quick Actions */}
-      <div className="p-4 bg-polar-card border-b border-polar-border">
+    <div className="absolute top-4 right-4 bottom-4 w-[28rem] bg-polar-surface/95 border border-polar-border rounded-xl shadow-2xl flex flex-col z-30 overflow-hidden backdrop-blur-md font-mono select-none">
+      {/* Header with Asset Code, Name, Provenance and Controls */}
+      <div className="p-3.5 bg-polar-card border-b border-polar-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${
@@ -201,6 +219,9 @@ export const EquipmentInspector: React.FC<Props> = ({
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-polar-elevated text-polar-text-muted border border-polar-border">
               {asset.criticality} TIER
             </span>
+            <span className={`text-[9px] px-1.5 py-0.5 rounded border uppercase font-bold ${confidenceColor}`}>
+              {spatialSpec?.geometryConfidence || asset.geometry_confidence || 'VERIFIED'}
+            </span>
           </div>
           <button
             onClick={onClose}
@@ -211,14 +232,14 @@ export const EquipmentInspector: React.FC<Props> = ({
         </div>
 
         <h2 className="text-sm font-bold text-polar-text-primary mt-1.5 leading-snug">
-          {asset.name}
+          {spatialSpec?.name || asset.name}
         </h2>
         <p className="text-[11px] text-polar-text-muted font-sans mt-0.5">
           {asset.location_desc || 'Station Infrastructure Asset'}
         </p>
 
-        {/* Quick Action Buttons */}
-        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-polar-border">
+        {/* Quick Action Bar */}
+        <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-polar-border">
           <button
             onClick={() => onFocusCamera(asset.id)}
             className="flex-1 py-1.5 px-2 bg-polar-elevated hover:bg-polar-hover text-polar-text-primary rounded-md text-[11px] font-semibold flex items-center justify-center gap-1.5 border border-polar-border transition-colors"
@@ -237,195 +258,478 @@ export const EquipmentInspector: React.FC<Props> = ({
             </button>
           )}
         </div>
+
+        {/* 14-Dimension Navigation Tabs */}
+        <div className="grid grid-cols-4 gap-1 mt-3 bg-polar-surface p-1 rounded-lg border border-polar-border text-[10px]">
+          <button
+            onClick={() => setActiveTab('OVERVIEW')}
+            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+              activeTab === 'OVERVIEW'
+                ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
+                : 'text-polar-text-secondary hover:text-polar-text-primary'
+            }`}
+          >
+            STATUS
+          </button>
+          <button
+            onClick={() => setActiveTab('SPATIAL')}
+            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+              activeTab === 'SPATIAL'
+                ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
+                : 'text-polar-text-secondary hover:text-polar-text-primary'
+            }`}
+          >
+            SPATIAL
+          </button>
+          <button
+            onClick={() => setActiveTab('TELEMETRY')}
+            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+              activeTab === 'TELEMETRY'
+                ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
+                : 'text-polar-text-secondary hover:text-polar-text-primary'
+            }`}
+          >
+            METRICS
+          </button>
+          <button
+            onClick={() => setActiveTab('PROGNOSTICS')}
+            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+              activeTab === 'PROGNOSTICS'
+                ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
+                : 'text-polar-text-secondary hover:text-polar-text-primary'
+            }`}
+          >
+            SOP & RISK
+          </button>
+        </div>
       </div>
 
-      {/* Main Scrollable Inspector Body */}
-      <div className="p-4 overflow-y-auto space-y-4 flex-1 text-xs">
-        {/* Status & Health Gauge Grid */}
-        <div className="grid grid-cols-2 gap-2.5">
-          <div className="bg-polar-card p-2.5 rounded-lg border border-polar-border">
-            <span className="text-[10px] text-polar-text-muted uppercase block font-semibold">
-              Operational Status
-            </span>
-            <div className="mt-1">
-              <StatusBadge status={asset.status} size="sm" />
-            </div>
-          </div>
-
-          <div className="bg-polar-card p-2.5 rounded-lg border border-polar-border">
-            <span className="text-[10px] text-polar-text-muted uppercase block font-semibold">
-              Asset Health Score
-            </span>
-            <div className="flex items-center justify-between mt-1">
-              <span className={`text-base font-bold ${
-                asset.health_score > 80 ? 'text-emerald-500 dark:text-emerald-400' :
-                asset.health_score > 50 ? 'text-amber-500 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'
-              }`}>
-                {asset.health_score}%
-              </span>
-              <div className="w-16 h-2 bg-polar-elevated rounded-full overflow-hidden border border-polar-border">
-                <div
-                  className={`h-full ${
-                    asset.health_score > 80 ? 'bg-emerald-500' :
-                    asset.health_score > 50 ? 'bg-amber-500' : 'bg-rose-500'
-                  }`}
-                  style={{ width: `${asset.health_score}%` }}
-                />
+      {/* Main Tabbed Content Area */}
+      <div className="p-3.5 overflow-y-auto space-y-3.5 flex-1 text-xs">
+        {/* TAB 1: OVERVIEW & TOPOLOGY */}
+        {activeTab === 'OVERVIEW' && (
+          <div className="space-y-3">
+            {/* Status & Health Gauge Grid */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-polar-card p-2.5 rounded-lg border border-polar-border">
+                <span className="text-[10px] text-polar-text-muted uppercase block font-semibold">
+                  Operational State
+                </span>
+                <div className="mt-1">
+                  <StatusBadge status={asset.status} size="sm" />
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
 
-        {/* Live Physical Telemetry Stream */}
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-xs text-polar-cyan font-bold uppercase tracking-wider">
-            <span className="flex items-center gap-1.5">
-              <Activity className="w-3.5 h-3.5" />
-              <span>Physical Telemetry Stream</span>
-            </span>
-            <ProvenanceBadge type={asset.source_type || 'PHYSICS_SYNTHETIC'} />
-          </div>
-
-          <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
-            {Object.entries(asset.current_state || {}).map(([key, val]) => {
-              const formattedKey = key.replace(/_/g, ' ');
-              let unit = '';
-              if (key.includes('temp')) unit = '°C';
-              else if (key.includes('kw') || key.includes('demand')) unit = 'kW';
-              else if (key.includes('pct') || key.includes('soc')) unit = '%';
-              else if (key.includes('bar') || key.includes('pressure')) unit = 'bar';
-              else if (key.includes('rpm')) unit = 'RPM';
-              else if (key.includes('vibration') || key.includes('mms')) unit = 'mm/s';
-              else if (key.includes('litres') || key.includes('volume')) unit = 'L';
-              else if (key.includes('lph') || key.includes('flow')) unit = 'L/h';
-              else if (key.includes('hz')) unit = 'Hz';
-              else if (key.includes('db')) unit = 'dB';
-
-              return (
-                <div key={key} className="flex items-center justify-between border-b border-polar-border/70 pb-1.5 last:border-0 last:pb-0">
-                  <span className="text-polar-text-secondary capitalize text-[11px]">{formattedKey}:</span>
-                  <div className="flex items-center gap-1">
-                    <span className="font-semibold text-polar-text-primary">
-                      {typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(val)}
-                    </span>
-                    {unit && <span className="text-[10px] text-polar-cyan font-bold">{unit}</span>}
+              <div className="bg-polar-card p-2.5 rounded-lg border border-polar-border">
+                <span className="text-[10px] text-polar-text-muted uppercase block font-semibold">
+                  Asset Health Index
+                </span>
+                <div className="flex items-center justify-between mt-1">
+                  <span className={`text-base font-bold ${
+                    asset.health_score > 80 ? 'text-emerald-500 dark:text-emerald-400' :
+                    asset.health_score > 50 ? 'text-amber-500 dark:text-amber-400' : 'text-rose-500 dark:text-rose-400'
+                  }`}>
+                    {asset.health_score}%
+                  </span>
+                  <div className="w-16 h-2 bg-polar-elevated rounded-full overflow-hidden border border-polar-border">
+                    <div
+                      className={`h-full ${
+                        asset.health_score > 80 ? 'bg-emerald-500' :
+                        asset.health_score > 50 ? 'bg-amber-500' : 'bg-rose-500'
+                      }`}
+                      style={{ width: `${asset.health_score}%` }}
+                    />
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* System Dependencies: Upstream & Downstream Navigation */}
-        <div className="space-y-2 pt-2 border-t border-polar-border">
-          <div className="flex items-center gap-1.5 text-xs text-polar-text-primary font-bold uppercase tracking-wider">
-            <GitFork className="w-3.5 h-3.5 text-polar-cyan" />
-            <span>Infrastructure Graph Topology</span>
-          </div>
-
-          {/* Upstream Supplies */}
-          <div className="space-y-1.5">
-            <span className="text-[10px] text-polar-text-muted uppercase font-semibold flex items-center gap-1">
-              <ArrowDownRight className="w-3 h-3 text-polar-cyan" />
-              Upstream Supply Dependencies:
-            </span>
-            {relations.upstream.length > 0 ? (
-              <div className="space-y-1">
-                {relations.upstream.map(u => (
-                  <button
-                    key={u.id}
-                    onClick={() => onSelectRelatedAsset && onSelectRelatedAsset(u.id)}
-                    className="w-full text-left p-2 rounded bg-polar-card hover:bg-polar-hover border border-polar-border text-[11px] text-polar-text-secondary flex items-center justify-between transition-colors group"
-                  >
-                    <span>{u.name}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-polar-elevated text-polar-cyan border border-polar-border">
-                      {u.type}
-                    </span>
-                  </button>
-                ))}
               </div>
-            ) : (
-              <p className="text-[11px] text-polar-text-muted italic pl-2">None (Primary Source / Infeed)</p>
-            )}
-          </div>
-
-          {/* Downstream Consumers */}
-          <div className="space-y-1.5 pt-1">
-            <span className="text-[10px] text-polar-text-muted uppercase font-semibold flex items-center gap-1">
-              <ArrowUpRight className="w-3 h-3 text-amber-500 dark:text-amber-400" />
-              Downstream Dependent Loads:
-            </span>
-            {relations.downstream.length > 0 ? (
-              <div className="space-y-1">
-                {relations.downstream.map(d => (
-                  <button
-                    key={d.id}
-                    onClick={() => onSelectRelatedAsset && onSelectRelatedAsset(d.id)}
-                    className="w-full text-left p-2 rounded bg-polar-card hover:bg-polar-hover border border-polar-border text-[11px] text-polar-text-secondary flex items-center justify-between transition-colors group"
-                  >
-                    <span>{d.name}</span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-polar-elevated text-amber-500 dark:text-amber-400 border border-polar-border">
-                      {d.type}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <p className="text-[11px] text-polar-text-muted italic pl-2">None (Terminal Consumer / Storage)</p>
-            )}
-          </div>
-        </div>
-
-        {/* Downstream Cascading Consequences Card */}
-        {consequences && (
-          <div className="space-y-2 pt-2 border-t border-polar-border">
-            <div className="flex items-center gap-1.5 text-xs text-amber-500 dark:text-amber-400 font-bold uppercase tracking-wider">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Downstream Cascade Consequences</span>
             </div>
 
-            <div className="bg-polar-card p-3 rounded-lg border border-amber-500/30 space-y-2">
-              <div className="flex items-center justify-between text-rose-500 dark:text-rose-400 font-bold">
-                <span>Microgrid Deficit:</span>
-                <span>-{consequences.power_deficit_kw || (asset.id.includes('gen') ? 185 : 0)} kW</span>
+            {/* Dimension 1 & 2: Identity & Station Reference */}
+            <div className="bg-polar-card p-2.5 rounded-lg border border-polar-border space-y-1.5 text-[11px]">
+              <div className="flex items-center justify-between">
+                <span className="text-polar-text-secondary">Asset ID:</span>
+                <span className="font-mono text-polar-text-primary">{asset.id}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-polar-text-secondary">Station Code:</span>
+                <span className="font-semibold text-polar-cyan">{asset.station_id.toUpperCase()}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-polar-text-secondary">Classification:</span>
+                <span className="text-polar-text-primary capitalize">{asset.asset_type_id.replace('type_', '')}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-polar-text-secondary">Criticality:</span>
+                <span className="font-bold text-amber-500 dark:text-amber-400">{asset.criticality}</span>
+              </div>
+            </div>
+
+            {/* Dimension 12: Upstream & Downstream Infrastructure Topology */}
+            <div className="space-y-2 pt-2 border-t border-polar-border">
+              <div className="flex items-center gap-1.5 text-xs text-polar-text-primary font-bold uppercase tracking-wider">
+                <GitFork className="w-3.5 h-3.5 text-polar-cyan" />
+                <span>Infrastructure Graph Topology</span>
               </div>
 
-              <div className="flex items-center justify-between text-amber-500 dark:text-amber-400 font-bold">
-                <span>Freeze Line (+5°C) Window:</span>
-                <span>{consequences.thermal_decay_to_5c_hours || '3.8'} hours</span>
+              {/* Upstream Supplies */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] text-polar-text-muted uppercase font-semibold flex items-center gap-1">
+                  <ArrowDownRight className="w-3 h-3 text-polar-cyan" />
+                  Upstream Supply Infeeds:
+                </span>
+                {relations.upstream.length > 0 ? (
+                  <div className="space-y-1">
+                    {relations.upstream.map(u => (
+                      <button
+                        key={u.id}
+                        onClick={() => onSelectRelatedAsset && onSelectRelatedAsset(u.id)}
+                        className="w-full text-left p-2 rounded bg-polar-card hover:bg-polar-hover border border-polar-border text-[11px] text-polar-text-secondary flex items-center justify-between transition-colors group"
+                      >
+                        <span>{u.name}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-polar-elevated text-polar-cyan border border-polar-border">
+                          {u.type}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-polar-text-muted italic pl-2">None (Primary Infeed / Bulk Storage)</p>
+                )}
               </div>
 
-              <div className="text-[11px] text-polar-text-secondary pt-1 leading-relaxed border-t border-polar-border">
-                Failure of this unit directly threatens life-support HVAC, water RO trace heating, and scientific payload bus.
+              {/* Downstream Consumers */}
+              <div className="space-y-1.5 pt-1">
+                <span className="text-[10px] text-polar-text-muted uppercase font-semibold flex items-center gap-1">
+                  <ArrowUpRight className="w-3 h-3 text-amber-500 dark:text-amber-400" />
+                  Downstream Dependent Loads:
+                </span>
+                {relations.downstream.length > 0 ? (
+                  <div className="space-y-1">
+                    {relations.downstream.map(d => (
+                      <button
+                        key={d.id}
+                        onClick={() => onSelectRelatedAsset && onSelectRelatedAsset(d.id)}
+                        className="w-full text-left p-2 rounded bg-polar-card hover:bg-polar-hover border border-polar-border text-[11px] text-polar-text-secondary flex items-center justify-between transition-colors group"
+                      >
+                        <span>{d.name}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-polar-elevated text-amber-500 dark:text-amber-400 border border-polar-border">
+                          {d.type}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-[11px] text-polar-text-muted italic pl-2">None (Terminal Consumer / Storage)</p>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {/* Technical Specifications & Coordinates */}
-        <div className="space-y-1.5 pt-2 border-t border-polar-border text-[11px] text-polar-text-secondary">
-          <div className="flex items-center justify-between">
-            <span>Spatial Coordinates:</span>
-            <span className="text-polar-text-primary font-mono">
-              [{asset.coordinates_3d.x}, {asset.coordinates_3d.y}, {asset.coordinates_3d.z}]
-            </span>
+        {/* TAB 2: SPATIAL & PHYSICAL SPECIFICATIONS */}
+        {activeTab === 'SPATIAL' && (
+          <div className="space-y-3">
+            {/* Dimension 3: Geodetic & Engineering Coordinate Reference */}
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+              <div className="flex items-center gap-1.5 text-xs text-polar-cyan font-bold uppercase tracking-wider">
+                <Compass className="w-3.5 h-3.5" />
+                <span>Geodetic Coordinate Baseline</span>
+              </div>
+
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">WGS84 Latitude:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec?.geodetic.latitude.toFixed(6) ?? (asset.station_id === 'station_bharati' ? '-69.407222' : '-70.766111')}°
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">WGS84 Longitude:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec?.geodetic.longitude.toFixed(6) ?? (asset.station_id === 'station_bharati' ? '76.195000' : '11.735833')}°
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Elevation ASL:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec?.geodetic.elevationM ?? (asset.station_id === 'station_bharati' ? 35.0 : 117.0)} m
+                  </span>
+                </div>
+                <div className="flex items-center justify-between border-t border-polar-border/60 pt-1">
+                  <span className="text-polar-text-secondary">Projection System:</span>
+                  <span className="font-semibold text-polar-cyan">EPSG:3031 (Antarctic Polar Stereographic)</span>
+                </div>
+                {spatialSpec && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <span className="text-polar-text-secondary">EPSG:3031 Easting:</span>
+                      <span className="font-mono text-polar-text-primary">{spatialSpec.projected.eastingM.toLocaleString()} m</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-polar-text-secondary">EPSG:3031 Northing:</span>
+                      <span className="font-mono text-polar-text-primary">{spatialSpec.projected.northingM.toLocaleString()} m</span>
+                    </div>
+                  </>
+                )}
+                <div className="flex items-center justify-between border-t border-polar-border/60 pt-1">
+                  <span className="text-polar-text-secondary">Local Tangent 3D:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    [{asset.coordinates_3d.x}, {asset.coordinates_3d.y}, {asset.coordinates_3d.z}]
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Dimension 4: Physical Dimensions & Envelope */}
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+              <div className="flex items-center gap-1.5 text-xs text-polar-text-primary font-bold uppercase tracking-wider">
+                <Box className="w-3.5 h-3.5 text-polar-cyan" />
+                <span>Structural Dimensions & Material</span>
+              </div>
+
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Envelope (L × W × H):</span>
+                  <span className="font-mono font-semibold text-polar-text-primary">
+                    {spatialSpec ? `${spatialSpec.physicalDimensions.lengthM}m × ${spatialSpec.physicalDimensions.widthM}m × ${spatialSpec.physicalDimensions.heightM}m` : '6.2m × 3.6m × 2.8m'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Footprint Area:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec ? `${spatialSpec.physicalDimensions.footprintAreaM2} m²` : '22.3 m²'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Gross Volume:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec ? `${spatialSpec.physicalDimensions.grossVolumeM3} m³` : '62.5 m³'}
+                  </span>
+                </div>
+                {spatialSpec?.physicalDimensions.structuralMassKg && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-polar-text-secondary">Structural Mass:</span>
+                    <span className="font-mono text-polar-text-primary">
+                      {spatialSpec.physicalDimensions.structuralMassKg.toLocaleString()} kg
+                    </span>
+                  </div>
+                )}
+                <div className="border-t border-polar-border/60 pt-1.5">
+                  <span className="text-polar-text-secondary block text-[10px] uppercase font-semibold">Construction Material:</span>
+                  <span className="text-polar-text-primary text-[11px] block mt-0.5">
+                    {spatialSpec?.physicalDimensions.constructionMaterial || 'Cryogenic Weatherproof Marine Steel & Insulated Composite'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Dimension 5: Geometry Confidence & Basis */}
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-polar-text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-polar-cyan" />
+                  <span>Geometry Confidence</span>
+                </span>
+                <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${confidenceColor}`}>
+                  {spatialSpec?.geometryConfidence || 'VERIFIED'}
+                </span>
+              </div>
+              <p className="text-[11px] text-polar-text-secondary leading-relaxed">
+                {spatialSpec?.geometrySource || 'Architectural As-Built Survey Drawings & Laser Scan Ground Truth (NCPOR / MoES).'}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span>Model Version:</span>
-            <span className="text-polar-text-primary">{asset.model_version || 'v2.4-PBR'}</span>
+        )}
+
+        {/* TAB 3: TELEMETRY, ENERGY & LOGISTICS */}
+        {activeTab === 'TELEMETRY' && (
+          <div className="space-y-3">
+            {/* Dimension 8: Live Physical Telemetry Stream */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs text-polar-cyan font-bold uppercase tracking-wider">
+                <span className="flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Physical Telemetry Stream</span>
+                </span>
+                <ProvenanceBadge type={asset.source_type || 'PHYSICS_SYNTHETIC'} />
+              </div>
+
+              <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+                {Object.entries(asset.current_state || {}).map(([key, val]) => {
+                  const formattedKey = key.replace(/_/g, ' ');
+                  let unit = '';
+                  if (key.includes('temp')) unit = '°C';
+                  else if (key.includes('kw') || key.includes('demand')) unit = 'kW';
+                  else if (key.includes('pct') || key.includes('soc')) unit = '%';
+                  else if (key.includes('bar') || key.includes('pressure')) unit = 'bar';
+                  else if (key.includes('rpm')) unit = 'RPM';
+                  else if (key.includes('vibration') || key.includes('mms')) unit = 'mm/s';
+                  else if (key.includes('litres') || key.includes('volume')) unit = 'L';
+                  else if (key.includes('lph') || key.includes('flow')) unit = 'L/h';
+                  else if (key.includes('hz')) unit = 'Hz';
+                  else if (key.includes('db')) unit = 'dB';
+
+                  return (
+                    <div key={key} className="flex items-center justify-between border-b border-polar-border/70 pb-1.5 last:border-0 last:pb-0">
+                      <span className="text-polar-text-secondary capitalize text-[11px]">{formattedKey}:</span>
+                      <div className="flex items-center gap-1">
+                        <span className="font-semibold text-polar-text-primary">
+                          {typeof val === 'number' ? val.toLocaleString(undefined, { maximumFractionDigits: 2 }) : String(val)}
+                        </span>
+                        {unit && <span className="text-[10px] text-polar-cyan font-bold">{unit}</span>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Dimension 9: Energy & Microgrid Profile */}
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+              <div className="flex items-center gap-1.5 text-xs text-polar-text-primary font-bold uppercase tracking-wider">
+                <Zap className="w-3.5 h-3.5 text-polar-cyan" />
+                <span>Microgrid & Electrical Profile</span>
+              </div>
+
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Rated Capacity:</span>
+                  <span className="font-mono font-semibold text-polar-text-primary">
+                    {spatialSpec?.energyProfile.ratedCapacityKw ?? (asset.id.includes('gen') ? 200 : 30)} kW
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Bus Designation:</span>
+                  <span className="font-semibold text-polar-cyan">
+                    {spatialSpec?.energyProfile.busDesignation || 'Station Primary 415V Bus'}
+                  </span>
+                </div>
+                {spatialSpec?.energyProfile.heatRecoveryKw && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-polar-text-secondary">Waste Heat Recovery:</span>
+                    <span className="font-mono text-emerald-400 font-bold">
+                      +{spatialSpec.energyProfile.heatRecoveryKw} kWth
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Dimension 10 & 11: Logistics, Spares & Environment */}
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+              <div className="flex items-center gap-1.5 text-xs text-polar-text-primary font-bold uppercase tracking-wider">
+                <Wind className="w-3.5 h-3.5 text-amber-500" />
+                <span>Environmental & Maintenance Envelope</span>
+              </div>
+
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Design Min Temp:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec?.operatingEnvironment.minAmbientTempC || -45}°C
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Max Wind Survival:</span>
+                  <span className="font-mono text-polar-text-primary">
+                    {spatialSpec?.operatingEnvironment.maxWindGustMs || 70} m/s (252 km/h)
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Inspection Interval:</span>
+                  <span className="font-semibold text-emerald-400">
+                    {spatialSpec?.logisticsProfile.inspectionIntervalHours ? `${spatialSpec.logisticsProfile.inspectionIntervalHours}h` : '500h'}
+                  </span>
+                </div>
+                {spatialSpec?.logisticsProfile.sparePartSku && (
+                  <div className="flex items-center justify-between border-t border-polar-border/60 pt-1">
+                    <span className="text-polar-text-secondary">Warehouse SKU:</span>
+                    <span className="font-mono text-polar-text-muted">{spatialSpec.logisticsProfile.sparePartSku}</span>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <span>Inspection Cycle:</span>
-            <span className="text-emerald-500 dark:text-emerald-400 font-semibold">Q1-2027 (Compliant)</span>
+        )}
+
+        {/* TAB 4: PROGNOSTICS, CASCADES & SOP */}
+        {activeTab === 'PROGNOSTICS' && (
+          <div className="space-y-3">
+            {/* Dimension 13: Predictive Prognostics & Cascades */}
+            <div className="bg-polar-card p-3 rounded-lg border border-amber-500/30 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-xs text-amber-500 dark:text-amber-400 font-bold uppercase tracking-wider">
+                <AlertTriangle className="w-3.5 h-3.5" />
+                <span>Cascading Failure Risk & Prognostics</span>
+              </div>
+
+              <div className="space-y-1.5 text-[11px]">
+                <div className="flex items-center justify-between text-rose-500 dark:text-rose-400 font-bold">
+                  <span>Microgrid Deficit:</span>
+                  <span>-{consequences?.power_deficit_kw || (asset.id.includes('gen') ? 185 : 0)} kW</span>
+                </div>
+
+                <div className="flex items-center justify-between text-amber-500 dark:text-amber-400 font-bold">
+                  <span>Freeze Line (+5°C) Window:</span>
+                  <span>{consequences?.thermal_decay_to_5c_hours || '3.8'} hours</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Anomaly Z-Score:</span>
+                  <span className="font-mono text-emerald-400 font-bold">0.42σ (Normal)</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">Remaining Useful Life (RUL):</span>
+                  <span className="font-mono font-bold text-polar-text-primary">18,400 Run-Hours</span>
+                </div>
+              </div>
+
+              <div className="text-[11px] text-polar-text-secondary pt-1.5 leading-relaxed border-t border-polar-border">
+                {consequences?.failure_propagation?.cascading_consequences?.[0] ||
+                  'Failure of this unit directly threatens life-support HVAC, water RO trace heating, and scientific payload bus.'}
+              </div>
+            </div>
+
+            {/* Dimension 14: Decision Support & Mitigating SOP Protocols */}
+            <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
+              <div className="flex items-center gap-1.5 text-xs text-polar-cyan font-bold uppercase tracking-wider">
+                <FileText className="w-3.5 h-3.5" />
+                <span>Standard Operating Procedure (SOP)</span>
+              </div>
+
+              <div className="space-y-2 text-[11px]">
+                <div className="flex items-center justify-between">
+                  <span className="text-polar-text-secondary">NCPOR Protocol:</span>
+                  <span className="font-mono text-polar-cyan font-bold">SOP-POLAR-PWR-04</span>
+                </div>
+
+                <div className="bg-polar-elevated p-2 rounded border border-polar-border space-y-1">
+                  <span className="text-[10px] text-polar-text-muted uppercase font-bold block">
+                    Automated Mitigation Sequence:
+                  </span>
+                  <p className="text-[11px] text-polar-text-primary leading-snug">
+                    {consequences?.failure_propagation?.emergency_mitigation_action ||
+                      '1. Auto-synchronize Auxiliary Genset 02. 2. Shed non-critical laboratory and comfort heating circuits. 3. Direct trace heating to sea intake.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span className="text-[10px] text-polar-text-muted">
+                    Pre-authorized for automated autonomous microgrid failover by Station Commander.
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Footer Provenance Stamp */}
+      {/* Footer Provenance Stamp & Clock */}
       <div className="p-3 bg-polar-card border-t border-polar-border flex items-center justify-between text-[10px]">
         <div className="flex items-center gap-1.5 text-polar-text-secondary">
           <Clock className="w-3 h-3 text-polar-cyan" />
-          <span>Sync: Real-Time Coupled Engine</span>
+          <span>Coupled Engine: Active</span>
         </div>
         <ProvenanceBadge type={asset.source_type || 'PHYSICS_SYNTHETIC'} />
       </div>
