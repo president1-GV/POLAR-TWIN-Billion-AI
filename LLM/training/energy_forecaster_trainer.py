@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Energy & Fuel Demand Forecaster Trainer
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Trains physics-informed gradient boosting model on Antarctic energy demand.
 Enforces chronological split and verifies MAE improvement >= 10% over naive baseline.

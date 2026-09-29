@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Evaluation Metrics
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Computes standard ML regression and classification metrics with baseline comparisons:
 - MAE, RMSE, MAPE, R²

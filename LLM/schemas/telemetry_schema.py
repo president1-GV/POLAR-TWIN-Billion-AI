@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Telemetry & Energy Schemas
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Defines schemas for asset telemetry and station microgrid energy readings.
 """

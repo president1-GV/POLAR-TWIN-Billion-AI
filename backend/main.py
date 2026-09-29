@@ -21,7 +21,7 @@ from backend.api.data_engineering import router as data_engineering_router
 
 app = FastAPI(
     title="POLAR-TWIN API",
-    description="Zero-Trust Operational Digital Twin for Remote Antarctic Research Stations (SIH 26060)",
+    description="Zero-Trust Operational Digital Twin for Remote Antarctic Research Stations (POLAR-TWIN)",
     version="2.1.0"
 )
 
@@ -96,7 +96,7 @@ def root():
     return {
         "product": "POLAR-TWIN",
         "description": "Zero-Trust Operational Digital Twin for Remote Antarctic Station Operations",
-        "sih_problem_code": "SIH 26060",
+        "programme": "Indian Antarctic Programme", "authority": "NCPOR / MoES",
         "security_standard": "Zero-Trust Architecture (RBAC + ABAC + PBKDF2 + Rate Limiting)",
         "stations": ["Bharati", "Maitri"],
         "operating_model": "OBSERVE -> UNDERSTAND -> PREDICT -> SIMULATE -> DECIDE",

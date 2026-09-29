@@ -1,6 +1,6 @@
 // ============================================================================
 // POLAR-TWIN: High-Precision Accessible Mission Control Role Selector
-// SIH 26060 — Indian Antarctic Research Stations (Bharati & Maitri)
+// POLAR-TWIN — Indian Antarctic Research Stations (Bharati & Maitri)
 // Robust Multi-Role Switcher & Zero-Trust Operator Identity Selector
 // ============================================================================
 

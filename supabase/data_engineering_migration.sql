@@ -1,6 +1,6 @@
 -- ============================================================================
 -- POLAR-TWIN: Data Engineering & Provenance Schema Migration
--- SIH 26060: Digital Platform for Remote Antarctic Station Operations
+-- POLAR-TWIN: Digital Platform for Remote Antarctic Station Operations
 -- ============================================================================
 
 -- 1. PROVENANCE TYPE CONSTRAINT UPDATE

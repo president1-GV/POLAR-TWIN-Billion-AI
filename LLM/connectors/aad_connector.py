@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Australian Antarctic Division (AADC) Benchmark Connector
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Ingests Australian Antarctic Division (AADC) open benchmark observations.
 Strict Provenance: EXTERNAL_ANTARCTIC_BENCHMARK

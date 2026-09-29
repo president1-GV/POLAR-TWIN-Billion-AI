@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Provenance & Dataset Schemas
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Defines strict provenance tiers and dataset metadata schema.
 """

@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Chronological Split Manager
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Enforces strictly chronological, non-leaking time-series splits:
 Train (70%) -> Validation (15%) -> Test (15%)

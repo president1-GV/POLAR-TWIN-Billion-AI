@@ -130,6 +130,11 @@ export class BharatiStationBuilder {
     roofDeck.position.set(0, stiltHeight + 6.0, 0);
     habGroup.add(roofDeck);
 
+    // Register Main Aerodynamic Habitat Core for Direct Raycast Interaction
+    this.registerInteractive('bh_hab_core', mainHull);
+    this.registerInteractive('bh_hab_core', nose);
+    this.registerInteractive('bh_hab_core', roofDeck);
+
     // Panoramic Double-Glazed Observation Windows (facing ocean ice)
     for (let x = -10; x <= 10; x += 2.8) {
       const windowMesh = new THREE.Mesh(
@@ -171,13 +176,12 @@ export class BharatiStationBuilder {
     bezel.position.set(0, stiltHeight + 4.2, 6.06);
     emblemGroup.add(bezel);
 
-    // High-Resolution POLAR-TWIN Mission Logo Medallion
+    // High-Resolution POLAR-TWIN Mission Logo Medallion (Planar Circular UV Mapping)
     const logoDisc = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.5, 1.5, 0.14, 32),
+      new THREE.CircleGeometry(1.5, 64),
       this.materials.missionLogoBadge
     );
-    logoDisc.rotation.x = Math.PI / 2;
-    logoDisc.position.set(0, stiltHeight + 4.2, 6.08);
+    logoDisc.position.set(0, stiltHeight + 4.2, 6.14);
     logoDisc.castShadow = true;
     emblemGroup.add(logoDisc);
 
@@ -883,21 +887,20 @@ export class BharatiStationBuilder {
     orangeBand.position.set(0, 5.2, 0);
     monolithGroup.add(orangeBand);
 
-    // Front-Facing POLAR-TWIN Logo Medallion
+    // Front-Facing POLAR-TWIN Logo Medallion (Planar Circular UV Mapping)
     const frontLogo = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.15, 1.15, 0.08, 32),
+      new THREE.CircleGeometry(1.15, 64),
       this.materials.missionLogoBadge
     );
-    frontLogo.rotation.x = Math.PI / 2;
     frontLogo.position.set(0, 3.4, 0.28);
     monolithGroup.add(frontLogo);
 
     // Rear-Facing POLAR-TWIN Logo Medallion
     const backLogo = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.15, 1.15, 0.08, 32),
+      new THREE.CircleGeometry(1.15, 64),
       this.materials.missionLogoBadge
     );
-    backLogo.rotation.x = -Math.PI / 2;
+    backLogo.rotation.y = Math.PI;
     backLogo.position.set(0, 3.4, -0.28);
     monolithGroup.add(backLogo);
 

@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Physics-Coupled Synthetic Telemetry Generator
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Generates physically realistic operational telemetry for Antarctic stations (Maitri & Bharati).
 Models thermodynamic building envelope, diesel gensets, BESS, and mechanical wear.

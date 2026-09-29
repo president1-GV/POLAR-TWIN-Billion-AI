@@ -1,6 +1,6 @@
 -- ============================================================================
 -- POLAR-TWIN: Supabase Schema Migration
--- SIH 26060: Digital Platform for Remote Antarctic Station Operations
+-- POLAR-TWIN: Digital Platform for Remote Antarctic Station Operations
 -- ============================================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

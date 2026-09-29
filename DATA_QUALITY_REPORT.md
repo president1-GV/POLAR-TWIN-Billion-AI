@@ -1,5 +1,5 @@
 # POLAR-TWIN: DATA QUALITY & VALIDATION AUDIT REPORT
-**SIH 26060 — Digital Platform for Remote Antarctic Station Management**  
+**POLAR-TWIN — Digital Platform for Remote Antarctic Station Management**  
 **Audit Executed By:** Data Quality & Validation Engine (`LLM/preprocessing/quality_engine.py`)  
 **Standard:** Rigorous Antarctic Physical Bounds Enforcement & Zero-Null Ingestion  
 

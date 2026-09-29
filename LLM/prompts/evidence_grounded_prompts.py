@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Evidence-Grounded LLM Prompt Engineering
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Defines system prompts, query templates, and strict anti-hallucination protocols:
 - Requires citing Provenance Tier, Dataset ID, Observation Timestamp, Sensor ID

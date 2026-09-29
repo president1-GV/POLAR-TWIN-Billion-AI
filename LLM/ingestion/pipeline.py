@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Master Ingestion Pipeline
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Executes end-to-end ingestion:
 1. Connects to official sources (NCPOR, AAD, Copernicus, Physics Synthetic)

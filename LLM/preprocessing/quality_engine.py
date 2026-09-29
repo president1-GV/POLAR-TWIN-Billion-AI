@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Data Quality & Validation Engine
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Performs comprehensive data quality audits:
 - Null checking and missingness reporting

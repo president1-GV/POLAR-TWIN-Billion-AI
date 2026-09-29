@@ -1,6 +1,6 @@
 // ============================================================================
 // POLAR-TWIN: Centralized Role-Based & Attribute-Based Access Control (RBAC/ABAC)
-// SIH 26060 — Indian Antarctic Research Stations (Bharati & Maitri)
+// POLAR-TWIN — Indian Antarctic Research Stations (Bharati & Maitri)
 // Standard: Zero-Trust Defense-in-Depth, NCPOR Mission Control Security
 // ============================================================================
 

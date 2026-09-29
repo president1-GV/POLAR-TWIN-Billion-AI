@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering API Router
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Provides endpoints for:
 - Datasets Catalog & Cryptographic Provenance

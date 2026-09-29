@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Change Data Capture (CDC) Handler
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Handles continuous streaming ingestion, deduplication, and record versioning.
 """

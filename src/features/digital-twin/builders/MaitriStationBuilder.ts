@@ -69,6 +69,44 @@ export class MaitriStationBuilder {
       { x: 0, z: 0, w: 4, d: 10, label: 'Central Corridor' },
     ];
 
+    // Structural Steel Stilts & Moraine Bedrock Anchor Footings (Schirmacher Oasis)
+    const stiltHeight = 1.4;
+    pods.forEach(p => {
+      const xOffsets = [-p.w / 2 + 1.0, 0, p.w / 2 - 1.0];
+      const zOffsets = [-p.d / 2 + 1.0, p.d / 2 - 1.0];
+      xOffsets.forEach(ox => {
+        zOffsets.forEach(oz => {
+          // Moraine concrete anchor footing
+          const footing = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.45, 0.55, 0.35, 12),
+            this.materials.structuralSteel
+          );
+          footing.position.set(p.x + ox, 0.17, p.z + oz);
+          footing.receiveShadow = true;
+          mainGroup.add(footing);
+
+          // Elevated tubular steel stilt
+          const stilt = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.18, stiltHeight, 12),
+            this.materials.steelStilts
+          );
+          stilt.position.set(p.x + ox, stiltHeight / 2 + 0.2, p.z + oz);
+          stilt.castShadow = true;
+          stilt.receiveShadow = true;
+          mainGroup.add(stilt);
+        });
+      });
+
+      // Underfloor structural steel grid
+      const underGrid = new THREE.Mesh(
+        new THREE.BoxGeometry(p.w, 0.3, p.d),
+        this.materials.structuralSteel
+      );
+      underGrid.position.set(p.x, stiltHeight + 0.15, p.z);
+      underGrid.castShadow = true;
+      mainGroup.add(underGrid);
+    });
+
     pods.forEach(p => {
       // Wall Module
       const wall = new THREE.Mesh(
@@ -100,6 +138,9 @@ export class MaitriStationBuilder {
       }
     });
 
+    // Register Living & Science Blocks for Raycast Interaction
+    this.registerInteractive('ma_hab_core', mainGroup);
+
     // ==========================================
     // OFFICIAL POLAR-TWIN MISSION CREST ON ENTRANCE
     // ==========================================
@@ -115,11 +156,10 @@ export class MaitriStationBuilder {
     crestGroup.add(bezel);
 
     const logoDisc = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.18, 1.18, 0.12, 32),
+      new THREE.CircleGeometry(1.2, 64),
       this.materials.missionLogoBadge
     );
-    logoDisc.rotation.x = Math.PI / 2;
-    logoDisc.position.set(0, 3.6, 5.08);
+    logoDisc.position.set(0, 3.6, 5.12);
     crestGroup.add(logoDisc);
 
     const crestSpot = new THREE.PointLight(0x00E5FF, 0.8, 8);
@@ -609,18 +649,17 @@ export class MaitriStationBuilder {
     monolithGroup.add(orangeBand);
 
     const frontLogo = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.05, 1.05, 0.08, 32),
+      new THREE.CircleGeometry(1.05, 64),
       this.materials.missionLogoBadge
     );
-    frontLogo.rotation.x = Math.PI / 2;
     frontLogo.position.set(0, 2.4, 0.24);
     monolithGroup.add(frontLogo);
 
     const backLogo = new THREE.Mesh(
-      new THREE.CylinderGeometry(1.05, 1.05, 0.08, 32),
+      new THREE.CircleGeometry(1.05, 64),
       this.materials.missionLogoBadge
     );
-    backLogo.rotation.x = -Math.PI / 2;
+    backLogo.rotation.y = Math.PI;
     backLogo.position.set(0, 2.4, -0.24);
     monolithGroup.add(backLogo);
 

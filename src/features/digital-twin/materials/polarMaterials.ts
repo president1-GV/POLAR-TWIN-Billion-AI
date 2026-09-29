@@ -404,16 +404,20 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
   const textureLoader = new THREE.TextureLoader();
   const iconTexture = textureLoader.load(polarTwinIcon);
   iconTexture.colorSpace = THREE.SRGBColorSpace;
+  iconTexture.generateMipmaps = true;
+  iconTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  iconTexture.magFilter = THREE.LinearFilter;
 
   const missionLogoBadge = new THREE.MeshStandardMaterial({
     map: iconTexture,
-    roughness: 0.25,
-    metalness: 0.15,
+    roughness: 0.2,
+    metalness: 0.1,
     transparent: true,
-    alphaTest: 0.05,
+    alphaTest: 0.02,
+    side: THREE.DoubleSide,
     emissive: new THREE.Color(0xFFFFFF),
     emissiveMap: iconTexture,
-    emissiveIntensity: 0.28,
+    emissiveIntensity: 0.35,
   });
 
   return {

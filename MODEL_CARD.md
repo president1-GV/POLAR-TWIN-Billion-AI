@@ -1,5 +1,5 @@
 # POLAR-TWIN: MODEL CARD SPECIFICATION
-**SIH 26060 — Digital Platform for Remote Antarctic Station Management**  
+**POLAR-TWIN — Digital Platform for Remote Antarctic Station Management**  
 **Lead Organization:** National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth Sciences, India  
 **Applicability:** Antarctic Microgrid Forecasting & Mechanical Diagnostics (Bharati & Maitri Stations)  
 

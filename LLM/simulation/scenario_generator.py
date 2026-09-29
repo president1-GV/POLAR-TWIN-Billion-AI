@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Operational Scenario Generator
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Generates critical operational scenarios (Blizzard, Fuel Starvation, Genset Failure)
 with strict simulation provenance and consequence tracking.

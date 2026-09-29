@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Observation Schema
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Defines schemas for physical meteorological observations from NCPOR AWS stations
 and external ocean/sea ice data.

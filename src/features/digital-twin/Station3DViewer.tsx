@@ -28,6 +28,103 @@ interface Props {
   onNavigateToSimulation?: (scenarioKey?: string) => void;
 }
 
+function resolveInteractiveAsset(assetId: string, stationId: string, currentAssets: StationAsset[]): StationAsset {
+  const existing = currentAssets.find(a => a.id === assetId);
+  if (existing) return existing;
+
+  const isBharati = stationId === 'station_bharati';
+
+  if (assetId === 'bh_mission_emblem' || assetId === 'maitri_mission_crest') {
+    return {
+      id: assetId,
+      station_id: stationId,
+      asset_type_id: 'type_insignia',
+      name: isBharati ? 'Bharati Polar Mission Insignia & Crest' : 'Maitri Polar Mission Insignia & Crest',
+      code: isBharati ? 'BH-CREST-01' : 'MA-CREST-01',
+      status: 'NORMAL',
+      health_score: 100,
+      criticality: 'HIGH',
+      location_desc: isBharati ? 'Central Aerodynamic Envelope Facade' : 'Main Living Block Primary Gantry Entrance',
+      coordinates_3d: isBharati ? { x: 0, y: 7.8, z: 6.14 } : { x: 0, y: 3.6, z: 5.12 },
+      current_state: {
+        programme: 'Indian Antarctic Programme',
+        authority: 'National Centre for Polar and Ocean Research (NCPOR)',
+        ministry: 'Ministry of Earth Sciences (MoES), Govt. of India',
+        coordinates: isBharati ? '69° 24.41′ S, 76° 11.72′ E (Larsemann Hills)' : '70° 45′ 58″ S, 11° 44′ 09″ E (Schirmacher Oasis)',
+        elevation: isBharati ? '35m Above Sea Level' : '50m Above Sea Level',
+        architectural_system: isBharati ? 'Aerodynamic 3-Tier Vacuum Envelope (bof / IMS)' : 'Steel-Stilt Modular Moraine Complex',
+        operational_status: 'Fully Operational Mission Crest',
+      },
+      source_type: 'REAL_PUBLIC',
+    };
+  }
+
+  if (assetId === 'bh_mission_monolith' || assetId === 'maitri_mission_monolith') {
+    return {
+      id: assetId,
+      station_id: stationId,
+      asset_type_id: 'type_monolith',
+      name: isBharati ? 'Bharati Mission Control Gateway Monolith' : 'Maitri Mission Control Gateway Monolith',
+      code: isBharati ? 'BH-MONO-01' : 'MA-MONO-01',
+      status: 'NORMAL',
+      health_score: 99.5,
+      criticality: 'CRITICAL',
+      location_desc: 'Station Operational Promenade',
+      coordinates_3d: isBharati ? { x: 12, y: 3.5, z: 22 } : { x: 14, y: 3.0, z: 18 },
+      current_state: {
+        gateway_role: 'POLAR-EDGE Zero-Trust Rugged Telemetry Gateway',
+        acquisition_bus: '100 Hz Real-Time Sensor Stream',
+        uplink_transceiver: isBharati ? 'GSAT-11 Primary / Inmarsat Fallback' : 'Inmarsat BGAN / HF Radio',
+        storage_buffer: 'NVMe Ring Buffer with CRC32 Integrity Checks',
+        encryption: 'HMAC-SHA256 Authenticated',
+      },
+      source_type: 'REAL_PUBLIC',
+    };
+  }
+
+  if (assetId.includes('hab') || assetId.includes('BLOCKS') || assetId.includes('BUILDING')) {
+    return {
+      id: assetId,
+      station_id: stationId,
+      asset_type_id: 'type_hab',
+      name: isBharati ? 'Bharati Main Aerodynamic Habitat' : 'Maitri Living & Science Complex',
+      code: isBharati ? 'BH-HAB-01' : 'MA-HAB-01',
+      status: 'NORMAL',
+      health_score: 97.5,
+      criticality: 'CRITICAL',
+      location_desc: 'Station Primary Living & Operations Enclosure',
+      coordinates_3d: { x: 0, y: 5.0, z: 0 },
+      current_state: {
+        indoor_temperature_c: isBharati ? 20.8 : 19.5,
+        indoor_pressure_hpa: 988.4,
+        occupancy_ratio: isBharati ? '18 / 25 Personnel' : '22 / 25 Personnel',
+        life_support_state: 'OPTIMAL',
+        thermal_envelope: 'Vacuum-Insulated Facade, Triple Glazed',
+      },
+      source_type: 'REAL_PUBLIC',
+    };
+  }
+
+  return {
+    id: assetId,
+    station_id: stationId,
+    asset_type_id: 'type_subsystem',
+    name: assetId.replace(/[_-]/g, ' ').toUpperCase(),
+    code: assetId.toUpperCase(),
+    status: 'NORMAL',
+    health_score: 96.0,
+    criticality: 'HIGH',
+    location_desc: 'Operational Station Sector',
+    coordinates_3d: { x: 0, y: 2.0, z: 0 },
+    current_state: {
+      operational_mode: 'ACTIVE',
+      telemetry_link: 'ONLINE',
+      station: isBharati ? 'Bharati Antarctic Base' : 'Maitri Antarctic Base',
+    },
+    source_type: 'REAL_PUBLIC',
+  };
+}
+
 export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimulation }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -303,7 +400,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
         }
 
         if (foundAssetId) {
-          const match = assets.find(a => a.id === foundAssetId);
+          const match = resolveInteractiveAsset(foundAssetId, stationId, assets);
           if (match) {
             mountRef.current.style.cursor = 'pointer';
             setHoveredAsset({
@@ -353,9 +450,15 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
         }
 
         if (foundAssetId) {
-          const match = assets.find(a => a.id === foundAssetId);
+          const match = resolveInteractiveAsset(foundAssetId, stationId, assets);
           if (match) {
             setSelectedAsset(match);
+            if (match.coordinates_3d) {
+              const c = match.coordinates_3d;
+              const targetLook = new THREE.Vector3(c.x, c.y + 0.5, c.z);
+              const targetPos = new THREE.Vector3(c.x + 10, c.y + 6, c.z + 12);
+              flyCameraTo(targetPos, targetLook, 0.7);
+            }
           }
         }
       }

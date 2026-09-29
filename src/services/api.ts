@@ -35,6 +35,7 @@ let edgeSequenceCounter = 1420;
 export const ROLE_CREDENTIALS: Record<string, { username: string; password?: string; mfa_code?: string; name: string; station: string }> = {
   OPERATOR: { username: 'operator.sharma', password: 'PolarOps@2026!', name: 'V. Sharma', station: 'station_bharati' },
   ENGINEER: { username: 'engineer.deshmukh', password: 'AntarcticEng#1', name: 'A. Deshmukh', station: 'station_bharati' },
+  COMMANDER: { username: 'commander.nair', password: 'BaseCommander$9', mfa_code: '123456', name: 'Col. R. Nair', station: 'station_bharati' },
   SUPERVISOR: { username: 'commander.nair', password: 'BaseCommander$9', mfa_code: '123456', name: 'Col. R. Nair', station: 'station_bharati' },
   ANALYST: { username: 'analyst.patel', password: 'PolarData*2026', name: 'Dr. K. Patel', station: 'station_maitri' },
   VIEWER: { username: 'viewer.guest', password: 'PolarGuest@View1', name: 'Scientific Guest', station: 'GLOBAL' },
@@ -81,17 +82,29 @@ async function backendFetch(endpoint: string, options: RequestInit = {}): Promis
 export const api = {
   // 0. Zero-Trust Identity & Session Management
   async login(username: string, password?: string, mfa_code?: string): Promise<any> {
-    const res = await backendFetch('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password, mfa_code }),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: 'Authentication failed' }));
-      throw new Error(err.detail || 'Authentication failed');
+    try {
+      const res = await backendFetch('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password, mfa_code }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSessionAuth(data.token, data.user);
+        return data;
+      }
+      if (res.status === 401 || res.status === 403) {
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const err = await res.json().catch(() => null);
+          if (err && err.detail) {
+            throw new Error(err.detail);
+          }
+        }
+      }
+      throw new Error(`BACKEND_UNAVAILABLE: HTTP ${res.status}`);
+    } catch (e: any) {
+      throw e;
     }
-    const data = await res.json();
-    setSessionAuth(data.token, data.user);
-    return data;
   },
 
   async logout(): Promise<void> {

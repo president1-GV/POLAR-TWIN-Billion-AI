@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Physics-Informed Feature Engineering
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Generates domain-specific physics features:
 - Heating Degree Hours (HDH)

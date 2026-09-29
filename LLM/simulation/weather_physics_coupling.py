@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Weather-to-Digital-Twin Physics Coupling
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Bridges real AWS observations (REAL_NCPOR) with digital twin asset physics,
 producing DERIVED telemetry while rigorously maintaining source provenance links.

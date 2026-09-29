@@ -1,6 +1,6 @@
 # POLAR-TWIN ANTIGRAVITY FORENSIC FULL-STACK AUDIT REPORT
 
-**SIH 26060 — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations**  
+**POLAR-TWIN — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations**  
 **Target Stations:** Maitri (-70.7658° S, 11.7397° E) & Bharati (-69.4077° S, 76.1872° E)  
 **Governing Bodies:** Ministry of Earth Sciences (MoES), National Centre for Polar and Ocean Research (NCPOR)  
 **Lead Auditor & Architect:** Principal Digital Twin, Data Engineering & Zero-Trust Security Architect  

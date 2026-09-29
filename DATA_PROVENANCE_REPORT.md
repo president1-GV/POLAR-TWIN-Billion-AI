@@ -1,5 +1,5 @@
 # POLAR-TWIN: DATA PROVENANCE & LINEAGE AUDIT REPORT
-**SIH 26060 — Digital Platform for Remote Antarctic Station Operations**  
+**POLAR-TWIN — Digital Platform for Remote Antarctic Station Operations**  
 **Lead Organization:** Ministry of Earth Sciences (MoES) / National Centre for Polar and Ocean Research (NCPOR), Goa  
 **Target Stations:** Bharati Station (East Antarctica) & Maitri Station (Queen Maud Land)  
 **Standard:** Scientifically Defensible, Provenance-Preserving, Auditable Data Engineering  
@@ -157,7 +157,7 @@ flowchart TD
 
 ## 7. Audit Compliance Statement
 
-The POLAR-TWIN data engineering implementation satisfies all SIH 26060 evaluation criteria:
+The POLAR-TWIN data engineering implementation satisfies all POLAR-TWIN evaluation criteria:
 - **Zero Fabricated Ground Truth:** All weather metrics derive from official public records or authentic physical calibrations.
 - **Zero Exposed Secrets:** All credentials stored in non-committed `.env`, accessed via strict environment injection.
 - **100% Cryptographic Verification:** Every ingested file, feature table, and model artifact contains a verifiable SHA-256 hash.

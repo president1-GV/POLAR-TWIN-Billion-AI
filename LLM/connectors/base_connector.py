@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Base Connector Interface
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Defines standard interface for all data ingestion connectors with cryptographic integrity.
 """

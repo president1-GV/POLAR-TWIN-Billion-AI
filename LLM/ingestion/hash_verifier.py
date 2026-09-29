@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Cryptographic Hash Verifier
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Guarantees SHA-256 dataset immutability and tamper detection.
 """

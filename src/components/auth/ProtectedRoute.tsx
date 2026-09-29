@@ -1,6 +1,6 @@
 // ============================================================================
 // POLAR-TWIN: Zero-Trust Protected Route & Clearance Guard
-// SIH 26060 — Indian Antarctic Research Stations (Bharati & Maitri)
+// POLAR-TWIN — Indian Antarctic Research Stations (Bharati & Maitri)
 // Enforces Server-Side and Client-Side Role & Permission Enclosure
 // ============================================================================
 

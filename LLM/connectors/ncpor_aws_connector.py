@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: NCPOR AWS Connector
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Ingests official NCPOR AWS observations for Bharati and Maitri stations.
 Strict Provenance: REAL_NCPOR

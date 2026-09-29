@@ -1,5 +1,5 @@
 # POLAR-TWIN: SYSTEM & DATA ENGINEERING ARCHITECTURE
-**SIH 26060 — Digital Platform for Remote Antarctic Station Management**  
+**POLAR-TWIN — Digital Platform for Remote Antarctic Station Management**  
 **Lead Authority:** National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth Sciences, India  
 
 ---

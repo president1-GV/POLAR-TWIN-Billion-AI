@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Validation Rules & Bounds
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Defines Antarctic physical plausibility bounds, consistency checks, and outlier thresholds.
 """

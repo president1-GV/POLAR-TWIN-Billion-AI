@@ -85,12 +85,12 @@ export const Header: React.FC<HeaderProps> = ({
   const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-polar-surface border-b border-polar-border px-3 sm:px-4 lg:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors w-full">
+    <header className="h-16 bg-polar-surface border-b border-polar-border px-2 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors w-full max-w-full overflow-hidden">
       {/* LEFT: Branding & First-Class Station Context */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         {/* Brand Identity arranged cleanly inside dedicated professional border */}
-        <div className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0">
-          <div className="w-8 h-8 rounded-md bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-sm ring-1 ring-polar-cyan/25 shrink-0 overflow-hidden">
+        <div className="flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-sm ring-1 ring-polar-cyan/25 shrink-0 overflow-hidden">
             <img 
               src={polarTwinIcon} 
               alt="POLAR-TWIN Mission Logo" 
@@ -98,7 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
             />
           </div>
           <div className="flex flex-col justify-center shrink-0">
-            <div className="flex items-center gap-2 whitespace-nowrap leading-none">
+            <div className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap leading-none">
               <span className="font-extrabold text-sm sm:text-base tracking-wider text-polar-text-primary whitespace-nowrap inline-flex items-center">
                 POLAR<span className="text-polar-cyan">&#8209;TWIN</span>
               </span>
@@ -116,11 +116,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="h-6 border-l border-polar-border hidden sm:block shrink-0" />
 
         {/* First-Class Station Selector */}
-        <div className="hidden sm:flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
+        <div className="flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
           <button
             onClick={() => onStationChange('station_bharati')}
             title="Bharati Station • Larsemann Hills (69.408° S, 76.187° E)"
-            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
               isBharati
                 ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
                 : 'text-polar-text-muted hover:text-polar-text-primary'
@@ -132,7 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={() => onStationChange('station_maitri')}
             title="Maitri Station • Schirmacher Oasis (70.766° S, 11.740° E)"
-            className={`px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+            className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
               !isBharati
                 ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
                 : 'text-polar-text-muted hover:text-polar-text-primary'
@@ -145,7 +145,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* CENTER: Compact Operational State Indicator */}
-      <div className="hidden xl:flex items-center shrink-0">
+      <div className="hidden 2xl:flex items-center shrink-0">
         <div 
           title={`Operational State: ${unreadAlertsCount > 0 ? `${unreadAlertsCount} Active ${unreadAlertsCount === 1 ? 'Advisory' : 'Advisories'}` : 'All Systems Nominal'} • Coordinates: ${isBharati ? '69.408° S, 76.187° E' : '70.766° S, 11.740° E'}`}
           className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-polar-base border border-polar-border hover:border-polar-border-strong text-xs whitespace-nowrap shadow-sm transition-colors cursor-default"
@@ -159,15 +159,15 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* RIGHT: System Health, Satellite Link, Alerts, Theme, RBAC, Clock */}
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0">
         {/* System Health / Zero-Trust Security */}
         <button
           onClick={() => setIsSecurityOpen(true)}
           title="System Health & Zero-Trust Access Controls"
-          className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border hover:border-polar-border-strong text-polar-text-secondary text-xs transition-colors shrink-0 whitespace-nowrap"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border hover:border-polar-border-strong text-polar-text-secondary text-xs transition-colors shrink-0 whitespace-nowrap"
         >
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-          <span className="hidden md:inline text-polar-text-muted font-medium whitespace-nowrap">HEALTH:</span>
+          <span className="hidden xl:inline text-polar-text-muted font-medium whitespace-nowrap">HEALTH:</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-bold whitespace-nowrap">98.4%</span>
         </button>
 
@@ -175,11 +175,12 @@ export const Header: React.FC<HeaderProps> = ({
         <button
           onClick={onLinkToggle}
           title="Toggle Satellite Link state to test Edge Offline Buffering and Replay Sync"
-          className={`flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md border text-xs transition-colors shrink-0 whitespace-nowrap ${currLink.bg}`}
+          className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-md border text-xs transition-colors shrink-0 whitespace-nowrap ${currLink.bg}`}
         >
-          <span className={`w-2 h-2 rounded-full shrink-0 ${currLink.dot}`} />
+          <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${currLink.dot}`} />
           <Radio className="w-3.5 h-3.5 shrink-0" />
-          <span className="font-bold hidden sm:inline whitespace-nowrap">{currLink.label}</span>
+          <span className="font-bold hidden xl:inline whitespace-nowrap">{currLink.label}</span>
+          <span className="font-bold inline xl:hidden whitespace-nowrap">{linkStatus === 'ONLINE' ? 'ONLINE' : 'LINK'}</span>
         </button>
 
         {/* Alerts Trigger */}
@@ -187,9 +188,9 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={onOpenAlerts}
           title="Open Operational Alerts Drawer"
           aria-label={`Operational Alerts: ${unreadAlertsCount} active`}
-          className="relative p-1.5 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border text-polar-text-secondary hover:text-polar-text-primary transition-colors shrink-0 flex items-center justify-center w-8 h-8"
+          className="relative p-1.5 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border text-polar-text-secondary hover:text-polar-text-primary transition-colors shrink-0 flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8"
         >
-          <Bell className="w-4 h-4" />
+          <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           {unreadAlertsCount > 0 && (
             <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-600 text-white text-[9px] font-bold flex items-center justify-center animate-pulse">
               {unreadAlertsCount}
@@ -211,20 +212,20 @@ export const Header: React.FC<HeaderProps> = ({
           />
         </div>
 
-        {/* Authentication Login / Station Gateway Trigger */}
+        {/* Authentication Login / Station Gateway Trigger - Guaranteed Visible & Fully Clickable */}
         {onOpenLogin && (
           <button
             onClick={onOpenLogin}
             title="Station Authentication & Identity Verification Portal"
-            className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-polar-base hover:bg-polar-elevated border border-polar-border hover:border-polar-cyan/60 text-polar-text-secondary hover:text-polar-text-primary text-xs transition-colors shrink-0 whitespace-nowrap"
+            className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-md bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-cyan-600 dark:text-cyan-300 font-bold text-xs transition-all shadow-sm shrink-0 whitespace-nowrap cursor-pointer active:scale-95"
           >
             <LogIn className="w-3.5 h-3.5 text-polar-cyan shrink-0" />
-            <span className="hidden sm:inline text-[11px] font-semibold whitespace-nowrap">LOGIN</span>
+            <span className="text-[11px] font-bold whitespace-nowrap">LOGIN</span>
           </button>
         )}
 
         {/* Scientific UTC Clock */}
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2.5 py-1 rounded-md border border-polar-border shrink-0 whitespace-nowrap min-w-[105px]">
+        <div className="hidden lg:flex items-center gap-1.5 text-xs text-polar-text-secondary bg-polar-base px-2 py-1 rounded-md border border-polar-border shrink-0 whitespace-nowrap min-w-[95px]">
           <Clock className="w-3.5 h-3.5 text-polar-text-muted shrink-0" />
           <span className="font-bold text-polar-text-primary font-mono whitespace-nowrap">{utcTime || '12:00:00 UTC'}</span>
         </div>

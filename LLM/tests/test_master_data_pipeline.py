@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Master Data Engineering & Model Training Test Suite
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Contains 70 Comprehensive Automated Tests verifying:
 - Ingestion Connectors (NCPOR, AADC, Copernicus, Synthetic, Base) [Tests 1-10]
@@ -88,7 +88,7 @@ def run_all_tests():
     t = TestHarness()
     print("=" * 75)
     print("POLAR-TWIN MASTER DATA ENGINEERING & ML ACCEPTANCE TEST SUITE")
-    print("SIH 26060 — 70 AUTOMATED TESTS")
+    print("POLAR-TWIN — 70 AUTOMATED TESTS")
     print("=" * 75)
 
     # --------------------------------------------------------------------------

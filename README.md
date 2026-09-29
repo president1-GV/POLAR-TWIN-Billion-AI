@@ -1,7 +1,7 @@
 # POLAR-TWIN
 
 **AI-Enabled Digital Twin for Remote Antarctic Station Operations**  
-*Smart India Hackathon (SIH) Problem Statement: SIH 26060 — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations*  
+*Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations*  
 *Target Stations: Maitri & Bharati (National Centre for Polar and Ocean Research — NCPOR / Ministry of Earth Sciences)*
 
 [![Live Deployment](https://img.shields.io/badge/Live_Deployment-GitHub_Pages-00E5FF?style=for-the-badge&logo=github)](https://president1-gv.github.io/POLAR-TWIN-Billion-AI/)
@@ -143,7 +143,7 @@ AI recommends actionable mitigations (e.g., auto-start Aux Genset 02 + shed East
 
 ---
 
-## 8. Deterministic Killer Demo Scenario (SIH 26060)
+## 8. Deterministic Killer Demo Scenario (POLAR-TWIN)
 
 Click **RUN 1-CLICK KILLER DEMO** on the top command bar to watch the 8-step closed loop:
 1. **BASELINE**: Bharati nominal operation ($-18.4^\circ\text{C}$, 11 m/s wind, 185 kW load, 96.5% health).
@@ -225,7 +225,7 @@ POLAR-TWIN incorporates real geospatial coordinates and spatial boundaries in Po
 
 ---
 
-## 12. Adversarial Evaluator Defense (SIH 26060 Architectural FAQ)
+## 12. Adversarial Evaluator Defense (POLAR-TWIN Architectural FAQ)
 
 | Evaluator Question | POLAR-TWIN Architectural Answer |
 | :--- | :--- |
@@ -240,5 +240,5 @@ POLAR-TWIN incorporates real geospatial coordinates and spatial boundaries in Po
 
 ## 13. Prototype Limitations Disclaimer
 
-> **Official Notice**: This system is a high-fidelity operational prototype designed for evaluation under SIH 26060. Meteorological observations use public scientific feeds (NCPOR / Open-Meteo Antarctic Grid). Machinery telemetry, internal SCADA states, and satellite link carrier losses are simulated using calibrated Antarctic thermodynamic and electrical models. This prototype does not claim access to classified or restricted Indian Antarctic infrastructure.
+> **Official Notice**: This system is a high-fidelity operational prototype designed for evaluation under POLAR-TWIN. Meteorological observations use public scientific feeds (NCPOR / Open-Meteo Antarctic Grid). Machinery telemetry, internal SCADA states, and satellite link carrier losses are simulated using calibrated Antarctic thermodynamic and electrical models. This prototype does not claim access to classified or restricted Indian Antarctic infrastructure.
 

@@ -52,9 +52,9 @@ export const MissionSummary: React.FC<Props> = ({
       </div>
 
       {/* Compositional Summary Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 pt-3 text-xs">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-2.5 sm:gap-3 pt-3 text-xs">
         {/* Microgrid */}
-        <div className="flex items-center gap-2.5 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden">
+        <div className="flex items-center gap-2 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden min-w-0" title={microgridStatus}>
           <Zap className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
           <div className="min-w-0">
             <div className="text-[10px] text-polar-text-muted uppercase font-semibold">Microgrid</div>
@@ -63,7 +63,7 @@ export const MissionSummary: React.FC<Props> = ({
         </div>
 
         {/* Water */}
-        <div className="flex items-center gap-2.5 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden">
+        <div className="flex items-center gap-2 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden min-w-0" title={waterStatus}>
           <Droplet className="w-4 h-4 text-sky-500 dark:text-sky-400 shrink-0" />
           <div className="min-w-0">
             <div className="text-[10px] text-polar-text-muted uppercase font-semibold">Water RO</div>
@@ -72,7 +72,7 @@ export const MissionSummary: React.FC<Props> = ({
         </div>
 
         {/* Fuel */}
-        <div className="flex items-center gap-2.5 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden">
+        <div className="flex items-center gap-2 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden min-w-0" title={fuelStatus}>
           <Fuel className="w-4 h-4 text-emerald-500 dark:text-emerald-400 shrink-0" />
           <div className="min-w-0">
             <div className="text-[10px] text-polar-text-muted uppercase font-semibold">Fuel Reserve</div>
@@ -81,7 +81,7 @@ export const MissionSummary: React.FC<Props> = ({
         </div>
 
         {/* Connectivity */}
-        <div className="flex items-center gap-2.5 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden">
+        <div className="flex items-center gap-2 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden min-w-0" title={connectivityStatus}>
           <Radio className="w-4 h-4 text-cyan-500 dark:text-cyan-400 shrink-0" />
           <div className="min-w-0">
             <div className="text-[10px] text-polar-text-muted uppercase font-semibold">Satellite</div>
@@ -90,7 +90,7 @@ export const MissionSummary: React.FC<Props> = ({
         </div>
 
         {/* Weather */}
-        <div className="col-span-2 md:col-span-1 flex items-center gap-2.5 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden">
+        <div className="col-span-2 md:col-span-1 xl:col-span-1 flex items-center gap-2 p-2 bg-polar-elevated rounded border border-polar-border overflow-hidden min-w-0" title={weatherStatus}>
           <CloudSnow className="w-4 h-4 text-blue-500 dark:text-blue-400 shrink-0" />
           <div className="min-w-0">
             <div className="text-[10px] text-polar-text-muted uppercase font-semibold">Weather</div>

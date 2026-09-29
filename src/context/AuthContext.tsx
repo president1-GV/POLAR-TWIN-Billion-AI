@@ -1,6 +1,6 @@
 // ============================================================================
 // POLAR-TWIN: Centralized Authentication & Zero-Trust Session Context
-// SIH 26060 — Indian Antarctic Research Stations (Bharati & Maitri)
+// POLAR-TWIN — Indian Antarctic Research Stations (Bharati & Maitri)
 // Backend: Supabase Only (fpoxnocbznagepusczkk.supabase.co) with Air-Gap Fallback
 // ============================================================================
 

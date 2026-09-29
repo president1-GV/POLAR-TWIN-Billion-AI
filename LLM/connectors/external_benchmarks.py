@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: External Benchmarks Registry
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Registry and provenance enforcement for external Antarctic datasets.
 """

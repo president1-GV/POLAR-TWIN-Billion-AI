@@ -16,7 +16,7 @@ TEST_MODULES = [
 def main():
     print("=" * 80)
     print("       POLAR-TWIN MASTER TEST SUITE EXECUTION & VERIFICATION")
-    print("  SIH 26060 — Digital Platform for Remote Antarctic Station Operations")
+    print("  POLAR-TWIN — Digital Platform for Remote Antarctic Station Operations")
     print("  National Centre for Polar and Ocean Research (NCPOR), MoES, India")
     print("=" * 80 + "\n")
 

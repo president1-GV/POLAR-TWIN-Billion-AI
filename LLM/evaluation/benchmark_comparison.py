@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Evaluation & Benchmark Comparison
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Orchestrates formal ML evaluation runs against test splits and external benchmarks.
 """

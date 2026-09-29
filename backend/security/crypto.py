@@ -17,7 +17,7 @@ if os.path.exists(env_path):
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Secure secret key from environment or cryptographically generated fallback
-SECRET_KEY = os.getenv("POLAR_TWIN_JWT_SECRET", "polar-twin-zero-trust-secret-key-antigravity-2026-sih26060-production-hardened")
+SECRET_KEY = os.getenv("POLAR_TWIN_JWT_SECRET", "polar-twin-zero-trust-secret-key-antigravity-2026-POLAR-TWIN - production-hardened")
 SALT_LENGTH = 16
 PBKDF2_ITERATIONS = 100000
 

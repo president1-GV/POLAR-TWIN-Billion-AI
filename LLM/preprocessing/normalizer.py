@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Feature Normalizer
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Scales and normalizes feature matrices with persistent parameters.
 """

@@ -1,5 +1,5 @@
 # POLAR-TWIN — UI/UX FORENSIC AUDIT & AEROSPACE REDESIGN MASTER REPORT
-**SIH 26060 — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations**  
+**POLAR-TWIN — Digital Platform for Efficient Remote Management of Indian Antarctic Research Stations**  
 **National Centre for Polar and Ocean Research (NCPOR), Ministry of Earth Sciences (MoES), Government of India**  
 **Evaluator Standard**: International-Grade Aerospace & Scientific Polar Operations Mission Control
 

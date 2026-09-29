@@ -45,19 +45,25 @@ export const TelemetryMetric: React.FC<Props> = ({
       </div>
 
       {/* Primary Value + Sparkline */}
-      <div className="my-2 flex items-baseline justify-between gap-2 min-w-0 overflow-hidden">
-        <div className="flex items-baseline gap-1.5 min-w-0 truncate">
-          <span className="text-xl sm:text-2xl lg:text-3xl font-bold text-polar-text-primary tracking-tight truncate">{value}</span>
-          {unit && <span className="text-[11px] text-polar-text-muted uppercase font-semibold shrink-0">{unit}</span>}
+      <div className="my-2 flex items-baseline justify-between gap-1.5 min-w-0">
+        <div className="flex items-baseline gap-1 min-w-0">
+          <span className="text-lg sm:text-xl lg:text-2xl font-bold font-mono text-polar-text-primary tracking-tight whitespace-nowrap">
+            {value}
+          </span>
+          {unit && (
+            <span className="text-[10px] sm:text-[11px] text-polar-text-muted uppercase font-semibold shrink-0">
+              {unit}
+            </span>
+          )}
         </div>
 
         {sparklineData && (
-          <div className="shrink-0 overflow-hidden">
+          <div className="shrink-0 overflow-hidden ml-1">
             <TelemetrySparkline 
               data={sparklineData} 
               color={sparklineColor} 
-              height={24} 
-              width={75} 
+              height={22} 
+              width={56} 
             />
           </div>
         )}

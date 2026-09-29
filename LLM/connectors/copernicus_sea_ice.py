@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Copernicus Sea Ice Connector
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Ingests Copernicus Marine Service Southern Ocean Sea Ice Extent and Concentration.
 Strict Provenance: PUBLIC_EXTERNAL

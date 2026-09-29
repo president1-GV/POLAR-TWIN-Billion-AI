@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Data Cleaner
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Cleans raw datasets: deduplication, UTC timezone normalization, interpolation.
 """

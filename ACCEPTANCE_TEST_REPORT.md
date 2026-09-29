@@ -1,5 +1,5 @@
 # POLAR-TWIN: ACCEPTANCE TEST EXECUTION REPORT
-**SIH 26060 — Digital Platform for Remote Antarctic Station Management**  
+**POLAR-TWIN — Digital Platform for Remote Antarctic Station Management**  
 **Audit Standard:** 100% Automated Test Pass Rate Required  
 **Execution Timestamp:** 2026-09-28T18:20:00Z  
 **Target Environment:** Windows / Python 3.14 / Supabase Cloud  

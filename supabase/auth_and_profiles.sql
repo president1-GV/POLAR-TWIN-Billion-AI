@@ -1,6 +1,6 @@
 -- ============================================================================
 -- POLAR-TWIN: Supabase Authentication, Profiles & RLS Security Migration
--- SIH 26060 — Indian Antarctic Research Stations (Bharati & Maitri)
+-- POLAR-TWIN — Indian Antarctic Research Stations (Bharati & Maitri)
 -- ============================================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

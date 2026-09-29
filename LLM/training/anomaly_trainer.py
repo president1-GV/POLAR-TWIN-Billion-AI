@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Multivariate Anomaly Detector Trainer
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Trains multivariate anomaly detection model combining Isolation Forest
 and calibrated Mahalanobis covariance estimation for genset telemetry.

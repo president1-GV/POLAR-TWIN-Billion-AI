@@ -10,7 +10,7 @@ from backend.simulation.scenario_engine import simulation_engine
 
 class KillerDemoOrchestrator:
     """
-    Deterministic End-to-End Killer Demonstration Runner for SIH 26060.
+    Deterministic End-to-End Killer Demonstration Runner for POLAR-TWIN.
     Executes the full closed loop:
     BASELINE -> SHOCK -> ANOMALY -> AI DETECTION -> TRANSITION ->
     FAILURE -> WHAT-IF -> RECOMMENDATION -> OPERATOR APPROVAL -> STABILIZATION -> AUDIT.

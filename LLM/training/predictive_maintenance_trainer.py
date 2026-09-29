@@ -1,6 +1,6 @@
 """
 POLAR-TWIN Data Engineering: Predictive Maintenance & RUL Classifier Trainer
-SIH 26060 - Digital Platform for Remote Antarctic Station Management
+POLAR-TWIN - Digital Platform for Remote Antarctic Station Management
 
 Trains machine learning model for generator bearing Remaining Useful Life (RUL) estimation.
 Explicit Disclosure: CALIBRATED_RESEARCH_PROTOTYPE (trained on synthetic mechanical degradation models).
