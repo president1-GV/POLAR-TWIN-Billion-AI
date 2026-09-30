@@ -240,6 +240,11 @@ class TestMasterArchitectureSpecification(unittest.TestCase):
 
     def test_05_isolated_simulation_does_not_mutate_telemetry(self):
         """Verifies that simulation runs in isolated sandbox without polluting observed state."""
+        # Ensure clean baseline state before isolation assertion
+        supabase_client.update_row("station_assets", "id", "bh_gen_01", {
+            "status": "NORMAL",
+            "health_score": 96.5
+        })
         pre_state = canonical_state_service.get_canonical_state("station_bharati")
         pre_gen_health = next(a["health_score"] for a in pre_state["assets"] if a["id"] == "bh_gen_01")
 

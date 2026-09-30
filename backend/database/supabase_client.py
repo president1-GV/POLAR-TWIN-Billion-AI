@@ -70,6 +70,8 @@ class SupabaseClient:
         self.anon_key = SUPABASE_ANON_KEY
         self.service_key = SUPABASE_SERVICE_ROLE_KEY
         self.token = SUPABASE_TOKEN
+        # In-memory resilient table cache for network jitter protection
+        self._table_cache: Dict[str, List[Dict[str, Any]]] = {}
         # Reusable HTTP client with persistent connection pool
         self._http = httpx.Client(
             timeout=15.0,
@@ -108,29 +110,39 @@ class SupabaseClient:
             return []
 
     def get_table(self, table: str, params: Optional[Dict[str, str]] = None) -> List[Dict[str, Any]]:
-        """Query a table via PostgREST."""
+        """Query a table via PostgREST with resilient fallback and jitter caching."""
+        cache_key = f"{table}:{json.dumps(params or {}, sort_keys=True)}"
         endpoint = f"{self.url}/rest/v1/{table}"
         headers = self._get_headers(service=True)
         try:
             resp = self._http.get(endpoint, params=params, headers=headers, timeout=12.0)
             if resp.status_code in [200, 206]:
-                return resp.json()
+                data = resp.json()
+                if isinstance(data, list) and data:
+                    self._table_cache[cache_key] = data
+                return data
             elif resp.status_code == 404:
                 # Table not exposed in PostgREST or missing; fallback to SQL if token available
                 if self.token:
                     sql = f"SELECT * FROM {table};"
-                    return self.query_sql(sql)
-                return []
-            return []
+                    res = self.query_sql(sql)
+                    if res:
+                        self._table_cache[cache_key] = res
+                    return res
+                return self._table_cache.get(cache_key, [])
+            return self._table_cache.get(cache_key, [])
         except Exception as e:
             print(f"[SupabaseClient.get_table] PostgREST query notice on {table}: {e}")
             if self.token:
                 try:
                     sql = f"SELECT * FROM {table};"
-                    return self.query_sql(sql)
+                    res = self.query_sql(sql)
+                    if res:
+                        self._table_cache[cache_key] = res
+                        return res
                 except Exception:
                     pass
-            return []
+            return self._table_cache.get(cache_key, [])
 
     def insert_row(self, table: str, row: Dict[str, Any]) -> Dict[str, Any]:
         """Insert a row via PostgREST with return representation."""
