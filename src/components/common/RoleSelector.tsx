@@ -20,7 +20,8 @@ import {
   KeyRound,
   ArrowRight
 } from 'lucide-react';
-import { PolarRole, ALL_ROLES, getRoleMeta } from '../../services/rbac';
+import { PolarRole, CANONICAL_ROLES, getRoleMeta } from '../../services/rbac';
+import { ROLE_CREDENTIALS } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { ScreenId } from './Sidebar';
 
@@ -39,7 +40,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
   onOpenLogin,
   className = '',
 }) => {
-  const { user, allowedRoles, switchRole } = useAuth();
+  const { user, allowedRoles, switchRole, impersonate, stopImpersonating, isImpersonating } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,7 +78,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
           e.preventDefault();
           setIsOpen(true);
-          const currentIndex = ALL_ROLES.findIndex((r) => r === activeMeta.id);
+          const currentIndex = CANONICAL_ROLES.findIndex((r) => r === activeMeta.canonicalId);
           setFocusedIndex(currentIndex >= 0 ? currentIndex : 0);
         }
         return;
@@ -90,17 +91,17 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
           break;
         case 'ArrowDown':
           e.preventDefault();
-          setFocusedIndex((prev) => (prev + 1) % ALL_ROLES.length);
+          setFocusedIndex((prev) => (prev + 1) % CANONICAL_ROLES.length);
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setFocusedIndex((prev) => (prev - 1 + ALL_ROLES.length) % ALL_ROLES.length);
+          setFocusedIndex((prev) => (prev - 1 + CANONICAL_ROLES.length) % CANONICAL_ROLES.length);
           break;
         case 'Enter':
         case ' ':
           e.preventDefault();
-          if (focusedIndex >= 0 && focusedIndex < ALL_ROLES.length) {
-            const selectedRole = ALL_ROLES[focusedIndex];
+          if (focusedIndex >= 0 && focusedIndex < CANONICAL_ROLES.length) {
+            const selectedRole = CANONICAL_ROLES[focusedIndex];
             handleSelect(selectedRole);
           }
           break;
@@ -111,18 +112,33 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
           break;
       }
     },
-    [isOpen, focusedIndex, activeMeta.id]
+    [isOpen, focusedIndex, activeMeta.canonicalId]
   );
 
   const handleSelect = async (selectedRole: PolarRole) => {
     try {
-      onRoleChange(selectedRole);
-      await switchRole(selectedRole);
+      const isCurrentlyAdmin = user?.role === 'ADMIN' || activeMeta.canonicalId === 'ADMIN' || isImpersonating;
+      if (isCurrentlyAdmin) {
+        if (selectedRole === 'ADMIN') {
+          await stopImpersonating();
+          onRoleChange('ADMIN');
+        } else {
+          const creds = ROLE_CREDENTIALS[selectedRole];
+          if (creds) {
+            await impersonate(creds.username);
+            onRoleChange(selectedRole);
+          } else {
+            await switchRole(selectedRole);
+            onRoleChange(selectedRole);
+          }
+        }
+      } else {
+        await switchRole(selectedRole);
+        onRoleChange(selectedRole);
+      }
       if (onNavigate) {
         if (selectedRole === 'ADMIN') {
           onNavigate('admin');
-        } else if (['COMMANDER', 'ENGINEER', 'OPERATOR', 'ANALYST'].includes(selectedRole)) {
-          onNavigate('officers', selectedRole.toLowerCase());
         } else {
           onNavigate('command-center');
         }
@@ -297,10 +313,10 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
             aria-activedescendant={`role-option-${focusedIndex}`}
             className="py-1 max-h-72 overflow-y-auto divide-y divide-polar-border/30"
           >
-            {ALL_ROLES.map((roleKey, idx) => {
+            {CANONICAL_ROLES.map((roleKey, idx) => {
               const meta = getRoleMeta(roleKey);
-              const isActive = meta.id === activeMeta.id;
-              const isAllowed = allowedRoles.includes(roleKey) || true; // Allow all roles in evaluation/demo
+              const isActive = meta.canonicalId === activeMeta.canonicalId;
+              const isAllowed = true;
               const isFocused = idx === focusedIndex;
 
               return (
