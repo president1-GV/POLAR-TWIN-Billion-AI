@@ -16,6 +16,7 @@ import { LinkStatus } from '../../types';
 import { SecurityModal } from './SecurityModal';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { RoleSelector } from './RoleSelector';
+import { ScreenId } from './Sidebar';
 import polarTwinIcon from '../../assets/polar-twin-icon.png';
 
 interface HeaderProps {
@@ -27,6 +28,7 @@ interface HeaderProps {
   onOpenAlerts: () => void;
   activeRole: string;
   onRoleChange: (role: string) => void;
+  onNavigate?: (screen: ScreenId, officerId?: string) => void;
   onOpenStationDrawer?: (stationId: string) => void;
   onOpenLogin?: () => void;
 }
@@ -40,6 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenAlerts,
   activeRole,
   onRoleChange,
+  onNavigate,
   onOpenStationDrawer,
   onOpenLogin,
 }) => {
@@ -208,6 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
           <RoleSelector 
             activeRole={activeRole} 
             onRoleChange={onRoleChange} 
+            onNavigate={onNavigate}
             onOpenLogin={onOpenLogin} 
           />
         </div>

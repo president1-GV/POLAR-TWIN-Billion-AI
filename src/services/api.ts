@@ -22,7 +22,11 @@ async function supabaseFetch(endpoint: string, options: RequestInit = {}): Promi
   if (!res.ok) {
     throw new Error(`Supabase error: ${res.status} ${res.statusText}`);
   }
-  return res.json();
+  if (res.status === 204) {
+    return null;
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
 }
 
 // In-memory demo state for client-side deterministic killer demo execution

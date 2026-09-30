@@ -71,3 +71,6 @@ export interface WhatIfScenario {
   defaultAmbientTempC: number;
   steps: WhatIfScenarioStep[];
 }
+
+export type LightingViewMode = 'OPERATIONAL' | 'SCIENTIFIC' | 'NIGHT' | 'WEATHER';
+

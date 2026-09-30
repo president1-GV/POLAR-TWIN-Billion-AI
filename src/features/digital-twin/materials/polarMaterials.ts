@@ -39,6 +39,7 @@ export interface PolarMaterialLibrary {
   windTurbineBlade: THREE.MeshStandardMaterial;
   helipadSurface: THREE.MeshStandardMaterial;
   helipadMarking: THREE.MeshStandardMaterial;
+  pipeBlue: THREE.MeshStandardMaterial;
 
   // Cargo & Vehicle Materials
   containerRed: THREE.MeshStandardMaterial;
@@ -260,6 +261,12 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
     roughness: 0.30,
   });
 
+  const pipeBlue = new THREE.MeshStandardMaterial({
+    color: 0x0284C7,
+    metalness: 0.85,
+    roughness: 0.25,
+  });
+
   const boilerVessel = new THREE.MeshStandardMaterial({
     color: 0xB45309,
     metalness: 0.55,
@@ -453,6 +460,7 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
     windTurbineBlade,
     helipadSurface,
     helipadMarking,
+    pipeBlue,
     containerRed,
     containerBlue,
     containerWhite,

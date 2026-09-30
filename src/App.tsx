@@ -12,6 +12,8 @@ import { AnalyticsDashboard } from './features/analytics/AnalyticsDashboard';
 import { DataCatalogDashboard } from './features/data-catalog/DataCatalogDashboard';
 import { KillerDemoPanel } from './features/demo/KillerDemoPanel';
 import { AlertsDrawer } from './features/alerts/AlertsDrawer';
+import { AdminMissionControl } from './features/admin/AdminMissionControl';
+import { StationOfficersPortal } from './features/officers/StationOfficersPortal';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LoginPage } from './components/auth/LoginPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -24,9 +26,17 @@ export const App: React.FC = () => {
   const { role, switchRole, isAuthenticated } = useAuth();
   const [currentStationId, setCurrentStationId] = useState<string>('station_bharati');
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('command-center');
+  const [selectedOfficerId, setSelectedOfficerId] = useState<string>('commander');
   const [linkStatus, setLinkStatus] = useState<LinkStatus>('ONLINE');
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [isAlertsOpen, setIsAlertsOpen] = useState<boolean>(false);
+
+  const handleNavigate = (screen: ScreenId, officerId?: string) => {
+    if (officerId) {
+      setSelectedOfficerId(officerId);
+    }
+    setCurrentScreen(screen);
+  };
 
   useEffect(() => {
     loadAlerts();
@@ -125,6 +135,7 @@ export const App: React.FC = () => {
         onOpenAlerts={() => setIsAlertsOpen(true)}
         activeRole={role}
         onRoleChange={handleRoleChange}
+        onNavigate={handleNavigate}
         onOpenLogin={() => setCurrentScreen('login')}
       />
 
@@ -136,6 +147,28 @@ export const App: React.FC = () => {
         {/* Dynamic Viewport */}
         <main className="flex-1 overflow-y-auto bg-polar-base polar-grid">
           <ErrorBoundary key={currentScreen} fallbackTitle={`MISSION VIEW SUBSYSTEM: ${currentScreen.toUpperCase()}`}>
+            {currentScreen === 'admin' && (
+              <AdminMissionControl
+                currentStationId={currentStationId}
+                onSelectStation={setCurrentStationId}
+                onNavigateToOfficers={(officerId) => {
+                  if (officerId) setSelectedOfficerId(officerId);
+                  setCurrentScreen('officers');
+                }}
+                onNavigateToScreen={setCurrentScreen}
+              />
+            )}
+
+            {currentScreen === 'officers' && (
+              <StationOfficersPortal
+                initialOfficerId={selectedOfficerId}
+                currentStationId={currentStationId}
+                onSelectStation={setCurrentStationId}
+                onNavigateToAdmin={() => setCurrentScreen('admin')}
+                onNavigateToScreen={setCurrentScreen}
+              />
+            )}
+
             {currentScreen === 'command-center' && (
               <ExecutiveCommandCenter
                 currentStationId={currentStationId}

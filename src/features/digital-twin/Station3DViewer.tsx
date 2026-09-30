@@ -8,7 +8,8 @@ import {
   CameraPresetId, 
   MeasurementResult, 
   WhatIfScenario, 
-  WhatIfScenarioStep 
+  WhatIfScenarioStep,
+  LightingViewMode
 } from './types';
 import { createPolarMaterialLibrary, PolarMaterialLibrary } from './materials/polarMaterials';
 import { AntarcticEnvironment } from './environment/AntarcticEnvironment';
@@ -19,6 +20,7 @@ import { MeasurementTool } from './systems/MeasurementTool';
 import { DigitalTwinToolbar } from './components/DigitalTwinToolbar';
 import { EquipmentInspector } from './components/EquipmentInspector';
 import { WhatIfSimulationModal } from './components/WhatIfSimulationModal';
+import { GeolocationValidationModal } from './components/GeolocationValidationModal';
 import { DigitalTwinHUD } from './components/DigitalTwinHUD';
 import { TwinAssetLabel } from '../../components/ui/TwinAssetLabel';
 import { useTheme } from '../../context/ThemeContext';
@@ -136,12 +138,16 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
 
   // Visual Modes & Controls State
   const [visualMode, setVisualMode] = useState<VisualMode>('REALISTIC');
+  const [lightingViewMode, setLightingViewMode] = useState<LightingViewMode>('OPERATIONAL');
   const [gridVisible, setGridVisible] = useState(true);
   const [snowVisible, setSnowVisible] = useState(true);
   const [flowVisible, setFlowVisible] = useState(true);
   const [humanScaleVisible, setHumanScaleVisible] = useState(false);
   const [measuringActive, setMeasuringActive] = useState(false);
   const [measurementResult, setMeasurementResult] = useState<MeasurementResult | null>(null);
+
+  // Geolocation & Spatial Model Audit Modal
+  const [isGeolocModalOpen, setIsGeolocModalOpen] = useState(false);
 
   // What-If Simulation State
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
@@ -595,6 +601,13 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     }
   }, [isDark]);
 
+  // Synchronize Atmosphere Lighting View Mode
+  useEffect(() => {
+    if (environmentRef.current) {
+      environmentRef.current.setLightingViewMode(lightingViewMode);
+    }
+  }, [lightingViewMode]);
+
   // Toggle Measurement Tool
   const handleToggleMeasuring = () => {
     setMeasuringActive(prev => {
@@ -626,6 +639,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       <DigitalTwinHUD
         stationId={stationId}
         visualMode={visualMode}
+        lightingViewMode={lightingViewMode}
+        onLightingViewModeChange={setLightingViewMode}
+        onOpenGeolocAudit={() => setIsGeolocModalOpen(true)}
         measurementResult={measurementResult}
         measuringActive={measuringActive}
         onClearMeasurement={handleClearMeasurement}
@@ -689,6 +705,13 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
         onApplyScenario={handleApplyScenario}
         onResetScenario={handleResetScenario}
         activeScenarioId={activeScenario?.id}
+      />
+
+      {/* NCPOR Geodetic Grounding & 3D Spatial Audit Modal */}
+      <GeolocationValidationModal
+        isOpen={isGeolocModalOpen}
+        onClose={() => setIsGeolocModalOpen(false)}
+        stationId={stationId}
       />
     </div>
   );

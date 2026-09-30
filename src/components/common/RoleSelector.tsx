@@ -17,14 +17,17 @@ import {
   Compass, 
   Info,
   LogIn,
-  KeyRound
+  KeyRound,
+  ArrowRight
 } from 'lucide-react';
 import { PolarRole, ALL_ROLES, getRoleMeta } from '../../services/rbac';
 import { useAuth } from '../../context/AuthContext';
+import { ScreenId } from './Sidebar';
 
 interface RoleSelectorProps {
   activeRole: string;
   onRoleChange: (newRole: string) => void;
+  onNavigate?: (screen: ScreenId, officerId?: string) => void;
   onOpenLogin?: () => void;
   className?: string;
 }
@@ -32,6 +35,7 @@ interface RoleSelectorProps {
 export const RoleSelector: React.FC<RoleSelectorProps> = ({
   activeRole,
   onRoleChange,
+  onNavigate,
   onOpenLogin,
   className = '',
 }) => {
@@ -114,10 +118,35 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
     try {
       onRoleChange(selectedRole);
       await switchRole(selectedRole);
+      if (onNavigate) {
+        if (selectedRole === 'ADMIN') {
+          onNavigate('admin');
+        } else if (['COMMANDER', 'ENGINEER', 'OPERATOR', 'ANALYST'].includes(selectedRole)) {
+          onNavigate('officers', selectedRole.toLowerCase());
+        } else {
+          onNavigate('command-center');
+        }
+      }
     } catch (err) {
       console.error('Error switching operational role:', err);
     } finally {
       setIsOpen(false);
+    }
+  };
+
+  const handleOpenCurrentConsole = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onNavigate) {
+      if (activeMeta.id === 'ADMIN') {
+        onNavigate('admin');
+      } else if (['COMMANDER', 'ENGINEER', 'OPERATOR', 'ANALYST'].includes(activeMeta.id)) {
+        onNavigate('officers', activeMeta.id.toLowerCase());
+      } else {
+        onNavigate('command-center');
+      }
+    } else {
+      setIsOpen((prev) => !prev);
     }
   };
 
@@ -127,48 +156,58 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
       className={`relative inline-block text-left select-none ${className}`}
       onKeyDown={handleKeyDown}
     >
-      {/* Trigger Button */}
-      <button
-        type="button"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setIsOpen((prev) => !prev);
-        }}
-        onPointerDown={(e) => {
-          e.stopPropagation();
-        }}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-label={`Current Role: ${activeMeta.label}. Click to switch operational identity.`}
-        title={`Active Operator Identity: ${activeMeta.label} (${activeMeta.clearanceBadge}). Click to switch role or login.`}
-        className={`flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border text-xs font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 shrink-0 whitespace-nowrap cursor-pointer select-none ${
+      {/* Trigger Button with 1-Click Page Navigate + Menu Chevron */}
+      <div
+        className={`inline-flex items-center rounded-md border text-xs font-medium transition-all duration-150 shrink-0 whitespace-nowrap select-none shadow-sm ${
           isOpen
-            ? 'bg-polar-surface border-polar-cyan/60 shadow-sm shadow-cyan-500/10 ring-1 ring-cyan-500/30'
+            ? 'bg-polar-surface border-polar-cyan/60 ring-1 ring-cyan-500/30'
             : 'bg-polar-base hover:bg-polar-surface border-polar-border hover:border-polar-border-active'
         }`}
       >
-        <span 
-          className="w-2 h-2 rounded-full animate-pulse shrink-0" 
-          style={{ backgroundColor: activeMeta.accentColor }} 
-        />
-        <Shield className="w-3.5 h-3.5 shrink-0" style={{ color: activeMeta.accentColor }} />
-        
-        <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
-          <span className="font-semibold text-polar-text-primary tracking-wide whitespace-nowrap">
-            {activeMeta.shortLabel}
-          </span>
-          <span className={`hidden 2xl:inline-block text-[10px] px-1.5 py-0.2 rounded border font-mono whitespace-nowrap ${activeMeta.badgeClass}`}>
-            {activeMeta.clearanceBadge}
-          </span>
-        </div>
+        {/* Direct Click to Admin / Officer Console */}
+        <button
+          type="button"
+          onClick={handleOpenCurrentConsole}
+          aria-label={`Open ${activeMeta.label} page`}
+          title={`Click to open ${activeMeta.label} page & workspace (or click arrow to switch role)`}
+          className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-1 sm:py-1.5 hover:bg-polar-elevated/80 transition-colors cursor-pointer"
+        >
+          <span 
+            className="w-2 h-2 rounded-full animate-pulse shrink-0" 
+            style={{ backgroundColor: activeMeta.accentColor }} 
+          />
+          <Shield className="w-3.5 h-3.5 shrink-0" style={{ color: activeMeta.accentColor }} />
+          
+          <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
+            <span className="font-semibold text-polar-text-primary tracking-wide whitespace-nowrap">
+              {activeMeta.shortLabel}
+            </span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded border font-mono whitespace-nowrap ${activeMeta.badgeClass}`}>
+              {activeMeta.clearanceBadge}
+            </span>
+          </div>
+        </button>
 
-        <ChevronDown 
-          className={`w-3.5 h-3.5 text-polar-text-muted transition-transform duration-200 shrink-0 ${
-            isOpen ? 'rotate-180 text-polar-cyan' : ''
-          }`} 
-        />
-      </button>
+        {/* Dropdown Chevron Toggle */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen((prev) => !prev);
+          }}
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          title="Switch operational identity or select station officer"
+          className="px-1.5 py-1 sm:py-1.5 border-l border-polar-border/60 hover:bg-polar-elevated/80 text-polar-text-muted hover:text-polar-cyan transition-colors cursor-pointer"
+        >
+          <ChevronDown 
+            className={`w-3.5 h-3.5 transition-transform duration-200 shrink-0 ${
+              isOpen ? 'rotate-180 text-polar-cyan' : ''
+            }`} 
+          />
+        </button>
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
@@ -176,6 +215,29 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
           onClick={(e) => e.stopPropagation()}
           className="absolute right-0 mt-1.5 w-80 rounded-lg bg-polar-card/98 backdrop-blur-md border border-polar-border shadow-2xl z-50 overflow-hidden"
         >
+          {/* Quick Launch Console Action Banner */}
+          <div className="p-2 border-b border-polar-border bg-cyan-950/40">
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                if (onNavigate) {
+                  if (activeMeta.id === 'ADMIN') {
+                    onNavigate('admin');
+                  } else if (['COMMANDER', 'ENGINEER', 'OPERATOR', 'ANALYST'].includes(activeMeta.id)) {
+                    onNavigate('officers', activeMeta.id.toLowerCase());
+                  } else {
+                    onNavigate('command-center');
+                  }
+                }
+              }}
+              className="w-full py-2 px-3 rounded-md bg-polar-cyan hover:bg-cyan-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-md transition-all uppercase tracking-wide cursor-pointer active:scale-98"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>LAUNCH {activeMeta.label.toUpperCase()} CONSOLE</span>
+              <ArrowRight className="w-3.5 h-3.5 ml-auto" />
+            </button>
+          </div>
           {/* Header Panel */}
           <div className="p-3 border-b border-polar-border bg-polar-base/60">
             <div className="flex items-center justify-between">

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MeasurementResult, VisualMode } from '../types';
+import { MeasurementResult, VisualMode, LightingViewMode } from '../types';
 import { 
   Layers, 
   Compass, 
@@ -11,7 +11,11 @@ import {
   AlertTriangle,
   RotateCcw,
   Sun,
-  Moon
+  Moon,
+  CheckCircle2,
+  CloudSun,
+  Wind,
+  Gauge
 } from 'lucide-react';
 import { ProvenanceBadge } from '../../../components/common/ProvenanceBadge';
 import polarTwinIcon from '../../../assets/polar-twin-icon.png';
@@ -20,6 +24,9 @@ import { useTheme } from '../../../context/ThemeContext';
 interface Props {
   stationId: string;
   visualMode: VisualMode;
+  lightingViewMode?: LightingViewMode;
+  onLightingViewModeChange?: (mode: LightingViewMode) => void;
+  onOpenGeolocAudit?: () => void;
   measurementResult?: MeasurementResult | null;
   measuringActive: boolean;
   onClearMeasurement?: () => void;
@@ -33,6 +40,9 @@ interface Props {
 export const DigitalTwinHUD: React.FC<Props> = ({
   stationId,
   visualMode,
+  lightingViewMode = 'OPERATIONAL',
+  onLightingViewModeChange,
+  onOpenGeolocAudit,
   measurementResult,
   measuringActive,
   onClearMeasurement,
@@ -97,10 +107,20 @@ export const DigitalTwinHUD: React.FC<Props> = ({
                 <span>•</span>
                 <span>{isBharati ? 'Larsemann Hills (35m ASL)' : 'Schirmacher Oasis (50m ASL)'}</span>
               </div>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-wrap items-center gap-1.5 mt-1">
                 <span className="text-[9px] px-1.5 py-0.2 rounded bg-polar-elevated text-polar-cyan border border-polar-border font-mono">
                   EPSG:3031
                 </span>
+                {onOpenGeolocAudit && (
+                  <button
+                    onClick={onOpenGeolocAudit}
+                    title="Open NCPOR Geodetic Grounding & 3D Spatial Audit"
+                    className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-mono font-bold flex items-center gap-1 hover:bg-emerald-500/30 transition-colors cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
+                    <span>GEODETIC: PASS (0.000°)</span>
+                  </button>
+                )}
                 <ProvenanceBadge 
                   type={isBharati ? 'DOCUMENTED' : 'RECONSTRUCTED'} 
                   size="sm"
@@ -123,14 +143,65 @@ export const DigitalTwinHUD: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* Real-Time Facility Summary KPIs */}
-        <div className="grid grid-cols-3 gap-2 mt-3 pt-2 border-t border-polar-border text-[11px]">
+        {/* Atmosphere Lighting View Switcher */}
+        <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-polar-border text-[10px]">
+          <span className="text-polar-text-muted uppercase tracking-wider font-semibold">Atmosphere:</span>
+          <div className="flex items-center gap-1">
+            {(['OPERATIONAL', 'SCIENTIFIC', 'NIGHT', 'WEATHER'] as LightingViewMode[]).map(mode => (
+              <button
+                key={mode}
+                onClick={() => onLightingViewModeChange && onLightingViewModeChange(mode)}
+                className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase transition-all cursor-pointer ${
+                  lightingViewMode === mode
+                    ? 'bg-polar-cyan/20 text-polar-cyan border border-polar-cyan/40 shadow-sm'
+                    : 'text-polar-text-secondary hover:text-polar-text-primary hover:bg-polar-hover border border-transparent'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Distinct NCPOR Meteorological Observation Layer (AWS) */}
+        <div className="mt-2.5 pt-2 border-t border-polar-border">
+          <div className="flex items-center justify-between text-[10px] text-polar-text-muted mb-1.5">
+            <span className="flex items-center gap-1 font-bold text-polar-cyan">
+              <CloudSun className="w-3 h-3 text-polar-cyan" />
+              NCPOR METEOROLOGICAL OBSERVATION (AWS)
+            </span>
+            <span className="text-[9px] px-1 rounded bg-polar-elevated text-polar-text-secondary border border-polar-border font-mono">
+              ON-SITE AWS
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-1.5 text-[10px]">
+            <div className="bg-polar-card p-1 rounded border border-polar-border text-center">
+              <span className="text-[8px] text-polar-text-muted block uppercase">Outdoor</span>
+              <span className="font-bold text-sky-400">{isBharati ? '-21.4°C' : '-24.8°C'}</span>
+            </div>
+            <div className="bg-polar-card p-1 rounded border border-polar-border text-center">
+              <span className="text-[8px] text-polar-text-muted block uppercase">Katabatic</span>
+              <span className="font-bold text-sky-400">{isBharati ? '18.4 kt' : '22.1 kt'}</span>
+            </div>
+            <div className="bg-polar-card p-1 rounded border border-polar-border text-center">
+              <span className="text-[8px] text-polar-text-muted block uppercase">Pressure</span>
+              <span className="font-bold text-sky-400">{isBharati ? '986 hPa' : '978 hPa'}</span>
+            </div>
+            <div className="bg-polar-card p-1 rounded border border-polar-border text-center">
+              <span className="text-[8px] text-polar-text-muted block uppercase">Humidity</span>
+              <span className="font-bold text-sky-400">62%</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Real-Time Facility Operational KPIs */}
+        <div className="grid grid-cols-3 gap-2 mt-2.5 pt-2 border-t border-polar-border text-[11px]">
           <div className="bg-polar-card p-1.5 rounded border border-polar-border">
             <span className="text-[9px] text-polar-text-muted uppercase block">Grid Power</span>
             <span className="font-bold text-polar-cyan">{generationKw} kW</span>
           </div>
           <div className="bg-polar-card p-1.5 rounded border border-polar-border">
-            <span className="text-[9px] text-polar-text-muted uppercase block">Envelope</span>
+            <span className="text-[9px] text-polar-text-muted uppercase block">Habitat Temp</span>
             <span className="font-bold text-emerald-500 dark:text-emerald-400">+21.2°C</span>
           </div>
           <div className="bg-polar-card p-1.5 rounded border border-polar-border">

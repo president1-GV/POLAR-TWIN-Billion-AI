@@ -12,7 +12,9 @@ import {
   Database,
   ChevronLeft,
   ChevronRight,
-  Lock
+  Lock,
+  ShieldAlert,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -27,6 +29,8 @@ export type ScreenId =
   | 'analytics'
   | 'data-catalog'
   | 'demo'
+  | 'admin'
+  | 'officers'
   | 'login';
 
 interface SidebarProps {
@@ -50,6 +54,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
 
   // Grouped Navigation per Phase 5 Specification
   const groups: NavGroup[] = [
+    {
+      title: 'COMMAND & PERSONNEL',
+      items: [
+        { 
+          id: 'admin', 
+          label: 'Admin Mission Control', 
+          icon: ShieldAlert, 
+          badge: 'LVL-5', 
+          badgeColor: 'bg-rose-500/15 text-rose-400 border-rose-500/40' 
+        },
+        { 
+          id: 'officers', 
+          label: 'Station Officers Portal', 
+          icon: Users, 
+          badge: 'ROSTER', 
+          badgeColor: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/40' 
+        },
+      ],
+    },
     {
       title: 'OPERATIONS',
       items: [

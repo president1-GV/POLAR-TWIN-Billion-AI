@@ -18,6 +18,10 @@ export class MaitriStationBuilder {
     this.buildBoilerThermalAnnex();
     this.buildLakeWaterIntakeSystem();
     this.buildFuelFarm();
+    this.buildFuelStation();
+    this.buildSummerCamp();
+    this.buildContainerizedModules();
+    this.buildAccessRoutes();
     this.buildCommunicationsArray();
     this.buildGeomagneticLaboratory();
     this.buildVehicleGarageAndLogistics();
@@ -55,7 +59,8 @@ export class MaitriStationBuilder {
 
   /**
    * 1. Maitri Main Modular Accommodation & Laboratory Blocks
-   * Historic multi-pod container structure with orange insulated cladding & gabled roofs
+   * Structurally elevated 2.2m on tubular steel stilts with bedrock pier footings
+   * High-clearance wind-scour underfloor zone prevents snow accumulation
    */
   private buildMainModularLivingBlocks(): void {
     const mainGroup = new THREE.Group();
@@ -70,39 +75,51 @@ export class MaitriStationBuilder {
     ];
 
     // Structural Steel Stilts & Moraine Bedrock Anchor Footings (Schirmacher Oasis)
-    const stiltHeight = 1.4;
+    const stiltHeight = 2.2;
     pods.forEach(p => {
       const xOffsets = [-p.w / 2 + 1.0, 0, p.w / 2 - 1.0];
       const zOffsets = [-p.d / 2 + 1.0, p.d / 2 - 1.0];
-      xOffsets.forEach(ox => {
+      xOffsets.forEach((ox, oIdx) => {
         zOffsets.forEach(oz => {
           // Moraine concrete anchor footing
           const footing = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.45, 0.55, 0.35, 12),
+            new THREE.CylinderGeometry(0.5, 0.65, 0.4, 14),
             this.materials.structuralSteel
           );
-          footing.position.set(p.x + ox, 0.17, p.z + oz);
+          footing.position.set(p.x + ox, 0.2, p.z + oz);
           footing.receiveShadow = true;
           mainGroup.add(footing);
 
-          // Elevated tubular steel stilt
+          // Elevated tubular steel stilt column (visibly elevating the station)
           const stilt = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.18, 0.18, stiltHeight, 12),
+            new THREE.CylinderGeometry(0.2, 0.2, stiltHeight, 14),
             this.materials.steelStilts
           );
           stilt.position.set(p.x + ox, stiltHeight / 2 + 0.2, p.z + oz);
           stilt.castShadow = true;
           stilt.receiveShadow = true;
           mainGroup.add(stilt);
+
+          // Diagonal cross wind bracing between stilts
+          if (oIdx < xOffsets.length - 1) {
+            const nextOx = xOffsets[oIdx + 1];
+            const brace = new THREE.Mesh(
+              new THREE.CylinderGeometry(0.08, 0.08, Math.hypot(nextOx - ox, stiltHeight), 8),
+              this.materials.steelStilts
+            );
+            brace.position.set(p.x + (ox + nextOx) / 2, stiltHeight / 2 + 0.2, p.z + oz);
+            brace.rotation.z = Math.atan2(stiltHeight, nextOx - ox);
+            mainGroup.add(brace);
+          }
         });
       });
 
       // Underfloor structural steel grid
       const underGrid = new THREE.Mesh(
-        new THREE.BoxGeometry(p.w, 0.3, p.d),
+        new THREE.BoxGeometry(p.w, 0.35, p.d),
         this.materials.structuralSteel
       );
-      underGrid.position.set(p.x, stiltHeight + 0.15, p.z);
+      underGrid.position.set(p.x, stiltHeight + 0.175, p.z);
       underGrid.castShadow = true;
       mainGroup.add(underGrid);
     });
@@ -113,7 +130,7 @@ export class MaitriStationBuilder {
         new THREE.BoxGeometry(p.w, 3.2, p.d),
         this.materials.maitriOrangeHull
       );
-      wall.position.set(p.x, 1.8, p.z);
+      wall.position.set(p.x, stiltHeight + 1.8, p.z);
       wall.castShadow = true;
       wall.receiveShadow = true;
       mainGroup.add(wall);
@@ -121,7 +138,7 @@ export class MaitriStationBuilder {
       // Gabled Roof
       const roofGeo = new THREE.ConeGeometry(Math.max(p.w, p.d) * 0.72, 1.4, 4);
       const roof = new THREE.Mesh(roofGeo, this.materials.maitriRoof);
-      roof.position.set(p.x, 4.1, p.z);
+      roof.position.set(p.x, stiltHeight + 4.1, p.z);
       roof.rotation.y = Math.PI / 4;
       roof.scale.set(p.w / Math.max(p.w, p.d), 1, p.d / Math.max(p.w, p.d));
       roof.castShadow = true;
@@ -133,10 +150,12 @@ export class MaitriStationBuilder {
           new THREE.PlaneGeometry(1.2, 0.9),
           this.materials.insulatedGlass
         );
-        win.position.set(p.x + w, 2.1, p.z + p.d / 2 + 0.02);
+        win.position.set(p.x + w, stiltHeight + 2.1, p.z + p.d / 2 + 0.02);
         mainGroup.add(win);
       }
     });
+
+    this.registerInteractive('ma_hab_core', mainGroup);
 
     // Register Living & Science Blocks for Raycast Interaction
     this.registerInteractive('ma_hab_core', mainGroup);
@@ -374,7 +393,7 @@ export class MaitriStationBuilder {
     const waterGroup = new THREE.Group();
     waterGroup.name = 'MA_WATER_SYSTEM';
 
-    // Pump House by Lake Shore (MA-PUMP-01)
+    // Primary Shoreline Pump House (MA-PUMP-01)
     const pumpGroup = new THREE.Group();
     pumpGroup.name = 'MA_PUMP_01';
     pumpGroup.position.set(18, 0, 8);
@@ -405,6 +424,63 @@ export class MaitriStationBuilder {
 
     this.registerInteractive('ma_water_pump_01', pumpGroup);
     waterGroup.add(pumpGroup);
+
+    // Lake Priyadarshini Deep Water Intake Pump House (MA-LAKE-PUMP)
+    const lakePumpGroup = new THREE.Group();
+    lakePumpGroup.name = 'MA_LAKE_PUMP';
+    lakePumpGroup.position.set(22.0, 0.4, -12.0);
+
+    // Moraine stilt piers supporting pump house over shoreline
+    for (let ox of [-2.8, 2.8]) {
+      for (let oz of [-1.8, 1.8]) {
+        const pier = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.18, 0.22, 1.2, 12),
+          this.materials.steelStilts
+        );
+        pier.position.set(ox, 0.6, oz);
+        pier.castShadow = true;
+        lakePumpGroup.add(pier);
+      }
+    }
+
+    // Insulated Timber & GRP Pump House (7.2m × 5.2m × 3.2m)
+    const lakeShed = new THREE.Mesh(
+      new THREE.BoxGeometry(7.2, 3.2, 5.2),
+      this.materials.maitriOrangeHull
+    );
+    lakeShed.position.set(0, 2.2, 0);
+    lakeShed.castShadow = true;
+    lakeShed.receiveShadow = true;
+    lakePumpGroup.add(lakeShed);
+
+    // Pitched Gable Roof
+    const lakeRoof = new THREE.Mesh(
+      new THREE.ConeGeometry(5.2, 1.4, 4),
+      this.materials.maitriRoof
+    );
+    lakeRoof.position.set(0, 4.4, 0);
+    lakeRoof.rotation.y = Math.PI / 4;
+    lakeRoof.scale.set(7.2 / 5.2, 1, 1);
+    lakePumpGroup.add(lakeRoof);
+
+    // Deep Submerged Intake Manifold entering Lake Priyadarshini
+    const lakeManifold = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.22, 0.22, 14.0, 12),
+      this.materials.stainlessPipe
+    );
+    lakeManifold.rotation.z = Math.PI / 2.5;
+    lakeManifold.position.set(6.0, 0.2, 0);
+    lakePumpGroup.add(lakeManifold);
+
+    const lakeBeacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.24, 12, 12),
+      this.getStatusMaterial('ma_lake_pump')
+    );
+    lakeBeacon.position.set(0, 5.2, 0);
+    lakePumpGroup.add(lakeBeacon);
+
+    this.registerInteractive('ma_lake_pump', lakePumpGroup);
+    waterGroup.add(lakePumpGroup);
 
     // Potable Water Storage Reservoir (MA-RES-01)
     const resGroup = new THREE.Group();
@@ -441,13 +517,31 @@ export class MaitriStationBuilder {
   }
 
   /**
-   * 5. Fuel Storage Farm (MA-TK-01)
+   * 5. Fuel Storage Farm & Environmental Catchment Berm (MA-FUEL-FARM, MA-TK-01)
    */
   private buildFuelFarm(): void {
     const fuelGroup = new THREE.Group();
     fuelGroup.name = 'MA_FUEL_FARM';
-    fuelGroup.position.set(-18, 0, 10);
+    fuelGroup.position.set(-18, 0, -10);
 
+    // Reinforced Moraine Earthen Catchment Berm (18m × 14m × 1.0m)
+    const bundWall = new THREE.Mesh(
+      new THREE.BoxGeometry(18.0, 1.0, 14.0),
+      this.materials.moraineRock
+    );
+    bundWall.position.set(0, 0.5, 0);
+    bundWall.receiveShadow = true;
+    fuelGroup.add(bundWall);
+
+    const bundFloor = new THREE.Mesh(
+      new THREE.BoxGeometry(16.5, 0.8, 12.5),
+      this.materials.structuralSteel
+    );
+    bundFloor.position.set(0, 0.55, 0);
+    bundFloor.receiveShadow = true;
+    fuelGroup.add(bundFloor);
+
+    // Primary Bulk Polar Diesel Tank (Alpha)
     const tankObj = new THREE.Group();
     tankObj.name = 'ma_fuel_tank_01';
 
@@ -456,21 +550,33 @@ export class MaitriStationBuilder {
       this.materials.fuelTankMaitri
     );
     cyl.rotation.z = Math.PI / 2;
-    cyl.position.set(0, 2.3, 0);
+    cyl.position.set(0, 2.3, -2.5);
     cyl.castShadow = true;
     tankObj.add(cyl);
 
+    // Secondary Reserve Tank (Bravo)
+    const cyl2 = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.0, 2.0, 7.5, 24),
+      this.materials.fuelTankMaitri
+    );
+    cyl2.rotation.z = Math.PI / 2;
+    cyl2.position.set(0, 2.3, 2.5);
+    cyl2.castShadow = true;
+    tankObj.add(cyl2);
+
     for (let s = -2.5; s <= 2.5; s += 5.0) {
-      const saddle = new THREE.Mesh(
-        new THREE.BoxGeometry(1.0, 1.2, 2.8),
-        this.materials.structuralSteel
-      );
-      saddle.position.set(s, 0.8, 0);
-      tankObj.add(saddle);
+      for (let tz of [-2.5, 2.5]) {
+        const saddle = new THREE.Mesh(
+          new THREE.BoxGeometry(1.0, 1.2, 2.8),
+          this.materials.structuralSteel
+        );
+        saddle.position.set(s, 0.8, tz);
+        tankObj.add(saddle);
+      }
     }
 
     const beacon = new THREE.Mesh(
-      new THREE.SphereGeometry(0.2, 12, 12),
+      new THREE.SphereGeometry(0.24, 12, 12),
       this.getStatusMaterial('ma_fuel_tank_01')
     );
     beacon.position.set(0, 4.6, 0);
@@ -478,7 +584,270 @@ export class MaitriStationBuilder {
 
     this.registerInteractive('ma_fuel_tank_01', tankObj);
     fuelGroup.add(tankObj);
+
+    this.registerInteractive('ma_fuel_farm', fuelGroup);
     this.group.add(fuelGroup);
+  }
+
+  /**
+   * 5b. Maitri Polar Vehicle Dispenser Station (MA-FUEL-STAT)
+   */
+  private buildFuelStation(): void {
+    const statGroup = new THREE.Group();
+    statGroup.name = 'MA_FUEL_STATION';
+    statGroup.position.set(-12.0, 0.8, -6.0);
+
+    // Concrete Base Skid
+    const pad = new THREE.Mesh(
+      new THREE.BoxGeometry(7.0, 0.4, 5.0),
+      this.materials.structuralSteel
+    );
+    pad.position.y = 0.2;
+    pad.receiveShadow = true;
+    statGroup.add(pad);
+
+    // Weather Canopy Roof
+    const canopy = new THREE.Mesh(
+      new THREE.BoxGeometry(7.4, 0.3, 5.4),
+      this.materials.maitriRoof
+    );
+    canopy.position.y = 3.2;
+    canopy.castShadow = true;
+    statGroup.add(canopy);
+
+    // Steel Support Pillars
+    const colCoords = [
+      [-3.2, -2.2], [-3.2, 2.2], [3.2, -2.2], [3.2, 2.2]
+    ];
+    colCoords.forEach(([cx, cz]) => {
+      const col = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.1, 0.1, 3.0, 12),
+        this.materials.steelStilts
+      );
+      col.position.set(cx, 1.7, cz);
+      col.castShadow = true;
+      statGroup.add(col);
+    });
+
+    // PistenBully Polar Diesel Dispenser
+    const dispenser = new THREE.Mesh(
+      new THREE.BoxGeometry(1.4, 1.8, 0.9),
+      this.materials.maitriOrangeHull
+    );
+    dispenser.position.set(0, 1.1, 0);
+    dispenser.castShadow = true;
+    statGroup.add(dispenser);
+
+    // Hose boom & grounding line
+    const boom = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.04, 2.0, 8),
+      this.materials.structuralSteel
+    );
+    boom.rotation.z = Math.PI / 4;
+    boom.position.set(0.5, 2.3, 0);
+    statGroup.add(boom);
+
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.2, 12, 12),
+      this.getStatusMaterial('ma_fuel_station')
+    );
+    beacon.position.set(0, 3.5, 0);
+    statGroup.add(beacon);
+
+    this.registerInteractive('ma_fuel_station', statGroup);
+    this.group.add(statGroup);
+  }
+
+  /**
+   * 5c. Maitri Summer Camp Modular Living Chalets (MA-SUMMER-CAMP)
+   */
+  private buildSummerCamp(): void {
+    const campGroup = new THREE.Group();
+    campGroup.name = 'MA_SUMMER_CAMP';
+    campGroup.position.set(18.0, 1.2, 12.0);
+
+    // 3 Interconnected Modular Living Chalets
+    const chalets = [
+      { x: -6.0, z: 0, w: 5.5, d: 8.0, label: 'Chalet 1' },
+      { x: 0.0, z: 0, w: 5.5, d: 8.0, label: 'Chalet 2' },
+      { x: 6.0, z: 0, w: 5.5, d: 8.0, label: 'Chalet 3' },
+    ];
+
+    chalets.forEach(ch => {
+      // Elevated pier footings
+      for (let px of [-ch.w / 2 + 0.6, ch.w / 2 - 0.6]) {
+        for (let pz of [-ch.d / 2 + 0.6, ch.d / 2 - 0.6]) {
+          const footing = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.18, 0.8, 8),
+            this.materials.steelStilts
+          );
+          footing.position.set(ch.x + px, 0.4, ch.z + pz);
+          footing.castShadow = true;
+          campGroup.add(footing);
+        }
+      }
+
+      // Chalet Living Unit
+      const unit = new THREE.Mesh(
+        new THREE.BoxGeometry(ch.w, 2.6, ch.d),
+        this.materials.maitriOrangeHull
+      );
+      unit.position.set(ch.x, 2.1, ch.z);
+      unit.castShadow = true;
+      unit.receiveShadow = true;
+      campGroup.add(unit);
+
+      // Pitched roof
+      const roof = new THREE.Mesh(
+        new THREE.ConeGeometry(ch.w * 0.72, 1.2, 4),
+        this.materials.maitriRoof
+      );
+      roof.position.set(ch.x, 3.9, ch.z);
+      roof.rotation.y = Math.PI / 4;
+      roof.scale.set(1, 1, ch.d / ch.w);
+      roof.castShadow = true;
+      campGroup.add(roof);
+
+      // Insulated windows
+      for (let wz of [-2.0, 0, 2.0]) {
+        const win = new THREE.Mesh(
+          new THREE.PlaneGeometry(0.8, 0.7),
+          this.materials.insulatedGlass
+        );
+        win.position.set(ch.x + ch.w / 2 + 0.02, 2.2, ch.z + wz);
+        win.rotation.y = Math.PI / 2;
+        campGroup.add(win);
+      }
+    });
+
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.24, 12, 12),
+      this.getStatusMaterial('ma_summer_camp')
+    );
+    beacon.position.set(0, 4.8, 0);
+    campGroup.add(beacon);
+
+    this.registerInteractive('ma_summer_camp', campGroup);
+    this.group.add(campGroup);
+  }
+
+  /**
+   * 5d. Maitri Containerized Field Science & Storage Pods (MA-CONTAINERS)
+   */
+  private buildContainerizedModules(): void {
+    const contGroup = new THREE.Group();
+    contGroup.name = 'MA_CONTAINERS';
+    contGroup.position.set(-16.0, 0.8, -14.0);
+
+    // 3x 20ft ISO Polar Storage & Science Containers on Steel Skids
+    const containers = [
+      { x: -5.0, z: 0, mat: this.materials.containerWhite, label: 'Geo-Lab Spares' },
+      { x: 0.0, z: 0, mat: this.materials.containerBlue, label: 'Scientific Equipment' },
+      { x: 5.0, z: 0, mat: this.materials.containerRed, label: 'Emergency Rations' },
+    ];
+
+    containers.forEach(c => {
+      // Bedrock steel skid
+      const skid = new THREE.Mesh(
+        new THREE.BoxGeometry(2.6, 0.3, 6.2),
+        this.materials.structuralSteel
+      );
+      skid.position.set(c.x, 0.15, 0);
+      skid.receiveShadow = true;
+      contGroup.add(skid);
+
+      // Container Body (2.4m × 2.6m × 6.0m)
+      const box = new THREE.Mesh(
+        new THREE.BoxGeometry(2.4, 2.6, 6.0),
+        c.mat
+      );
+      box.position.set(c.x, 1.6, 0);
+      box.castShadow = true;
+      box.receiveShadow = true;
+      contGroup.add(box);
+
+      // Corrugated texture ribs / corner castings
+      for (let rz of [-2.8, -1.4, 0, 1.4, 2.8]) {
+        const rib = new THREE.Mesh(
+          new THREE.BoxGeometry(2.44, 2.64, 0.08),
+          this.materials.structuralSteel
+        );
+        rib.position.set(c.x, 1.6, rz);
+        contGroup.add(rib);
+      }
+    });
+
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.22, 12, 12),
+      this.getStatusMaterial('ma_containers')
+    );
+    beacon.position.set(0, 3.4, 0);
+    contGroup.add(beacon);
+
+    this.registerInteractive('ma_containers', contGroup);
+    this.group.add(contGroup);
+  }
+
+  /**
+   * 5e. Maitri Schirmacher Oasis Moraine Vehicle Routes & Markers (MA-ROUTES)
+   */
+  private buildAccessRoutes(): void {
+    const routeGroup = new THREE.Group();
+    routeGroup.name = 'MA_ACCESS_ROUTES';
+    routeGroup.position.set(0, 0.05, 0);
+
+    // Compacted moraine tracks connecting core infrastructure
+    const trackSegments = [
+      // Core -> Priyadarshini Water Pump House
+      { from: new THREE.Vector3(0, 0.05, 0), to: new THREE.Vector3(22.0, 0.05, -12.0) },
+      // Core -> Fuel Farm
+      { from: new THREE.Vector3(0, 0.05, 0), to: new THREE.Vector3(-18.0, 0.05, -10.0) },
+      // Core -> Vehicle Garage
+      { from: new THREE.Vector3(0, 0.05, 0), to: new THREE.Vector3(10.0, 0.05, 16.0) },
+      // Core -> Summer Camp
+      { from: new THREE.Vector3(0, 0.05, 0), to: new THREE.Vector3(18.0, 0.05, 12.0) },
+      // Core -> Geomagnetic Lab
+      { from: new THREE.Vector3(0, 0.05, 0), to: new THREE.Vector3(-14.0, 0.05, -16.0) },
+    ];
+
+    trackSegments.forEach(seg => {
+      const mid = new THREE.Vector3().addVectors(seg.from, seg.to).multiplyScalar(0.5);
+      const dist = seg.from.distanceTo(seg.to);
+      const angleY = Math.atan2(seg.to.x - seg.from.x, seg.to.z - seg.from.z);
+
+      const track = new THREE.Mesh(
+        new THREE.PlaneGeometry(3.6, dist),
+        this.materials.moraineRock
+      );
+      track.rotation.x = -Math.PI / 2;
+      track.rotation.z = -angleY;
+      track.position.set(mid.x, 0.06, mid.z);
+      track.receiveShadow = true;
+      routeGroup.add(track);
+
+      // Route Marker Poles along edges (Orange polar markers with reflective bands)
+      for (let t of [0.25, 0.5, 0.75]) {
+        const markerPos = new THREE.Vector3().lerpVectors(seg.from, seg.to, t);
+        const pole = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.04, 0.04, 2.4, 8),
+          this.materials.maitriOrangeHull
+        );
+        pole.position.set(markerPos.x + 2.2 * Math.cos(angleY), 1.2, markerPos.z - 2.2 * Math.sin(angleY));
+        pole.castShadow = true;
+        routeGroup.add(pole);
+
+        // Reflective top beacon flag
+        const flag = new THREE.Mesh(
+          new THREE.BoxGeometry(0.3, 0.2, 0.04),
+          this.materials.statusWarning
+        );
+        flag.position.set(pole.position.x, 2.3, pole.position.z);
+        routeGroup.add(flag);
+      }
+    });
+
+    this.registerInteractive('ma_access_routes', routeGroup);
+    this.group.add(routeGroup);
   }
 
   /**

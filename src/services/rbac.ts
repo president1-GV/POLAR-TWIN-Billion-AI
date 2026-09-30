@@ -114,6 +114,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics',
       'data-catalog',
       'demo',
+      'officers',
+      'admin',
     ],
   },
 
@@ -165,6 +167,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics',
       'data-catalog',
       'demo',
+      'officers',
+      'admin',
     ],
   },
 
@@ -220,6 +224,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics',
       'data-catalog',
       'demo',
+      'officers',
+      'admin',
     ],
   },
 
@@ -263,6 +269,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics',
       'data-catalog',
       'demo',
+      'officers',
+      'admin',
     ],
   },
 
@@ -298,6 +306,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'meteorology',
       'analytics',
       'data-catalog',
+      'officers',
+      'admin',
     ],
   },
 
@@ -355,6 +365,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics',
       'data-catalog',
       'demo',
+      'admin',
+      'officers',
     ],
   },
 };

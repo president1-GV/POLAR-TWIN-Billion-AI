@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PolarMaterialLibrary } from '../materials/polarMaterials';
+import { LightingViewMode } from '../types';
 
 export class AntarcticEnvironment {
   public group: THREE.Group;
@@ -15,6 +16,8 @@ export class AntarcticEnvironment {
   private particlePositions?: Float32Array;
   private particleVelocities?: Float32Array;
   private nunatakMat?: THREE.MeshStandardMaterial;
+  private currentLightingMode: LightingViewMode = 'OPERATIONAL';
+  private isCurrentDark: boolean = true;
 
   constructor(
     private scene: THREE.Scene,
@@ -256,11 +259,12 @@ export class AntarcticEnvironment {
     const pos = this.particlePositions;
     const vel = this.particleVelocities;
     const count = pos.length / 3;
+    const speedMult = this.currentLightingMode === 'WEATHER' ? 3.4 : 1.0;
 
     for (let i = 0; i < count; i++) {
-      pos[i * 3] += vel[i * 3];
-      pos[i * 3 + 1] += vel[i * 3 + 1];
-      pos[i * 3 + 2] += vel[i * 3 + 2];
+      pos[i * 3] += vel[i * 3] * speedMult;
+      pos[i * 3 + 1] += vel[i * 3 + 1] * speedMult;
+      pos[i * 3 + 2] += vel[i * 3 + 2] * speedMult;
 
       // Recycle snow particles that reach ground level or drift past bounds
       if (pos[i * 3 + 1] < 0 || pos[i * 3] < -70 || pos[i * 3 + 2] > 70) {
@@ -285,7 +289,13 @@ export class AntarcticEnvironment {
     if (this.humanScaleAvatar) this.humanScaleAvatar.visible = visible;
   }
 
+  public setLightingViewMode(mode: LightingViewMode): void {
+    this.currentLightingMode = mode;
+    this.applyLightingConfiguration();
+  }
+
   public updateTheme(isDark: boolean): void {
+    this.isCurrentDark = isDark;
     const currentGridVisible = this.gridHelper ? this.gridHelper.visible : true;
     if (this.gridHelper) {
       this.group.remove(this.gridHelper);
@@ -300,59 +310,7 @@ export class AntarcticEnvironment {
     this.gridHelper.visible = currentGridVisible;
     this.group.add(this.gridHelper);
 
-    if (isDark) {
-      this.scene.background = new THREE.Color(0x060E1A);
-      if (this.scene.fog instanceof THREE.FogExp2) {
-        this.scene.fog.color.setHex(0x060E1A);
-        this.scene.fog.density = 0.0075;
-      }
-      if (this.hemiLight) {
-        this.hemiLight.color.setHex(0xBAE6FD);
-        this.hemiLight.groundColor.setHex(0x0F172A);
-        this.hemiLight.intensity = 0.85;
-      }
-      if (this.sunLight) {
-        this.sunLight.color.setHex(0xFFF7ED);
-        this.sunLight.intensity = 1.5;
-      }
-      if (this.rimLight) {
-        this.rimLight.color.setHex(0x38BDF8);
-        this.rimLight.intensity = 0.55;
-      }
-      if (this.coreLight) {
-        this.coreLight.intensity = 0.6;
-      }
-      if (this.snowParticles) {
-        (this.snowParticles.material as THREE.PointsMaterial).color.setHex(0xE2EEF8);
-        (this.snowParticles.material as THREE.PointsMaterial).opacity = 0.65;
-      }
-    } else {
-      this.scene.background = new THREE.Color(0xD9E6F2);
-      if (this.scene.fog instanceof THREE.FogExp2) {
-        this.scene.fog.color.setHex(0xD9E6F2);
-        this.scene.fog.density = 0.0065;
-      }
-      if (this.hemiLight) {
-        this.hemiLight.color.setHex(0xFFFFFF);
-        this.hemiLight.groundColor.setHex(0xC3D5E8);
-        this.hemiLight.intensity = 1.25;
-      }
-      if (this.sunLight) {
-        this.sunLight.color.setHex(0xFFFFFF);
-        this.sunLight.intensity = 1.85;
-      }
-      if (this.rimLight) {
-        this.rimLight.color.setHex(0x0284C7);
-        this.rimLight.intensity = 0.4;
-      }
-      if (this.coreLight) {
-        this.coreLight.intensity = 0.45;
-      }
-      if (this.snowParticles) {
-        (this.snowParticles.material as THREE.PointsMaterial).color.setHex(0x64748B);
-        (this.snowParticles.material as THREE.PointsMaterial).opacity = 0.7;
-      }
-    }
+    this.applyLightingConfiguration();
 
     if (this.nunatakMat) {
       this.nunatakMat.color.setHex(isDark ? 0x1E293B : 0x475569);
@@ -362,6 +320,141 @@ export class AntarcticEnvironment {
     }
     if (this.materials.wireframeEngineering) {
       this.materials.wireframeEngineering.color.setHex(isDark ? 0x06B6D4 : 0x0284C7);
+    }
+  }
+
+  private applyLightingConfiguration(): void {
+    const isDark = this.isCurrentDark;
+
+    switch (this.currentLightingMode) {
+      case 'OPERATIONAL': {
+        if (isDark) {
+          this.scene.background = new THREE.Color(0x060E1A);
+          if (this.scene.fog instanceof THREE.FogExp2) {
+            this.scene.fog.color.setHex(0x060E1A);
+            this.scene.fog.density = 0.0075;
+          }
+          if (this.hemiLight) {
+            this.hemiLight.color.setHex(0xBAE6FD);
+            this.hemiLight.groundColor.setHex(0x0F172A);
+            this.hemiLight.intensity = 0.85;
+          }
+          if (this.sunLight) {
+            this.sunLight.color.setHex(0xFFF7ED);
+            this.sunLight.intensity = 1.5;
+          }
+          if (this.rimLight) {
+            this.rimLight.color.setHex(0x38BDF8);
+            this.rimLight.intensity = 0.55;
+          }
+          if (this.coreLight) {
+            this.coreLight.intensity = 0.6;
+          }
+        } else {
+          this.scene.background = new THREE.Color(0xD9E6F2);
+          if (this.scene.fog instanceof THREE.FogExp2) {
+            this.scene.fog.color.setHex(0xD9E6F2);
+            this.scene.fog.density = 0.0065;
+          }
+          if (this.hemiLight) {
+            this.hemiLight.color.setHex(0xFFFFFF);
+            this.hemiLight.groundColor.setHex(0xC3D5E8);
+            this.hemiLight.intensity = 1.25;
+          }
+          if (this.sunLight) {
+            this.sunLight.color.setHex(0xFFFFFF);
+            this.sunLight.intensity = 1.85;
+          }
+          if (this.rimLight) {
+            this.rimLight.color.setHex(0x0284C7);
+            this.rimLight.intensity = 0.4;
+          }
+          if (this.coreLight) {
+            this.coreLight.intensity = 0.45;
+          }
+        }
+        break;
+      }
+
+      case 'SCIENTIFIC': {
+        const skyCol = isDark ? 0x0A131F : 0xEDF2F7;
+        this.scene.background = new THREE.Color(skyCol);
+        if (this.scene.fog instanceof THREE.FogExp2) {
+          this.scene.fog.color.setHex(skyCol);
+          this.scene.fog.density = 0.0020;
+        }
+        if (this.hemiLight) {
+          this.hemiLight.color.setHex(0xFFFFFF);
+          this.hemiLight.groundColor.setHex(isDark ? 0x1E293B : 0xCBD5E1);
+          this.hemiLight.intensity = 1.5;
+        }
+        if (this.sunLight) {
+          this.sunLight.color.setHex(0xF8FAFC);
+          this.sunLight.intensity = 1.6;
+        }
+        if (this.rimLight) {
+          this.rimLight.color.setHex(0x94A3B8);
+          this.rimLight.intensity = 0.4;
+        }
+        if (this.coreLight) {
+          this.coreLight.intensity = 0.4;
+        }
+        break;
+      }
+
+      case 'NIGHT': {
+        const skyCol = 0x020813;
+        this.scene.background = new THREE.Color(skyCol);
+        if (this.scene.fog instanceof THREE.FogExp2) {
+          this.scene.fog.color.setHex(skyCol);
+          this.scene.fog.density = 0.0085;
+        }
+        if (this.hemiLight) {
+          this.hemiLight.color.setHex(0x1E1B4B);
+          this.hemiLight.groundColor.setHex(0x020617);
+          this.hemiLight.intensity = 0.35;
+        }
+        if (this.sunLight) {
+          this.sunLight.color.setHex(0x38BDF8);
+          this.sunLight.intensity = 0.4;
+        }
+        if (this.rimLight) {
+          this.rimLight.color.setHex(0x06B6D4);
+          this.rimLight.intensity = 0.65;
+        }
+        if (this.coreLight) {
+          this.coreLight.color.setHex(0xF59E0B);
+          this.coreLight.intensity = 2.2;
+        }
+        break;
+      }
+
+      case 'WEATHER': {
+        const skyCol = isDark ? 0x1E293B : 0x94A3B8;
+        this.scene.background = new THREE.Color(skyCol);
+        if (this.scene.fog instanceof THREE.FogExp2) {
+          this.scene.fog.color.setHex(skyCol);
+          this.scene.fog.density = 0.018;
+        }
+        if (this.hemiLight) {
+          this.hemiLight.color.setHex(0x94A3B8);
+          this.hemiLight.groundColor.setHex(0x334155);
+          this.hemiLight.intensity = 0.7;
+        }
+        if (this.sunLight) {
+          this.sunLight.color.setHex(0xE2E8F0);
+          this.sunLight.intensity = 0.55;
+        }
+        if (this.rimLight) {
+          this.rimLight.color.setHex(0x64748B);
+          this.rimLight.intensity = 0.25;
+        }
+        if (this.coreLight) {
+          this.coreLight.color.setHex(0xF59E0B);
+          this.coreLight.intensity = 1.4;
+        }
+        break;
+      }
     }
   }
 
