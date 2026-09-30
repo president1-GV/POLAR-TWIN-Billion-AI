@@ -127,9 +127,9 @@ async function backendFetch(endpoint: string, options: RequestInit = {}): Promis
   }
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
 
-  // Fail-fast 2.5s timeout for seamless fallback when running on static deployments (e.g. GitHub Pages)
+  // Resilient 6.0s timeout for seamless fallback when running on static deployments (e.g. GitHub Pages)
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2500);
+  const timeoutId = setTimeout(() => controller.abort(), 6000);
 
   try {
     const res = await fetch(`${API_BASE}${cleanEndpoint}`, {

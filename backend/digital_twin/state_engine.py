@@ -52,6 +52,13 @@ class DigitalTwinStateEngine:
         Retrieves complete operational digital twin representation strictly structured
         across 15 canonical domains with explicit provenance, data_status, and confidence tags.
         """
+        import time
+        now_ts = time.time()
+        if hasattr(self, "_twin_cache") and station_id in self._twin_cache:
+            entry = self._twin_cache[station_id]
+            if now_ts - entry["ts"] < 10.0:
+                return entry["data"]
+
         now_iso = datetime.now(timezone.utc).isoformat()
         is_bharati = (station_id == "station_bharati")
 
@@ -360,7 +367,7 @@ class DigitalTwinStateEngine:
         }
 
         # Return root object containing both Canonical 15 Domains AND legacy top-level keys for 100% compatibility
-        return {
+        result_twin = {
             # Top-level legacy keys (guarantees tests & current UI never break)
             "station_id": station_id,
             "overall_health_score": overall_health,
@@ -393,11 +400,17 @@ class DigitalTwinStateEngine:
                 "audit": domain_audit
             }
         }
+        if not hasattr(self, "_twin_cache"):
+            self._twin_cache = {}
+        self._twin_cache[station_id] = {"ts": now_ts, "data": result_twin}
+        return result_twin
 
     def update_asset_telemetry(self, asset_id: str, updates: Dict[str, Any], station_id: str = "station_bharati") -> Dict[str, Any]:
         """
         Updates an asset's health, status, and telemetry, triggering transitions if thresholds crossed.
         """
+        if hasattr(self, "_twin_cache"):
+            self._twin_cache.pop(station_id, None)
         res = supabase_client.update_row("station_assets", "id", asset_id, updates)
         
         # Check if alert needs to be generated on transition to WARNING or CRITICAL

@@ -13,9 +13,10 @@ if os.path.exists(env_path):
                 k, v = line.split("=", 1)
                 os.environ.setdefault(k.strip(), v.strip())
 
+DEFAULT_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwb3hub2Niem5hZ2VwdXNjemtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1NTMyNTMsImV4cCI6MjEwNjEyOTI1M30.Np8y0hopJxoTHHY587rKDhKB0Jk6m95SxoS8owCL6qY"
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://fpoxnocbznagepusczkk.supabase.co")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
-SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", SUPABASE_ANON_KEY)
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "") or DEFAULT_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "") or SUPABASE_ANON_KEY
 SUPABASE_TOKEN = os.getenv("SUPABASE_ACCESS_TOKEN", "")
 PROJECT_REF = os.getenv("SUPABASE_PROJECT_REF", "fpoxnocbznagepusczkk")
 QUERY_URL = f"https://api.supabase.com/v1/projects/{PROJECT_REF}/database/query"
@@ -84,13 +85,15 @@ class SupabaseClient:
         return SupabaseQueryBuilder(self, table_name)
 
     def _get_headers(self, service: bool = True) -> Dict[str, str]:
-        key = self.service_key if (service and self.service_key) else self.anon_key
-        return {
+        key = (self.service_key if (service and self.service_key) else self.anon_key) or DEFAULT_SUPABASE_ANON_KEY
+        headers: Dict[str, str] = {
             "apikey": key,
-            "Authorization": f"Bearer {key}",
             "Accept": "application/json",
             "Content-Type": "application/json"
         }
+        if key:
+            headers["Authorization"] = f"Bearer {key}"
+        return headers
 
     def query_sql(self, sql: str) -> List[Dict[str, Any]]:
         """Execute arbitrary SQL directly through the Supabase Management API."""
