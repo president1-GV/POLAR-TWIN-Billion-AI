@@ -11,6 +11,7 @@ import { EdgeMonitor } from './features/edge/EdgeMonitor';
 import { AnalyticsDashboard } from './features/analytics/AnalyticsDashboard';
 import { DataCatalogDashboard } from './features/data-catalog/DataCatalogDashboard';
 import { KillerDemoPanel } from './features/demo/KillerDemoPanel';
+import { SmartAutomationCenter } from './features/automation/SmartAutomationCenter';
 import { AlertsDrawer } from './features/alerts/AlertsDrawer';
 import { AdminMissionControl } from './features/admin/AdminMissionControl';
 import { StationOfficersPortal } from './features/officers/StationOfficersPortal';
@@ -237,6 +238,16 @@ export const App: React.FC = () => {
             {currentScreen === 'simulation' && (
               <ProtectedRoute screenId="simulation" onNavigateHome={() => setCurrentScreen('command-center')}>
                 <EmergencySimulator stationId={currentStationId} />
+              </ProtectedRoute>
+            )}
+
+            {currentScreen === 'automation' && (
+              <ProtectedRoute screenId="automation" onNavigateHome={() => setCurrentScreen('command-center')}>
+                <SmartAutomationCenter
+                  currentStationId={currentStationId}
+                  onNavigateToDigitalTwin={() => setCurrentScreen('digital-twin')}
+                  onNavigateToEnergy={() => setCurrentScreen('energy')}
+                />
               </ProtectedRoute>
             )}
 

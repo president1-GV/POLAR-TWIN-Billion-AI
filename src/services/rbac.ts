@@ -39,6 +39,9 @@ export type PolarPermission =
   | 'data_catalog:view'
   | 'data_catalog:export'
   | 'demo:access'
+  | 'automation:view'
+  | 'automation:approve'
+  | 'automation:execute'
   | 'security:view'
   | 'security:revoke_sessions'
   | 'admin:full';
@@ -101,6 +104,8 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics:view',
       'data_catalog:view',
       'demo:access',
+      'automation:view',
+      'automation:approve',
       'security:view',
     ],
     accessibleScreens: [
@@ -110,6 +115,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'logistics',
       'meteorology',
       'simulation',
+      'automation',
       'edge',
       'analytics',
       'data-catalog',
@@ -154,6 +160,9 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'analytics:export',
       'data_catalog:view',
       'demo:access',
+      'automation:view',
+      'automation:approve',
+      'automation:execute',
       'security:view',
     ],
     accessibleScreens: [
@@ -163,6 +172,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'logistics',
       'meteorology',
       'simulation',
+      'automation',
       'edge',
       'analytics',
       'data-catalog',
@@ -211,6 +221,9 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'data_catalog:view',
       'data_catalog:export',
       'demo:access',
+      'automation:view',
+      'automation:approve',
+      'automation:execute',
       'security:view',
     ],
     accessibleScreens: [
@@ -220,6 +233,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'logistics',
       'meteorology',
       'simulation',
+      'automation',
       'edge',
       'analytics',
       'data-catalog',
@@ -256,6 +270,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'data_catalog:view',
       'data_catalog:export',
       'demo:access',
+      'automation:view',
       'security:view',
     ],
     accessibleScreens: [
@@ -265,6 +280,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'logistics',
       'meteorology',
       'simulation',
+      'automation',
       'edge',
       'analytics',
       'data-catalog',
@@ -294,6 +310,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'logistics:view',
       'meteorology:view',
       'simulation:view',
+      'automation:view',
       'edge:view',
       'analytics:view',
       'data_catalog:view',
@@ -304,6 +321,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'energy',
       'logistics',
       'meteorology',
+      'automation',
       'analytics',
       'data-catalog',
       'officers',
@@ -350,6 +368,9 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'data_catalog:view',
       'data_catalog:export',
       'demo:access',
+      'automation:view',
+      'automation:approve',
+      'automation:execute',
       'security:view',
       'security:revoke_sessions',
       'admin:full',
@@ -361,6 +382,7 @@ export const ROLE_DEFINITIONS: Record<PolarRole, RoleMetadata> = {
       'logistics',
       'meteorology',
       'simulation',
+      'automation',
       'edge',
       'analytics',
       'data-catalog',

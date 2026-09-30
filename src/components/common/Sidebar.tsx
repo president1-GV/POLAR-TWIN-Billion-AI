@@ -14,7 +14,8 @@ import {
   ChevronRight,
   Lock,
   ShieldAlert,
-  Users
+  Users,
+  Cpu
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -25,6 +26,7 @@ export type ScreenId =
   | 'logistics'
   | 'meteorology'
   | 'simulation'
+  | 'automation'
   | 'edge'
   | 'analytics'
   | 'data-catalog'
@@ -92,6 +94,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentScreen, onScreenChange 
       title: 'SIMULATION',
       items: [
         { id: 'simulation', label: 'What-If Simulator', icon: AlertOctagon },
+      ],
+    },
+    {
+      title: 'SMART AUTOMATION',
+      items: [
+        { 
+          id: 'automation', 
+          label: 'Smart Automation', 
+          icon: Cpu, 
+          badge: 'CLOSED-LOOP', 
+          badgeColor: 'bg-polar-cyan/15 text-polar-cyan border-polar-cyan/40' 
+        },
       ],
     },
     {

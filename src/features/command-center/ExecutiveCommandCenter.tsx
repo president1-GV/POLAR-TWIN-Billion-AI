@@ -20,7 +20,8 @@ import {
   ChevronRight,
   Droplet,
   Fuel,
-  Play
+  Play,
+  Cpu
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
@@ -306,6 +307,15 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
             >
               <span>Full Screen 3D</span>
               <ExternalLink className="w-3 h-3" />
+            </button>
+
+            <button
+              onClick={() => onNavigate('automation')}
+              className="hidden sm:flex items-center gap-1.5 text-[11px] text-polar-cyan hover:text-polar-base bg-polar-cyan/10 hover:bg-polar-cyan border border-polar-cyan/40 rounded px-2.5 py-1 font-semibold transition-all shadow-sm"
+              title="Open Smart Automation & Closed-Loop Decision Engine"
+            >
+              <Cpu className="w-3.5 h-3.5" />
+              <span>Smart Automation</span>
             </button>
           </div>
         </div>

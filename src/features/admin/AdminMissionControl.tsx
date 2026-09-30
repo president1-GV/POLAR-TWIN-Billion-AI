@@ -362,23 +362,30 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
 
       {/* Emergency Lockdown Notice Banner if active */}
       {emergencyLockdownActive && (
-        <div className="p-4 rounded-xl bg-rose-950/90 border border-rose-500 text-rose-200 shadow-2xl flex items-center justify-between animate-pulse">
+        <div className="p-4 rounded-xl bg-gradient-to-r from-red-600 via-rose-600 to-red-700 dark:from-red-950 dark:via-rose-950 dark:to-red-900 border-2 border-red-400 text-white shadow-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-pulse">
           <div className="flex items-center gap-3">
-            <AlertOctagon className="w-6 h-6 text-rose-400 shrink-0" />
+            <div className="p-2 rounded-lg bg-white/20 border border-white/40 text-white shrink-0 shadow-inner">
+              <AlertOctagon className="w-6 h-6 text-white" />
+            </div>
             <div>
-              <h4 className="font-bold text-sm tracking-wider uppercase text-white">
-                STATION EMERGENCY RED ALERT IN EFFECT
-              </h4>
-              <p className="text-xs text-rose-300">
+              <div className="flex items-center gap-2">
+                <h4 className="font-extrabold text-sm tracking-wider uppercase text-white drop-shadow-sm">
+                  STATION EMERGENCY RED ALERT IN EFFECT
+                </h4>
+                <span className="px-2 py-0.5 rounded bg-yellow-400 text-black text-[10px] font-black uppercase tracking-wider shadow-sm">
+                  ACTIVE
+                </span>
+              </div>
+              <p className="text-xs text-red-100 dark:text-red-200 font-medium mt-0.5 leading-relaxed">
                 Auxiliary diesel gensets synchronized to essential bus. Non-critical labs shed. Edge store-and-forward buffer armed.
               </p>
             </div>
           </div>
           <button
             onClick={handleSimulateRedAlert}
-            className="px-3 py-1.5 rounded bg-rose-900 hover:bg-rose-800 border border-rose-400 text-white font-bold text-xs uppercase"
+            className="px-4 py-2 rounded-lg bg-white hover:bg-red-50 border-2 border-white text-red-700 font-black text-xs uppercase tracking-wider shadow-lg shrink-0 transition-colors"
           >
-            Clear Red Alert
+            CLEAR RED ALERT
           </button>
         </div>
       )}
@@ -618,7 +625,7 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
                     className={`flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold transition-all text-center ${
                       isCurrentActive
                         ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 cursor-default'
-                        : 'bg-polar-surface hover:bg-polar-elevated border border-polar-border text-polar-text-secondary hover:text-white'
+                        : 'bg-polar-surface hover:bg-polar-elevated border border-polar-border text-polar-text-secondary hover:text-polar-text-primary'
                     }`}
                   >
                     {isCurrentActive ? 'CURRENT IDENTITY' : 'ASSUME ROLE'}
@@ -790,99 +797,126 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
       </div>
 
       {/* Emergency Station Overrides & Global Lockdown Console */}
-      <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl p-5 shadow-sm space-y-4">
-        <div className="flex items-center gap-2.5 border-b border-rose-500/30 pb-3">
-          <div className="p-1.5 rounded-md bg-rose-500/20 border border-rose-500/40 text-rose-400">
-            <AlertOctagon className="w-4 h-4" />
+      <div className={`rounded-xl p-5 shadow-2xl space-y-4 text-white relative overflow-hidden transition-all bg-gradient-to-br from-red-600 via-rose-700 to-red-800 dark:from-red-950 dark:via-rose-950 dark:to-red-900 border-2 border-red-500 dark:border-red-600 ${
+        emergencyLockdownActive ? 'ring-4 ring-yellow-400/90 shadow-red-600/50 animate-pulse' : ''
+      }`}>
+        {/* Accent Bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-yellow-400 to-red-400" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/20 dark:border-red-500/30 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-lg bg-white/20 dark:bg-red-900/60 border border-white/40 dark:border-red-400/50 text-white shadow-inner shrink-0">
+              <AlertOctagon className={`w-5 h-5 text-white ${emergencyLockdownActive ? 'animate-bounce' : ''}`} />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-base font-extrabold text-white uppercase tracking-wider drop-shadow-sm flex items-center gap-2">
+                <span>EMERGENCY STATION OVERRIDES & HIGH-CONSEQUENCE INCIDENT PROTOCOLS</span>
+              </h3>
+              <p className="text-xs text-red-100 dark:text-red-200 font-medium leading-relaxed mt-0.5">
+                High-consequence emergency controls strictly reserved for Level-5 Root Administration.
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-sm font-bold text-white uppercase tracking-wide">
-              EMERGENCY STATION OVERRIDES & HIGH-CONSEQUENCE INCIDENT PROTOCOLS
-            </h3>
-            <p className="text-[11px] text-rose-300">
-              High-consequence emergency controls strictly reserved for Level-5 Root Administration.
-            </p>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="px-2.5 py-0.5 rounded font-mono text-[10px] font-extrabold uppercase tracking-wider bg-black/50 text-white border border-white/30 backdrop-blur-sm">
+              LEVEL-5 ROOT ONLY
+            </span>
+            {emergencyLockdownActive && (
+              <span className="px-2.5 py-0.5 rounded font-mono text-[10px] font-black uppercase tracking-wider bg-yellow-400 text-black border border-yellow-200 shadow-lg animate-pulse flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-ping" />
+                RED ALERT ACTIVE
+              </span>
+            )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-          <div className="p-3.5 rounded-lg bg-polar-base/90 border border-rose-500/40 space-y-2 flex flex-col justify-between">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
+          {/* Card 1: Red Alert */}
+          <div className="p-4 rounded-xl bg-red-950/85 dark:bg-black/80 border border-red-400/50 dark:border-red-600/60 space-y-3 flex flex-col justify-between shadow-xl backdrop-blur-md hover:border-white/50 transition-all">
             <div>
-              <h4 className="font-bold text-white flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-rose-400" />
+              <h4 className="font-extrabold text-white text-sm flex items-center gap-1.5 drop-shadow-sm">
+                <Flame className="w-4 h-4 text-yellow-300" />
                 <span>Simulate Red Alert</span>
               </h4>
-              <p className="text-[10px] text-polar-text-muted mt-1 leading-relaxed">
+              <p className="text-xs text-red-100 dark:text-red-200 mt-1.5 leading-relaxed font-normal">
                 Forces emergency generator bus synchronization, isolates non-vital loads, and dispatches red advisory.
               </p>
             </div>
             <button
               onClick={handleSimulateRedAlert}
-              className={`w-full py-1.5 px-2 rounded font-bold text-xs transition-colors ${
+              className={`w-full py-2 px-3 rounded-lg font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md ${
                 emergencyLockdownActive
-                  ? 'bg-rose-600 text-white hover:bg-rose-500'
-                  : 'bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40'
+                  ? 'bg-yellow-400 hover:bg-yellow-300 text-black ring-2 ring-white shadow-lg animate-pulse'
+                  : 'bg-white hover:bg-red-50 text-red-700 border-2 border-white shadow'
               }`}
             >
-              {emergencyLockdownActive ? 'DEACTIVATE RED ALERT' : 'TRIGGER RED ALERT'}
+              <Flame className="w-3.5 h-3.5" />
+              <span>{emergencyLockdownActive ? 'DEACTIVATE RED ALERT' : 'TRIGGER RED ALERT'}</span>
             </button>
           </div>
 
-          <div className="p-3.5 rounded-lg bg-polar-base/90 border border-polar-border space-y-2 flex flex-col justify-between">
+          {/* Card 2: Quarantine Sat-Link */}
+          <div className="p-4 rounded-xl bg-red-950/85 dark:bg-black/80 border border-red-400/50 dark:border-red-600/60 space-y-3 flex flex-col justify-between shadow-xl backdrop-blur-md hover:border-white/50 transition-all">
             <div>
-              <h4 className="font-bold text-white flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5 text-amber-400" />
+              <h4 className="font-extrabold text-white text-sm flex items-center gap-1.5 drop-shadow-sm">
+                <Radio className="w-4 h-4 text-amber-300" />
                 <span>Quarantine Sat-Link</span>
               </h4>
-              <p className="text-[10px] text-polar-text-muted mt-1 leading-relaxed">
+              <p className="text-xs text-red-100 dark:text-red-200 mt-1.5 leading-relaxed font-normal">
                 Immediately air-gaps station edge buffer to prevent untrusted telemetry replay during degraded link state.
               </p>
             </div>
             <button
               onClick={handleQuarantineEdge}
-              className={`w-full py-1.5 px-2 rounded font-bold text-xs transition-colors ${
+              className={`w-full py-2 px-3 rounded-lg font-extrabold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md ${
                 quarantineEdgeBuffer
-                  ? 'bg-amber-600 text-white hover:bg-amber-500'
-                  : 'bg-polar-surface hover:bg-polar-elevated border border-polar-border text-amber-400'
+                  ? 'bg-amber-400 hover:bg-amber-300 text-black ring-2 ring-white shadow-lg'
+                  : 'bg-amber-500/25 hover:bg-amber-500/40 text-amber-200 border border-amber-400/60'
               }`}
             >
-              {quarantineEdgeBuffer ? 'RELEASE QUARANTINE' : 'QUARANTINE EDGE BUFFER'}
+              <Radio className="w-3.5 h-3.5" />
+              <span>{quarantineEdgeBuffer ? 'RELEASE QUARANTINE' : 'QUARANTINE EDGE BUFFER'}</span>
             </button>
           </div>
 
-          <div className="p-3.5 rounded-lg bg-polar-base/90 border border-polar-border space-y-2 flex flex-col justify-between">
+          {/* Card 3: Rotate Session Keys */}
+          <div className="p-4 rounded-xl bg-red-950/85 dark:bg-black/80 border border-red-400/50 dark:border-red-600/60 space-y-3 flex flex-col justify-between shadow-xl backdrop-blur-md hover:border-white/50 transition-all">
             <div>
-              <h4 className="font-bold text-white flex items-center gap-1.5">
-                <Key className="w-3.5 h-3.5 text-cyan-400" />
+              <h4 className="font-extrabold text-white text-sm flex items-center gap-1.5 drop-shadow-sm">
+                <Key className="w-4 h-4 text-cyan-300" />
                 <span>Rotate Session Keys</span>
               </h4>
-              <p className="text-[10px] text-polar-text-muted mt-1 leading-relaxed">
+              <p className="text-xs text-red-100 dark:text-red-200 mt-1.5 leading-relaxed font-normal">
                 Generates fresh HMAC-SHA256 bearer signing salts and forces all station nodes to refresh active sessions.
               </p>
             </div>
             <button
               onClick={handleRotateKeys}
-              className="w-full py-1.5 px-2 rounded font-bold text-xs bg-polar-surface hover:bg-polar-elevated border border-polar-border text-cyan-400 transition-colors"
+              className="w-full py-2 px-3 rounded-lg font-extrabold text-xs uppercase tracking-wider bg-cyan-500/25 hover:bg-cyan-500/40 text-cyan-200 border border-cyan-400/60 transition-all flex items-center justify-center gap-1.5 shadow-sm"
             >
-              ROTATE CRYPTO KEYS
+              <Key className="w-3.5 h-3.5" />
+              <span>ROTATE CRYPTO KEYS</span>
             </button>
           </div>
 
-          <div className="p-3.5 rounded-lg bg-polar-base/90 border border-polar-border space-y-2 flex flex-col justify-between">
+          {/* Card 4: Revoke All Sessions */}
+          <div className="p-4 rounded-xl bg-red-950/85 dark:bg-black/80 border border-red-400/50 dark:border-red-600/60 space-y-3 flex flex-col justify-between shadow-xl backdrop-blur-md hover:border-white/50 transition-all">
             <div>
-              <h4 className="font-bold text-white flex items-center gap-1.5">
-                <LogOut className="w-3.5 h-3.5 text-rose-400" />
+              <h4 className="font-extrabold text-white text-sm flex items-center gap-1.5 drop-shadow-sm">
+                <LogOut className="w-3.5 h-3.5 text-rose-300" />
                 <span>Revoke All Sessions</span>
               </h4>
-              <p className="text-[10px] text-polar-text-muted mt-1 leading-relaxed">
+              <p className="text-xs text-red-100 dark:text-red-200 mt-1.5 leading-relaxed font-normal">
                 Emergency server-side revocation: purges all active operator bearer tokens from session memory.
               </p>
             </div>
             <button
               onClick={handleEmergencyRevokeAll}
-              className="w-full py-1.5 px-2 rounded font-bold text-xs bg-rose-500/20 text-rose-300 hover:bg-rose-500/30 border border-rose-500/40 transition-colors"
+              className="w-full py-2 px-3 rounded-lg font-extrabold text-xs uppercase tracking-wider bg-white hover:bg-red-50 text-red-700 border-2 border-white transition-all flex items-center justify-center gap-1.5 shadow-md"
             >
-              REVOKE ALL TOKENS
+              <LogOut className="w-3.5 h-3.5" />
+              <span>REVOKE ALL TOKENS</span>
             </button>
           </div>
         </div>
@@ -908,7 +942,7 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportAuditJson}
-              className="px-2.5 py-1 rounded bg-polar-base hover:bg-polar-elevated border border-polar-border text-xs font-semibold text-polar-text-secondary hover:text-white flex items-center gap-1.5 transition-colors"
+              className="px-2.5 py-1 rounded bg-polar-base hover:bg-polar-elevated border border-polar-border text-xs font-semibold text-polar-text-secondary hover:text-polar-text-primary flex items-center gap-1.5 transition-colors"
             >
               <Download className="w-3.5 h-3.5 text-cyan-400" />
               <span>EXPORT JSON</span>
