@@ -73,6 +73,8 @@ export const DutyOperatorCommandCenter: React.FC<Props> = ({
     }
   };
 
+  const [resolveInProgress, setResolveInProgress] = useState<string | null>(null);
+
   const handleAcknowledgeAlert = async (alertId: string) => {
     setAckInProgress(alertId);
     try {
@@ -84,6 +86,19 @@ export const DutyOperatorCommandCenter: React.FC<Props> = ({
       setAckInProgress(null);
     }
   };
+
+  const handleResolveAlert = async (alertId: string) => {
+    setResolveInProgress(alertId);
+    try {
+      await api.resolveAlert(alertId, 'Resolved via Duty Operations Center');
+      await loadData();
+    } catch (e) {
+      console.error('Failed to resolve alert:', e);
+    } finally {
+      setResolveInProgress(null);
+    }
+  };
+
 
   const isBharati = currentStationId === 'station_bharati';
   const stationName = isBharati ? 'Bharati Station' : 'Maitri Station';
@@ -284,9 +299,24 @@ export const DutyOperatorCommandCenter: React.FC<Props> = ({
                       {ackInProgress === alert.id ? 'Acknowledging...' : 'Acknowledge'}
                     </button>
                   ) : (
-                    <span className="flex items-center gap-1 text-xs text-emerald-400 font-bold px-2.5 py-1 rounded bg-emerald-950/40 border border-emerald-800/40">
+                    <span className="flex items-center gap-1 text-xs text-amber-400 font-bold px-2.5 py-1 rounded bg-amber-950/40 border border-amber-800/40">
                       <CheckCircle2 className="w-3.5 h-3.5" />
                       ACKNOWLEDGED
+                    </span>
+                  )}
+
+                  {alert.status !== 'RESOLVED' ? (
+                    <button
+                      onClick={() => handleResolveAlert(alert.id)}
+                      disabled={resolveInProgress === alert.id}
+                      className="px-3 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50"
+                    >
+                      {resolveInProgress === alert.id ? 'Resolving...' : 'Resolve'}
+                    </button>
+                  ) : (
+                    <span className="flex items-center gap-1 text-xs text-emerald-400 font-bold px-2.5 py-1 rounded bg-emerald-950/40 border border-emerald-800/40">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      RESOLVED
                     </span>
                   )}
                 </div>

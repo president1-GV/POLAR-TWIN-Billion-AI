@@ -95,9 +95,10 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleAcknowledgeAlert = async (alertId: string) => {
+  const handleAcknowledgeAlert = async (alertId: string, customNotes?: string) => {
     const nowIso = new Date().toISOString();
-    const dutyOfficer = user?.username || `operator.${role.toLowerCase()}`;
+    const dutyOfficer = user?.display_name || user?.name || user?.username || `operator.${(role || 'operator').toLowerCase()}`;
+    const notes = customNotes || `Acknowledged by ${dutyOfficer}`;
 
     // 1. Instant optimistic state update for zero-latency UI reaction
     setAlerts((prev) =>
@@ -115,7 +116,7 @@ export const App: React.FC = () => {
 
     // 2. Dispatch to backend/Supabase and reconcile
     try {
-      await api.acknowledgeAlert(alertId, `Acknowledged by ${dutyOfficer}`);
+      await api.acknowledgeAlert(alertId, notes);
       await loadAlerts();
     } catch (e) {
       console.error('Failed to acknowledge alert:', e);
@@ -123,8 +124,10 @@ export const App: React.FC = () => {
     }
   };
 
-  const handleResolveAlert = async (alertId: string) => {
+  const handleResolveAlert = async (alertId: string, customNotes?: string) => {
     const nowIso = new Date().toISOString();
+    const resolver = user?.display_name || user?.name || user?.username || `operator.${(role || 'operator').toLowerCase()}`;
+    const notes = customNotes || `Resolved by ${resolver}`;
 
     // 1. Instant optimistic state update for zero-latency UI reaction
     setAlerts((prev) =>
@@ -134,6 +137,7 @@ export const App: React.FC = () => {
               ...al,
               status: 'RESOLVED',
               resolved_at: nowIso,
+              resolved_by: resolver,
             }
           : al
       )
@@ -141,13 +145,39 @@ export const App: React.FC = () => {
 
     // 2. Dispatch to backend/Supabase and reconcile
     try {
-      await api.resolveAlert(alertId, `Resolved by ${role}`);
+      await api.resolveAlert(alertId, notes);
       await loadAlerts();
     } catch (e) {
       console.error('Failed to resolve alert:', e);
       await loadAlerts();
     }
   };
+
+  const handleReopenAlert = async (alertId: string) => {
+    // 1. Instant optimistic state update
+    setAlerts((prev) =>
+      prev.map((al) =>
+        al.id === alertId
+          ? {
+              ...al,
+              status: 'ACTIVE',
+              resolved_at: null,
+              resolved_by: null,
+            }
+          : al
+      )
+    );
+
+    // 2. Dispatch to backend/Supabase and reconcile
+    try {
+      await api.reopenAlert(alertId);
+      await loadAlerts();
+    } catch (e) {
+      console.error('Failed to reopen alert:', e);
+      await loadAlerts();
+    }
+  };
+
 
   const unreadCount = alerts.filter((a) => a.status === 'ACTIVE').length;
 
@@ -277,7 +307,12 @@ export const App: React.FC = () => {
         alerts={alerts}
         onAcknowledge={handleAcknowledgeAlert}
         onResolve={handleResolveAlert}
+        onReopen={handleReopenAlert}
+        currentStationId={currentStationId}
+        currentRole={role}
+        currentUser={user}
       />
+
     </div>
   );
 };

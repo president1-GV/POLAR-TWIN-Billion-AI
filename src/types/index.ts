@@ -126,6 +126,7 @@ export interface Alert {
   acknowledged_by?: string | null;
   acknowledged_at?: string | null;
   resolved_at?: string | null;
+  resolved_by?: string | null;
   created_at: string;
 }
 
@@ -174,6 +175,7 @@ export interface UserProfile {
   email?: string;
   username: string;
   display_name: string;
+  name?: string;
   role: string;
   canonical_role?: string;
   station_id: string;
