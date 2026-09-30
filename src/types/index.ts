@@ -175,7 +175,13 @@ export interface UserProfile {
   username: string;
   display_name: string;
   role: string;
+  canonical_role?: string;
   station_id: string;
+  station_scope?: string[];
+  domain_scope?: string[];
+  operational_authority?: string;
+  is_impersonating?: boolean;
+  impersonated_by?: string;
   mfa_enabled?: boolean;
   avatar_url?: string;
   created_at?: string;
