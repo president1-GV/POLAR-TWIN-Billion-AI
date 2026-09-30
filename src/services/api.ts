@@ -126,11 +126,25 @@ async function backendFetch(endpoint: string, options: RequestInit = {}): Promis
     headers['Authorization'] = `Bearer ${activeSessionToken}`;
   }
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  return fetch(`${API_BASE}${cleanEndpoint}`, {
-    ...options,
-    headers,
-  });
+
+  // Fail-fast 2.5s timeout for seamless fallback when running on static deployments (e.g. GitHub Pages)
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+  try {
+    const res = await fetch(`${API_BASE}${cleanEndpoint}`, {
+      ...options,
+      headers,
+      signal: options.signal || controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return res;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    throw err;
+  }
 }
+
 
 export const api = {
   // 0. Zero-Trust Identity & Session Management
@@ -1990,6 +2004,7 @@ export const api = {
     saveAlertOverride(alertId, {
       status: 'RESOLVED',
       resolved_at: nowIso,
+      resolved_by: currentUser,
     });
 
     // 1. Try FastAPI backend
@@ -2025,6 +2040,45 @@ export const api = {
       notes,
     };
   },
+
+  async reopenAlert(alertId: string): Promise<any> {
+    // Persist locally immediately to guarantee instant responsive state
+    saveAlertOverride(alertId, {
+      status: 'ACTIVE',
+      resolved_at: null,
+      resolved_by: null,
+    });
+
+    // 1. Try FastAPI backend
+    try {
+      const res = await backendFetch(`/alerts/${alertId}/reopen`, {
+        method: 'POST',
+      });
+      if (res.ok) return await res.json();
+    } catch (_) {}
+
+    // 2. Try Supabase PostgREST direct PATCH if valid UUID
+    if (isValidUuid(alertId)) {
+      try {
+        await supabaseFetch(`alerts?id=eq.${alertId}`, {
+          method: 'PATCH',
+          headers: { 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            status: 'ACTIVE',
+            resolved_at: null,
+          }),
+        });
+      } catch (e) {
+        console.warn('Supabase reopenAlert fallback:', e);
+      }
+    }
+
+    return {
+      status: 'ACTIVE',
+      alert_id: alertId,
+    };
+  },
+
 
   // 7. Emergency Simulations
   async getScenarios(): Promise<any[]> {

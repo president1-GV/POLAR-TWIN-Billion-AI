@@ -101,3 +101,38 @@ def resolve_alert(
     )
 
     return {"status": "RESOLVED", "alert_id": alert_id, "resolved_by": actor_username, "resolved_at": now_iso}
+
+@router.post("/{alert_id}/reopen")
+def reopen_alert(
+    alert_id: str,
+    current_user: Dict[str, Any] = Depends(require_permission("acknowledge_alerts"))
+):
+    """
+    Reopen a previously resolved alert back to active operational status.
+    """
+    actor_username = current_user.get("username", "operator")
+    actor_role = current_user.get("role", "OPERATOR")
+
+    alerts = supabase_client.get_table("alerts", {"id": f"eq.{alert_id}"})
+    if not alerts or len(alerts) == 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Alert not found")
+
+    target_alert = alerts[0]
+    alert_station = target_alert.get("station_id", "GLOBAL")
+    require_station_access(alert_station, current_user)
+
+    supabase_client.update_row("alerts", "id", alert_id, {
+        "status": "ACTIVE",
+        "resolved_at": None
+    })
+
+    security_audit_logger.log_event(
+        action="ALERT_REOPENED",
+        actor_id=actor_username,
+        role=actor_role,
+        station_id=alert_station,
+        details={"alert_id": alert_id}
+    )
+
+    return {"status": "ACTIVE", "alert_id": alert_id}
+
