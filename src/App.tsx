@@ -23,7 +23,7 @@ import { useAuth } from './context/AuthContext';
 import { PolarRole } from './services/rbac';
 
 export const App: React.FC = () => {
-  const { role, switchRole, isAuthenticated } = useAuth();
+  const { role, switchRole, isAuthenticated, user } = useAuth();
   const [currentStationId, setCurrentStationId] = useState<string>('station_bharati');
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('command-center');
   const [selectedOfficerId, setSelectedOfficerId] = useState<string>('commander');
@@ -95,20 +95,56 @@ export const App: React.FC = () => {
   };
 
   const handleAcknowledgeAlert = async (alertId: string) => {
+    const nowIso = new Date().toISOString();
+    const dutyOfficer = user?.username || `operator.${role.toLowerCase()}`;
+
+    // 1. Instant optimistic state update for zero-latency UI reaction
+    setAlerts((prev) =>
+      prev.map((al) =>
+        al.id === alertId
+          ? {
+              ...al,
+              status: 'ACKNOWLEDGED',
+              acknowledged_by: dutyOfficer,
+              acknowledged_at: nowIso,
+            }
+          : al
+      )
+    );
+
+    // 2. Dispatch to backend/Supabase and reconcile
     try {
-      await api.acknowledgeAlert(alertId, `Acknowledged by ${role}`);
-      loadAlerts();
+      await api.acknowledgeAlert(alertId, `Acknowledged by ${dutyOfficer}`);
+      await loadAlerts();
     } catch (e) {
       console.error('Failed to acknowledge alert:', e);
+      await loadAlerts();
     }
   };
 
   const handleResolveAlert = async (alertId: string) => {
+    const nowIso = new Date().toISOString();
+
+    // 1. Instant optimistic state update for zero-latency UI reaction
+    setAlerts((prev) =>
+      prev.map((al) =>
+        al.id === alertId
+          ? {
+              ...al,
+              status: 'RESOLVED',
+              resolved_at: nowIso,
+            }
+          : al
+      )
+    );
+
+    // 2. Dispatch to backend/Supabase and reconcile
     try {
       await api.resolveAlert(alertId, `Resolved by ${role}`);
-      loadAlerts();
+      await loadAlerts();
     } catch (e) {
       console.error('Failed to resolve alert:', e);
+      await loadAlerts();
     }
   };
 

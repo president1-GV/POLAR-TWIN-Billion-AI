@@ -10,7 +10,7 @@ import { PolarRole, PolarPermission, RoleMetadata, getRoleMeta, hasPermission as
 import { ROLE_CREDENTIALS, api } from '../services/api';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://fpoxnocbznagepusczkk.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwb3hub2Niem5hZ2VwdXNjemtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1NTMyNTMsImV4cCI6MjEwNjEyOTI1M30.Np8y0hopJxoTHHY587rKDhKB0Jk6m95SxoS8owCL6qY';
 
 interface AuthContextType {
   user: UserProfile | null;

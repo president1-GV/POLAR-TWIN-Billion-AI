@@ -19,6 +19,8 @@ class StationAssetGraph:
         nodes = [
             {"id": "bh_fuel_tank_01", "name": "Polar Fuel Tank Alpha", "type": "FUEL", "criticality": "CRITICAL", "shed_priority": None},
             {"id": "bh_fuel_tank_02", "name": "Polar Fuel Tank Bravo", "type": "FUEL", "criticality": "CRITICAL", "shed_priority": None},
+            {"id": "bh_fuel_farm", "name": "Bharati Bulk Fuel Farm", "type": "FUEL", "criticality": "CRITICAL", "shed_priority": None},
+            {"id": "bh_fuel_station", "name": "Bharati Fuel Dispenser Station", "type": "FUEL", "criticality": "HIGH", "shed_priority": None},
             {"id": "bh_gen_01", "name": "Primary Genset 01", "type": "ENERGY", "criticality": "CRITICAL", "capacity_kw": 200.0, "shed_priority": None},
             {"id": "bh_gen_02", "name": "Auxiliary Genset 02", "type": "ENERGY", "criticality": "CRITICAL", "capacity_kw": 200.0, "shed_priority": None},
             {"id": "bh_gen_03", "name": "Emergency Genset 03", "type": "ENERGY", "criticality": "CRITICAL", "capacity_kw": 200.0, "shed_priority": None},
@@ -27,27 +29,80 @@ class StationAssetGraph:
             {"id": "bh_pdb_01", "name": "Central Switchgear PDB", "type": "ENERGY", "criticality": "CRITICAL", "shed_priority": None},
             {"id": "bh_hvac_01", "name": "Thermal Recovery HVAC", "type": "HVAC", "criticality": "CRITICAL", "load_kw": 62.0, "shed_priority": 3},
             {"id": "bh_water_01", "name": "Snow Melt & RO Plant", "type": "WATER", "criticality": "CRITICAL", "load_kw": 24.0, "freeze_risk_hours": 4.5, "shed_priority": 2},
+            {"id": "bh_seawater_pump", "name": "Coastal Sea-Water Intake Pump House", "type": "WATER", "criticality": "CRITICAL", "load_kw": 22.0, "freeze_risk_hours": 4.0, "shed_priority": 2},
             {"id": "bh_comms_01", "name": "Satellite Earth Station", "type": "COMMS", "criticality": "HIGH", "load_kw": 12.0, "shed_priority": 4},
-            {"id": "bh_lab_01", "name": "Atmospheric Science Lab", "type": "RESEARCH", "criticality": "MEDIUM", "load_kw": 28.0, "shed_priority": 1}
+            {"id": "bh_lab_01", "name": "Atmospheric Science Lab", "type": "RESEARCH", "criticality": "MEDIUM", "load_kw": 28.0, "shed_priority": 1},
+            {"id": "bh_summer_camp", "name": "Summer Camp Living Modules", "type": "LIVING", "criticality": "LOW", "load_kw": 35.0, "shed_priority": 1},
+            {"id": "bh_containers", "name": "Scientific & Utility Containers", "type": "STORAGE", "criticality": "LOW", "load_kw": 15.0, "shed_priority": 1},
+
+            # Register nodes for Maitri
+            {"id": "ma_fuel_farm", "name": "Maitri Bulk Fuel Farm & Catchment Berm", "type": "FUEL", "criticality": "CRITICAL", "shed_priority": None},
+            {"id": "ma_fuel_tank_01", "name": "Bulk Polar Fuel Storage Alpha", "type": "FUEL", "criticality": "CRITICAL", "shed_priority": None},
+            {"id": "ma_fuel_station", "name": "Maitri Polar Vehicle Dispenser", "type": "FUEL", "criticality": "HIGH", "shed_priority": None},
+            {"id": "ma_gen_01", "name": "Kirloskar 125 kVA Genset 01", "type": "ENERGY", "criticality": "CRITICAL", "capacity_kw": 100.0, "shed_priority": None},
+            {"id": "ma_gen_02", "name": "Kirloskar 125 kVA Genset 02", "type": "ENERGY", "criticality": "CRITICAL", "capacity_kw": 100.0, "shed_priority": None},
+            {"id": "ma_gen_03", "name": "Kirloskar 125 kVA Genset 03", "type": "ENERGY", "criticality": "CRITICAL", "capacity_kw": 100.0, "shed_priority": None},
+            {"id": "ma_wind_01", "name": "Micro-Wind Turbine Array (15kW)", "type": "ENERGY", "criticality": "MEDIUM", "capacity_kw": 15.0, "shed_priority": None},
+            {"id": "ma_pdb_01", "name": "Central Power Distribution Board", "type": "ENERGY", "criticality": "CRITICAL", "shed_priority": None},
+            {"id": "ma_boiler_01", "name": "Central Hydronic Space Heating Boiler", "type": "HVAC", "criticality": "CRITICAL", "load_kw": 32.0, "shed_priority": 3},
+            {"id": "ma_lake_pump", "name": "Lake Priyadarshini Submerged Intake Pump House", "type": "WATER", "criticality": "CRITICAL", "load_kw": 22.0, "freeze_risk_hours": 3.5, "shed_priority": 2},
+            {"id": "ma_water_pump_01", "name": "Shoreline Water Intake Pump Station", "type": "WATER", "criticality": "HIGH", "load_kw": 18.0, "freeze_risk_hours": 3.5, "shed_priority": 2},
+            {"id": "ma_water_tank_01", "name": "Potable Water Reservoir (40,000 L)", "type": "WATER", "criticality": "CRITICAL", "shed_priority": None},
+            {"id": "ma_comms_01", "name": "Inmarsat & HF Communications Array", "type": "COMMS", "criticality": "HIGH", "load_kw": 8.0, "shed_priority": 4},
+            {"id": "ma_lab_geo", "name": "Geomagnetic & Seismological Lab", "type": "RESEARCH", "criticality": "MEDIUM", "load_kw": 6.0, "shed_priority": 1},
+            {"id": "ma_garage_01", "name": "Vehicle Maintenance Garage & Sledge Depot", "type": "LOGISTICS", "criticality": "MEDIUM", "load_kw": 24.0, "shed_priority": 1},
+            {"id": "ma_summer_camp", "name": "Maitri Summer Camp Chalets", "type": "LIVING", "criticality": "LOW", "load_kw": 25.0, "shed_priority": 1},
+            {"id": "ma_containers", "name": "Field Science & Storage Pods", "type": "STORAGE", "criticality": "LOW", "load_kw": 10.0, "shed_priority": 1}
         ]
         for n in nodes:
             self.node_metadata[n["id"]] = n
             self.downstream_edges[n["id"]] = []
             self.upstream_edges[n["id"]] = []
 
-        # Register edges
+        # Register edges for Bharati and Maitri
         edges = [
+            # Bharati Supply & Power
+            ("bh_fuel_farm", "bh_fuel_tank_01", "SUPPLIES", 1.0),
+            ("bh_fuel_farm", "bh_fuel_tank_02", "SUPPLIES", 1.0),
+            ("bh_fuel_farm", "bh_fuel_station", "SUPPLIES", 0.9),
             ("bh_fuel_tank_01", "bh_gen_01", "SUPPLIES", 1.0),
             ("bh_fuel_tank_02", "bh_gen_02", "SUPPLIES", 1.0),
             ("bh_gen_01", "bh_pdb_01", "POWERS", 1.0),
             ("bh_gen_02", "bh_pdb_01", "POWERS", 1.0),
+            ("bh_gen_03", "bh_pdb_01", "POWERS", 1.0),
             ("bh_solar_01", "bh_pdb_01", "POWERS", 0.6),
             ("bh_bess_01", "bh_pdb_01", "SUPPORTS", 0.8),
             ("bh_pdb_01", "bh_hvac_01", "POWERS", 1.0),
             ("bh_pdb_01", "bh_water_01", "POWERS", 0.95),
+            ("bh_pdb_01", "bh_seawater_pump", "POWERS", 0.95),
+            ("bh_seawater_pump", "bh_water_01", "FEEDS", 1.0),
             ("bh_pdb_01", "bh_comms_01", "POWERS", 0.9),
             ("bh_pdb_01", "bh_lab_01", "POWERS", 0.7),
-            ("bh_gen_02", "bh_gen_01", "BACKS_UP", 1.0)
+            ("bh_pdb_01", "bh_summer_camp", "POWERS", 0.6),
+            ("bh_pdb_01", "bh_containers", "POWERS", 0.5),
+            ("bh_gen_02", "bh_gen_01", "BACKS_UP", 1.0),
+
+            # Maitri Supply & Power
+            ("ma_fuel_farm", "ma_fuel_tank_01", "SUPPLIES", 1.0),
+            ("ma_fuel_farm", "ma_fuel_station", "SUPPLIES", 0.9),
+            ("ma_fuel_tank_01", "ma_gen_01", "SUPPLIES", 1.0),
+            ("ma_fuel_tank_01", "ma_gen_02", "SUPPLIES", 1.0),
+            ("ma_fuel_tank_01", "ma_gen_03", "SUPPLIES", 1.0),
+            ("ma_gen_01", "ma_pdb_01", "POWERS", 1.0),
+            ("ma_gen_02", "ma_pdb_01", "POWERS", 1.0),
+            ("ma_gen_03", "ma_pdb_01", "POWERS", 1.0),
+            ("ma_wind_01", "ma_pdb_01", "POWERS", 0.5),
+            ("ma_pdb_01", "ma_boiler_01", "POWERS", 1.0),
+            ("ma_pdb_01", "ma_lake_pump", "POWERS", 0.95),
+            ("ma_pdb_01", "ma_water_pump_01", "POWERS", 0.95),
+            ("ma_lake_pump", "ma_water_tank_01", "FEEDS", 1.0),
+            ("ma_water_pump_01", "ma_water_tank_01", "PRESSURIZES", 0.9),
+            ("ma_pdb_01", "ma_comms_01", "POWERS", 0.9),
+            ("ma_pdb_01", "ma_lab_geo", "POWERS", 0.7),
+            ("ma_pdb_01", "ma_garage_01", "POWERS", 0.6),
+            ("ma_pdb_01", "ma_summer_camp", "POWERS", 0.6),
+            ("ma_pdb_01", "ma_containers", "POWERS", 0.5),
+            ("ma_gen_02", "ma_gen_01", "BACKS_UP", 1.0)
         ]
         for src, dst, rel, weight in edges:
             self.downstream_edges[src].append({"target": dst, "relationship": rel, "weight": weight})

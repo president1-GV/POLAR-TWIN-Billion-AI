@@ -7,16 +7,16 @@ import httpx
 STATION_COORDINATES = {
     "station_bharati": {
         "name": "Bharati Antarctic Station",
-        "latitude": -69.4078,
-        "longitude": 76.1872,
+        "latitude": -69.406833,
+        "longitude": 76.195333,
         "elevation": 35.0,
         "region": "Larsemann Hills"
     },
     "station_maitri": {
         "name": "Maitri Antarctic Station",
-        "latitude": -70.7661,
-        "longitude": 11.7322,
-        "elevation": 130.0,
+        "latitude": -70.764444,
+        "longitude": 11.734167,
+        "elevation": 50.0,
         "region": "Schirmacher Oasis"
     }
 }

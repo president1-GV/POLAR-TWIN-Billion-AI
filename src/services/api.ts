@@ -2,7 +2,7 @@ import { Station, StationAsset, EnvironmentObservation, Alert, LogisticsItem, Sh
 
 const API_BASE = '/api';
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://fpoxnocbznagepusczkk.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwb3hub2Niem5hZ2VwdXNjemtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1NTMyNTMsImV4cCI6MjEwNjEyOTI1M30.Np8y0hopJxoTHHY587rKDhKB0Jk6m95SxoS8owCL6qY';
 
 // Helper for direct Supabase PostgREST queries (only when anon key provided)
 async function supabaseFetch(endpoint: string, options: RequestInit = {}): Promise<any> {
@@ -27,6 +27,51 @@ async function supabaseFetch(endpoint: string, options: RequestInit = {}): Promi
   }
   const text = await res.text();
   return text ? JSON.parse(text) : null;
+}
+
+// Persistent and in-memory alert overrides to guarantee instant responsive state across offline/online/air-gap
+const ALERTS_OVERRIDE_STORAGE_KEY = 'polar_twin_alerts_overrides';
+
+function getStoredAlertOverrides(): Record<string, Partial<Alert>> {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem(ALERTS_OVERRIDE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function saveAlertOverride(alertId: string, override: Partial<Alert>) {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getStoredAlertOverrides();
+    current[alertId] = { ...(current[alertId] || {}), ...override };
+    localStorage.setItem(ALERTS_OVERRIDE_STORAGE_KEY, JSON.stringify(current));
+  } catch (_) {}
+}
+
+function isValidUuid(id: string): boolean {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+}
+
+function safeParseEvidence(evidence: any): string[] {
+  if (!evidence) return [];
+  if (Array.isArray(evidence)) return evidence;
+  if (typeof evidence === 'string') {
+    try {
+      const parsed = JSON.parse(evidence);
+      if (Array.isArray(parsed)) return parsed;
+      if (typeof parsed === 'string') {
+        const doubleParsed = JSON.parse(parsed);
+        if (Array.isArray(doubleParsed)) return doubleParsed;
+      }
+      return [parsed.toString()];
+    } catch (_) {
+      return [evidence];
+    }
+  }
+  return [];
 }
 
 // In-memory demo state for client-side deterministic killer demo execution
@@ -1537,31 +1582,54 @@ export const api = {
 
   // 6. Alerts
   async getAlerts(stationId?: string, status?: string): Promise<Alert[]> {
+    const overrides = getStoredAlertOverrides();
+
+    // 1. Try FastAPI backend
     try {
       const params = new URLSearchParams();
       if (stationId) params.append('station_id', stationId);
-      if (status) params.append('status', status);
+      if (status) params.append('status_filter', status);
       const res = await backendFetch(`/alerts?${params.toString()}`);
-      if (res.ok) return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          return data.map((r: any) => {
+            const ov = overrides[r.id];
+            return {
+              ...r,
+              evidence: safeParseEvidence(r.evidence),
+              ...(ov || {}),
+            };
+          });
+        }
+      }
     } catch (_) {}
 
+    // 2. Try Supabase PostgREST direct query
     try {
-      let query = 'alerts?select=*';
+      let query = 'alerts?select=*&order=created_at.desc';
       if (stationId) query += `&station_id=eq.${stationId}`;
       if (status) query += `&status=eq.${status}`;
       const rows = await supabaseFetch(query);
       if (rows && rows.length > 0) {
-        return rows.map((r: any) => ({
-          ...r,
-          evidence: typeof r.evidence === 'string' ? JSON.parse(r.evidence) : r.evidence,
-        }));
+        return rows.map((r: any) => {
+          const ov = overrides[r.id];
+          return {
+            ...r,
+            evidence: safeParseEvidence(r.evidence),
+            ...(ov || {}),
+          };
+        });
       }
-    } catch (_) {}
+    } catch (e) {
+      console.warn('Supabase getAlerts fallback:', e);
+    }
 
-    return [
+    // 3. Fallback deterministic seed alerts
+    const fallbackAlerts: Alert[] = [
       {
-        id: 'alert_live_01',
-        station_id: stationId || 'station_bharati',
+        id: '7977f5a1-8ca5-4f1d-83f7-64adf2af6cba',
+        station_id: 'station_bharati',
         asset_id: 'bh_gen_01',
         title: 'Generator Bearing High-Frequency Micro-Vibration Anomaly',
         severity: 'WARNING',
@@ -1570,12 +1638,47 @@ export const api = {
         evidence: ['Vibration 4.82 mm/s (ISO limit 4.5 mm/s)', 'Exhaust Temp 468°C (+22% drift)'],
         predicted_consequence: 'Impending turbocharger bearing mechanical seizure within 4.2 operating hours',
         recommended_action: 'Perform hot transfer to Aux Genset 02 and inspect injector lubrication',
-        created_at: new Date().toISOString(),
+        created_at: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+      },
+      {
+        id: 'e8fa54e7-cc71-49ed-a92d-95d652d39c15',
+        station_id: 'station_maitri',
+        asset_id: 'ma_gen_01',
+        title: 'Generator Bearing High-Frequency Micro-Vibration Anomaly',
+        severity: 'WARNING',
+        status: 'ACTIVE',
+        source_type: 'PHYSICS_SYNTHETIC',
+        evidence: ['Vibration 4.82 mm/s (ISO limit 4.5 mm/s)', 'Exhaust Temp 468°C (+22% drift)'],
+        predicted_consequence: 'Impending turbocharger bearing mechanical seizure within 4.2 operating hours',
+        recommended_action: 'Perform hot transfer to Aux Genset 02 and inspect injector lubrication',
+        created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
       },
     ];
+
+    const filtered = stationId ? fallbackAlerts.filter((a) => a.station_id === stationId) : fallbackAlerts;
+    const finalAlerts = filtered.map((a) => {
+      const ov = overrides[a.id];
+      return ov ? { ...a, ...ov } : a;
+    });
+
+    if (status) {
+      return finalAlerts.filter((a) => a.status === status);
+    }
+    return finalAlerts;
   },
 
   async acknowledgeAlert(alertId: string, notes: string = 'Acknowledged via command center'): Promise<any> {
+    const nowIso = new Date().toISOString();
+    const currentUser = activeSessionUser?.username || 'operator.sharma';
+
+    // Persist locally immediately to guarantee instant responsive state
+    saveAlertOverride(alertId, {
+      status: 'ACKNOWLEDGED',
+      acknowledged_by: currentUser,
+      acknowledged_at: nowIso,
+    });
+
+    // 1. Try FastAPI backend
     try {
       const res = await backendFetch(`/alerts/${alertId}/acknowledge`, {
         method: 'POST',
@@ -1584,17 +1687,43 @@ export const api = {
       if (res.ok) return await res.json();
     } catch (_) {}
 
-    try {
-      await supabaseFetch(`alerts?id=eq.${alertId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: 'ACKNOWLEDGED' }),
-      });
-    } catch (_) {}
+    // 2. Try Supabase PostgREST direct PATCH if valid UUID
+    if (isValidUuid(alertId)) {
+      try {
+        await supabaseFetch(`alerts?id=eq.${alertId}`, {
+          method: 'PATCH',
+          headers: { 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            status: 'ACKNOWLEDGED',
+            acknowledged_by: currentUser,
+            acknowledged_at: nowIso,
+          }),
+        });
+      } catch (e) {
+        console.warn('Supabase acknowledgeAlert fallback:', e);
+      }
+    }
 
-    return { status: 'ACKNOWLEDGED', alert_id: alertId, notes };
+    return {
+      status: 'ACKNOWLEDGED',
+      alert_id: alertId,
+      acknowledged_by: currentUser,
+      acknowledged_at: nowIso,
+      notes,
+    };
   },
 
   async resolveAlert(alertId: string, notes: string = 'Resolved via command center'): Promise<any> {
+    const nowIso = new Date().toISOString();
+    const currentUser = activeSessionUser?.username || 'operator.sharma';
+
+    // Persist locally immediately to guarantee instant responsive state
+    saveAlertOverride(alertId, {
+      status: 'RESOLVED',
+      resolved_at: nowIso,
+    });
+
+    // 1. Try FastAPI backend
     try {
       const res = await backendFetch(`/alerts/${alertId}/resolve`, {
         method: 'POST',
@@ -1603,14 +1732,29 @@ export const api = {
       if (res.ok) return await res.json();
     } catch (_) {}
 
-    try {
-      await supabaseFetch(`alerts?id=eq.${alertId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: 'RESOLVED' }),
-      });
-    } catch (_) {}
+    // 2. Try Supabase PostgREST direct PATCH if valid UUID
+    if (isValidUuid(alertId)) {
+      try {
+        await supabaseFetch(`alerts?id=eq.${alertId}`, {
+          method: 'PATCH',
+          headers: { 'Prefer': 'return=representation' },
+          body: JSON.stringify({
+            status: 'RESOLVED',
+            resolved_at: nowIso,
+          }),
+        });
+      } catch (e) {
+        console.warn('Supabase resolveAlert fallback:', e);
+      }
+    }
 
-    return { status: 'RESOLVED', alert_id: alertId, notes };
+    return {
+      status: 'RESOLVED',
+      alert_id: alertId,
+      resolved_by: currentUser,
+      resolved_at: nowIso,
+      notes,
+    };
   },
 
   // 7. Emergency Simulations
