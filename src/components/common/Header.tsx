@@ -113,7 +113,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      <header className="h-16 bg-polar-surface border-b border-polar-border px-2 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between shadow-sm transition-colors w-full max-w-full overflow-hidden">
+      <header className="h-16 bg-polar-surface border-b border-polar-border px-2 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between shadow-sm transition-colors w-full max-w-full relative z-30">
         {/* LEFT: Branding & First-Class Station Context */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Brand Identity arranged cleanly inside dedicated professional border */}
