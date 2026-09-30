@@ -61,6 +61,9 @@ export interface PolarMaterialLibrary {
   thermalNormal: THREE.MeshStandardMaterial;
   thermalWarm: THREE.MeshStandardMaterial;
   thermalHot: THREE.MeshStandardMaterial;
+  ghostTranslucent: THREE.MeshStandardMaterial;
+  telemetryBackdrop: THREE.MeshStandardMaterial;
+  flowHighlighted: THREE.MeshStandardMaterial;
 
   // Interactive Selection Highlights
   selectedOutline: THREE.MeshBasicMaterial;
@@ -392,6 +395,32 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
     roughness: 0.4,
   });
 
+  const ghostTranslucent = new THREE.MeshStandardMaterial({
+    color: 0x334155,
+    roughness: 0.35,
+    metalness: 0.7,
+    transparent: true,
+    opacity: 0.22,
+    depthWrite: false,
+  });
+
+  const telemetryBackdrop = new THREE.MeshStandardMaterial({
+    color: 0x0F172A,
+    roughness: 0.75,
+    metalness: 0.25,
+    transparent: true,
+    opacity: 0.38,
+    depthWrite: false,
+  });
+
+  const flowHighlighted = new THREE.MeshStandardMaterial({
+    color: 0x22D3EE,
+    emissive: new THREE.Color(0x0891B2),
+    emissiveIntensity: 0.75,
+    roughness: 0.2,
+    metalness: 0.8,
+  });
+
   // Selection
   const selectedOutline = new THREE.MeshBasicMaterial({
     color: 0x22D3EE,
@@ -476,6 +505,9 @@ export function createPolarMaterialLibrary(): PolarMaterialLibrary {
     thermalNormal,
     thermalWarm,
     thermalHot,
+    ghostTranslucent,
+    telemetryBackdrop,
+    flowHighlighted,
     selectedOutline,
     hoverHighlight,
     missionLogoBadge,
