@@ -21,6 +21,7 @@ import { DigitalTwinToolbar } from './components/DigitalTwinToolbar';
 import { EquipmentInspector } from './components/EquipmentInspector';
 import { WhatIfSimulationModal } from './components/WhatIfSimulationModal';
 import { GeolocationValidationModal } from './components/GeolocationValidationModal';
+import { CausalChainModal } from './components/CausalChainModal';
 import { DigitalTwinHUD } from './components/DigitalTwinHUD';
 import { TwinAssetLabel } from '../../components/ui/TwinAssetLabel';
 import { useTheme } from '../../context/ThemeContext';
@@ -148,6 +149,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
 
   // Geolocation & Spatial Model Audit Modal
   const [isGeolocModalOpen, setIsGeolocModalOpen] = useState(false);
+
+  // 10-Link Cross-Domain Causal Chain Modal
+  const [isCausalModalOpen, setIsCausalModalOpen] = useState(false);
 
   // What-If Simulation State
   const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
@@ -642,6 +646,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
         lightingViewMode={lightingViewMode}
         onLightingViewModeChange={setLightingViewMode}
         onOpenGeolocAudit={() => setIsGeolocModalOpen(true)}
+        onOpenCausalChain={() => setIsCausalModalOpen(true)}
         measurementResult={measurementResult}
         measuringActive={measuringActive}
         onClearMeasurement={handleClearMeasurement}
@@ -711,6 +716,13 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       <GeolocationValidationModal
         isOpen={isGeolocModalOpen}
         onClose={() => setIsGeolocModalOpen(false)}
+        stationId={stationId}
+      />
+
+      {/* 10-Link Cross-Domain Causal Chain Forensic Modal */}
+      <CausalChainModal
+        isOpen={isCausalModalOpen}
+        onClose={() => setIsCausalModalOpen(false)}
         stationId={stationId}
       />
     </div>

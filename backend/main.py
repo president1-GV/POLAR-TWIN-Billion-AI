@@ -18,6 +18,8 @@ from backend.api.audit import router as audit_router
 from backend.api.analytics import router as analytics_router
 from backend.api.auth import router as auth_router
 from backend.api.data_engineering import router as data_engineering_router
+from backend.app.api.canonical import router as canonical_router
+from backend.app.api.optimization import router as optimization_router
 
 app = FastAPI(
     title="POLAR-TWIN API",
@@ -90,6 +92,8 @@ app.include_router(audit_router, prefix="/api")
 app.include_router(analytics_router, prefix="/api")
 app.include_router(auth_router, prefix="/api")
 app.include_router(data_engineering_router, prefix="/api")
+app.include_router(canonical_router, prefix="/api")
+app.include_router(optimization_router, prefix="/api")
 
 @app.get("/")
 def root():

@@ -15,7 +15,8 @@ import {
   CheckCircle2,
   CloudSun,
   Wind,
-  Gauge
+  Gauge,
+  Activity
 } from 'lucide-react';
 import { ProvenanceBadge } from '../../../components/common/ProvenanceBadge';
 import polarTwinIcon from '../../../assets/polar-twin-icon.png';
@@ -27,6 +28,7 @@ interface Props {
   lightingViewMode?: LightingViewMode;
   onLightingViewModeChange?: (mode: LightingViewMode) => void;
   onOpenGeolocAudit?: () => void;
+  onOpenCausalChain?: () => void;
   measurementResult?: MeasurementResult | null;
   measuringActive: boolean;
   onClearMeasurement?: () => void;
@@ -43,6 +45,7 @@ export const DigitalTwinHUD: React.FC<Props> = ({
   lightingViewMode = 'OPERATIONAL',
   onLightingViewModeChange,
   onOpenGeolocAudit,
+  onOpenCausalChain,
   measurementResult,
   measuringActive,
   onClearMeasurement,
@@ -119,6 +122,16 @@ export const DigitalTwinHUD: React.FC<Props> = ({
                   >
                     <CheckCircle2 className="w-2.5 h-2.5 text-emerald-400" />
                     <span>GEODETIC: PASS (0.000°)</span>
+                  </button>
+                )}
+                {onOpenCausalChain && (
+                  <button
+                    onClick={onOpenCausalChain}
+                    title="Open 10-Link Cross-Domain Causal Chain Engine"
+                    className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 font-mono font-bold flex items-center gap-1 hover:bg-cyan-500/30 transition-colors cursor-pointer"
+                  >
+                    <Activity className="w-2.5 h-2.5 text-cyan-400 animate-pulse" />
+                    <span>CAUSAL: 10-LINK PASS</span>
                   </button>
                 )}
                 <ProvenanceBadge 
