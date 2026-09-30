@@ -82,6 +82,10 @@ let edgeSequenceCounter = 1420;
 
 // Zero-Trust Session Storage & Active Personnel Credentials
 export const ROLE_CREDENTIALS: Record<string, { username: string; password?: string; mfa_code?: string; name: string; station: string }> = {
+  DUTY_OPERATOR: { username: 'operator.sharma', password: 'PolarOps@2026!', name: 'V. Sharma', station: 'station_bharati' },
+  BASE_ENGINEER: { username: 'engineer.deshmukh', password: 'AntarcticEng#1', name: 'A. Deshmukh', station: 'station_bharati' },
+  EXPEDITION_CMDR: { username: 'commander.nair', password: 'BaseCommander$9', mfa_code: '123456', name: 'Col. R. Nair', station: 'station_bharati' },
+  MISSION_CONTROL: { username: 'controller.raman', password: 'MissionCtrl#2026', mfa_code: '123456', name: 'K. Raman (Flight Controller)', station: 'GLOBAL' },
   OPERATOR: { username: 'operator.sharma', password: 'PolarOps@2026!', name: 'V. Sharma', station: 'station_bharati' },
   ENGINEER: { username: 'engineer.deshmukh', password: 'AntarcticEng#1', name: 'A. Deshmukh', station: 'station_bharati' },
   COMMANDER: { username: 'commander.nair', password: 'BaseCommander$9', mfa_code: '123456', name: 'Col. R. Nair', station: 'station_bharati' },
@@ -206,6 +210,62 @@ export const api = {
     const fallbackUser = { id: `usr_${creds.username}`, username: creds.username, role, station: creds.station, name: creds.name };
     setSessionAuth(`mock_offline_${role.toLowerCase()}`, fallbackUser);
     return { authenticated: true, user: fallbackUser };
+  },
+
+  async impersonateUser(targetUsername: string): Promise<any> {
+    const res = await backendFetch('/auth/impersonate', {
+      method: 'POST',
+      body: JSON.stringify({ target_username: targetUsername })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setSessionAuth(data.token, data.user);
+      return data;
+    }
+    // Offline / fallback impersonation for standalone UI demonstration
+    const creds = Object.values(ROLE_CREDENTIALS).find(c => c.username === targetUsername);
+    if (creds) {
+      const targetRole = Object.keys(ROLE_CREDENTIALS).find(k => ROLE_CREDENTIALS[k].username === targetUsername) || 'DUTY_OPERATOR';
+      const fakeImpersonatedUser = {
+        id: `usr_${creds.username}`,
+        username: creds.username,
+        role: targetRole,
+        canonical_role: targetRole,
+        station: creds.station,
+        name: creds.name,
+        is_impersonating: true,
+        impersonated_by: 'admin.ncpor'
+      };
+      setSessionAuth(`mock_impersonation_${targetUsername}_${Date.now()}`, fakeImpersonatedUser);
+      return { authenticated: true, user: fakeImpersonatedUser };
+    }
+    throw new Error('Failed to impersonate user');
+  },
+
+  async stopImpersonating(): Promise<any> {
+    try {
+      const res = await backendFetch('/auth/stop-impersonate', {
+        method: 'POST'
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSessionAuth(data.token, data.user);
+        return data;
+      }
+    } catch (_) {}
+    // Revert to admin.ncpor
+    const adminCreds = ROLE_CREDENTIALS.ADMIN;
+    const adminUser = {
+      id: `usr_${adminCreds.username}`,
+      username: adminCreds.username,
+      role: 'ADMIN',
+      canonical_role: 'ADMIN',
+      station: adminCreds.station,
+      name: adminCreds.name,
+      is_impersonating: false
+    };
+    setSessionAuth(`mock_offline_admin_${Date.now()}`, adminUser);
+    return { authenticated: true, user: adminUser };
   },
 
   // 1. Stations & Digital Twin

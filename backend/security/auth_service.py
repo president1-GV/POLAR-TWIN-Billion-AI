@@ -2,6 +2,7 @@ import time
 import uuid
 from typing import Dict, Any, List, Optional
 from backend.security.crypto import hash_password, verify_password, sign_session_token, verify_session_token
+from backend.security.audit_service import security_audit_logger
 
 # Pre-hashed default user credentials with PBKDF2-HMAC-SHA256
 # Passwords:
@@ -19,6 +20,7 @@ def _init_users():
         {"username": "operator.sharma", "name": "V. Sharma", "role": "OPERATOR", "station": "station_bharati", "pwd": "PolarOps@2026!"},
         {"username": "engineer.deshmukh", "name": "A. Deshmukh", "role": "ENGINEER", "station": "station_bharati", "pwd": "AntarcticEng#1"},
         {"username": "commander.nair", "name": "Col. R. Nair", "role": "SUPERVISOR", "station": "station_bharati", "pwd": "BaseCommander$9"},
+        {"username": "controller.raman", "name": "K. Raman (Flight Controller)", "role": "MISSION_CONTROL", "station": "GLOBAL", "pwd": "MissionCtrl#2026"},
         {"username": "analyst.patel", "name": "Dr. K. Patel", "role": "ANALYST", "station": "station_maitri", "pwd": "PolarData*2026"},
         {"username": "admin.ncpor", "name": "NCPOR Mission Control Admin", "role": "ADMIN", "station": "GLOBAL", "pwd": "NcporMissionControl!2026"},
         {"username": "viewer.guest", "name": "Scientific Guest", "role": "VIEWER", "station": "GLOBAL", "pwd": "PolarGuest@View1"}
@@ -33,7 +35,7 @@ def _init_users():
             "station": u["station"],
             "password_hash": h,
             "salt": s,
-            "mfa_enabled": u["role"] in ["SUPERVISOR", "ADMIN"],
+            "mfa_enabled": u["role"] in ["SUPERVISOR", "COMMANDER", "EXPEDITION_CMDR", "MISSION_CONTROL", "ADMIN"],
             "mfa_secret": "JBSWY3DPEHPK3PXP",  # standard base32 test secret
             "created_at": "2026-01-01T00:00:00Z"
         }
@@ -81,20 +83,47 @@ class AuthenticationService:
         return user
 
     @staticmethod
-    def create_session(user: Dict[str, Any], client_ip: str = "127.0.0.1", user_agent: str = "unknown") -> Dict[str, Any]:
+    def create_session(
+        user: Dict[str, Any],
+        client_ip: str = "127.0.0.1",
+        user_agent: str = "unknown",
+        is_impersonating: bool = False,
+        impersonated_by: Optional[str] = None,
+        original_role: Optional[str] = None
+    ) -> Dict[str, Any]:
         """
-        Create a new cryptographically bound session with rotation capability.
+        Create a new cryptographically bound session with rotation capability,
+        enriched with operational authority, station scope, and domain scope.
         """
+        # Lazy import to avoid circular dependency
+        from backend.security.rbac import normalize_role, OPERATIONAL_AUTHORITIES, DOMAIN_SCOPES
+
         session_id = str(uuid.uuid4())
         now = time.time()
         exp = now + SESSION_DURATION_SECONDS
+
+        canonical_role = normalize_role(user["role"])
+        operational_authority = OPERATIONAL_AUTHORITIES.get(canonical_role, "OBSERVATION_ONLY")
+        domain_scope = DOMAIN_SCOPES.get(canonical_role, [])
+
+        if canonical_role in ["ADMIN", "MISSION_CONTROL"] or user.get("station") == "GLOBAL":
+            station_scope = ["station_bharati", "station_maitri"]
+        else:
+            station_scope = [user.get("station", "station_bharati")]
 
         session_record = {
             "session_id": session_id,
             "user_id": user["id"],
             "username": user["username"],
             "role": user["role"],
+            "canonical_role": canonical_role,
             "station": user["station"],
+            "station_scope": station_scope,
+            "domain_scope": domain_scope,
+            "operational_authority": operational_authority,
+            "is_impersonating": is_impersonating,
+            "impersonated_by": impersonated_by,
+            "original_role": original_role,
             "client_ip": client_ip,
             "user_agent": user_agent,
             "created_at": now,
@@ -109,7 +138,13 @@ class AuthenticationService:
             "sub": user["id"],
             "username": user["username"],
             "role": user["role"],
+            "canonical_role": canonical_role,
             "station": user["station"],
+            "station_scope": station_scope,
+            "domain_scope": domain_scope,
+            "operational_authority": operational_authority,
+            "is_impersonating": is_impersonating,
+            "impersonated_by": impersonated_by,
             "sid": session_id,
             "iat": int(now),
             "exp": int(exp)
@@ -120,13 +155,24 @@ class AuthenticationService:
             "token": token,
             "session_id": session_id,
             "expires_at": exp,
+            "station_scope": station_scope,
+            "domain_scope": domain_scope,
+            "operational_authority": operational_authority,
+            "is_impersonating": is_impersonating,
+            "impersonated_by": impersonated_by,
             "user": {
                 "id": user["id"],
                 "username": user["username"],
                 "name": user["name"],
                 "role": user["role"],
+                "canonical_role": canonical_role,
                 "station": user["station"],
-                "mfa_enabled": user.get("mfa_enabled", False)
+                "station_scope": station_scope,
+                "domain_scope": domain_scope,
+                "operational_authority": operational_authority,
+                "mfa_enabled": user.get("mfa_enabled", False),
+                "is_impersonating": is_impersonating,
+                "impersonated_by": impersonated_by
             }
         }
 
@@ -186,5 +232,96 @@ class AuthenticationService:
     @staticmethod
     def get_user_by_username(username: str) -> Optional[Dict[str, Any]]:
         return USER_DATABASE.get(username)
+
+    @staticmethod
+    def impersonate_user(
+        admin_username: str,
+        target_username: str,
+        client_ip: str = "127.0.0.1",
+        user_agent: str = "unknown"
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Administrative identity impersonation (ADMIN ONLY).
+        Permits security audits, operational inspections, and troubleshooting
+        through another role's lens while logging full forensic audit trails.
+        """
+        from backend.security.rbac import normalize_role
+
+        admin_user = USER_DATABASE.get(admin_username)
+        if not admin_user or normalize_role(admin_user.get("role")) != "ADMIN":
+            security_audit_logger.log_event(
+                action="UNAUTHORIZED_IMPERSONATION_ATTEMPT",
+                actor_id=admin_username,
+                role=admin_user.get("role", "UNKNOWN") if admin_user else "UNKNOWN",
+                client_ip=client_ip,
+                status="BLOCKED",
+                details={"target_username": target_username, "reason": "Non-admin attempted impersonation"}
+            )
+            return None
+
+        target_user = USER_DATABASE.get(target_username)
+        if not target_user:
+            return None
+
+        session_ctx = AuthenticationService.create_session(
+            user=target_user,
+            client_ip=client_ip,
+            user_agent=user_agent,
+            is_impersonating=True,
+            impersonated_by=admin_username,
+            original_role="ADMIN"
+        )
+
+        security_audit_logger.log_event(
+            action="ADMIN_IMPERSONATION_STARTED",
+            actor_id=admin_username,
+            role="ADMIN",
+            station_id=target_user.get("station", "GLOBAL"),
+            client_ip=client_ip,
+            status="SUCCESS",
+            details={
+                "target_username": target_username,
+                "target_role": target_user.get("role"),
+                "impersonated_session_id": session_ctx["session_id"]
+            }
+        )
+
+        return session_ctx
+
+    @staticmethod
+    def stop_impersonating(session_id: str, client_ip: str = "127.0.0.1") -> Optional[Dict[str, Any]]:
+        """
+        Terminate active impersonation session and revert to authenticated administrator.
+        """
+        session = ACTIVE_SESSIONS.get(session_id)
+        if not session or not session.get("is_impersonating"):
+            return None
+
+        admin_username = session.get("impersonated_by", "admin.ncpor")
+        target_username = session.get("username")
+
+        # Invalidate the impersonated session immediately
+        AuthenticationService.revoke_session(session_id)
+
+        security_audit_logger.log_event(
+            action="ADMIN_IMPERSONATION_TERMINATED",
+            actor_id=admin_username,
+            role="ADMIN",
+            client_ip=client_ip,
+            status="SUCCESS",
+            details={
+                "terminated_session_id": session_id,
+                "previous_target_username": target_username
+            }
+        )
+
+        admin_user = USER_DATABASE.get(admin_username)
+        if not admin_user:
+            return None
+
+        return AuthenticationService.create_session(
+            user=admin_user,
+            client_ip=client_ip
+        )
 
 auth_service = AuthenticationService()

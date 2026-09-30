@@ -22,6 +22,10 @@ class SessionRevocationPayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
     session_id: str
 
+class ImpersonatePayload(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    target_username: str = Field(..., min_length=3, max_length=64)
+
 @router.get("/roles")
 def get_roles():
     """Retrieve RBAC role capabilities and hierarchy."""
@@ -112,12 +116,19 @@ def login(payload: LoginPayload, request: Request):
 
 @router.get("/me")
 def get_current_user_profile(current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Retrieve verified profile of the active session."""
+    """Retrieve verified profile of the active session with operational authority and scopes."""
+    from backend.security.rbac import normalize_role
     return {
         "user_id": current_user.get("sub"),
         "username": current_user.get("username"),
         "role": current_user.get("role"),
+        "canonical_role": current_user.get("canonical_role", normalize_role(current_user.get("role"))),
         "station": current_user.get("station"),
+        "station_scope": current_user.get("station_scope", [current_user.get("station", "station_bharati")]),
+        "domain_scope": current_user.get("domain_scope", []),
+        "operational_authority": current_user.get("operational_authority", "OBSERVATION_ONLY"),
+        "is_impersonating": current_user.get("is_impersonating", False),
+        "impersonated_by": current_user.get("impersonated_by"),
         "session_id": current_user.get("sid"),
         "expires_at": current_user.get("exp")
     }
@@ -163,10 +174,10 @@ def revoke_all_sessions(current_user: Dict[str, Any] = Depends(get_current_user)
     }
 
 @router.get("/active-sessions")
-def list_active_sessions(current_user: Dict[str, Any] = Depends(require_permission("*"))):
+def list_active_sessions(current_user: Dict[str, Any] = Depends(require_permission("security_admin"))):
     """
     Administrative inspection of all active server-managed sessions.
-    Requires ADMIN or SUPERVISOR role.
+    Strictly requires ADMIN role (platform governance).
     """
     return [
         {
@@ -177,8 +188,63 @@ def list_active_sessions(current_user: Dict[str, Any] = Depends(require_permissi
             "client_ip": s.get("client_ip"),
             "created_at": s.get("created_at"),
             "last_active": s.get("last_active"),
-            "is_active": s.get("is_active")
+            "is_active": s.get("is_active"),
+            "is_impersonating": s.get("is_impersonating", False),
+            "impersonated_by": s.get("impersonated_by")
         }
         for sid, s in ACTIVE_SESSIONS.items()
         if s.get("is_active")
     ]
+
+@router.post("/impersonate")
+def impersonate(
+    payload: ImpersonatePayload,
+    request: Request,
+    current_user: Dict[str, Any] = Depends(require_permission("impersonate_user"))
+):
+    """
+    Administrative role impersonation (ADMIN ONLY).
+    Allows an administrator to inspect and operate the platform through another role's lens
+    with persistent audit logging and visible impersonation indicators.
+    """
+    admin_username = current_user.get("username", "admin.ncpor")
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    user_agent = request.headers.get("user-agent", "unknown")
+
+    session_ctx = auth_service.impersonate_user(
+        admin_username=admin_username,
+        target_username=payload.target_username,
+        client_ip=client_ip,
+        user_agent=user_agent
+    )
+    if not session_ctx:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Target identity '{payload.target_username}' not found or cannot be impersonated."
+        )
+    return session_ctx
+
+@router.post("/stop-impersonate")
+def stop_impersonate(
+    request: Request,
+    current_user: Dict[str, Any] = Depends(get_current_user)
+):
+    """
+    Stop active impersonation and revert to authenticated administrator identity.
+    """
+    sid = current_user.get("sid")
+    is_imp = current_user.get("is_impersonating", False)
+    if not is_imp:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current session is not an active impersonation session."
+        )
+
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    admin_session_ctx = auth_service.stop_impersonating(sid, client_ip=client_ip)
+    if not admin_session_ctx:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to restore administrator session."
+        )
+    return admin_session_ctx
