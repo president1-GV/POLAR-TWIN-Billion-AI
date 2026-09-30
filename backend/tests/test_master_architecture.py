@@ -18,6 +18,7 @@ from backend.app.services.canonical_state import canonical_state_service
 from backend.app.simulation.isolated_engine import isolated_simulation_engine
 from backend.app.audit.audit_service import immutable_audit_service
 from backend.app.ingestion.telemetry_ingest import telemetry_ingestion_engine
+from backend.database.supabase_client import supabase_client
 
 
 class TestMasterArchitectureSpecification(unittest.TestCase):
