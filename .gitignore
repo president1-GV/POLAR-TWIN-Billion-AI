@@ -36,3 +36,6 @@ supabase/.temp/
 .idea/
 .DS_Store
 Thumbs.db
+
+# Test artifacts
+LLM/datasets/raw/ds_test_temp*
