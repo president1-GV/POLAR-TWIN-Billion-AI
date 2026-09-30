@@ -35,6 +35,13 @@ import { LoadingSkeleton } from '../../components/ui/LoadingSkeleton';
 import { TelemetryMetric } from '../../components/ui/TelemetryMetric';
 import { MissionSummary } from '../../components/ui/MissionSummary';
 import { CommandButton } from '../../components/ui/CommandButton';
+import { useAuth } from '../../context/AuthContext';
+import { toCanonicalRole } from '../../services/rbac';
+import { DutyOperatorCommandCenter } from './DutyOperatorCommandCenter';
+import { BaseEngineerCommandCenter } from './BaseEngineerCommandCenter';
+import { ExpeditionCommanderCommandCenter } from './ExpeditionCommanderCommandCenter';
+import { MissionControlCommandCenter } from './MissionControlCommandCenter';
+import { AdminConsole } from './AdminConsole';
 
 interface Props {
   currentStationId?: string;
@@ -47,6 +54,25 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
   onNavigate, 
   onSelectStation 
 }) => {
+  const { role } = useAuth();
+  const canonical = toCanonicalRole(role);
+
+  if (canonical === 'DUTY_OPERATOR') {
+    return <DutyOperatorCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
+  }
+  if (canonical === 'BASE_ENGINEER') {
+    return <BaseEngineerCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
+  }
+  if (canonical === 'EXPEDITION_CMDR') {
+    return <ExpeditionCommanderCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
+  }
+  if (canonical === 'MISSION_CONTROL') {
+    return <MissionControlCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
+  }
+  if (canonical === 'ADMIN') {
+    return <AdminConsole currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
+  }
+
   const [stations, setStations] = useState<any[]>([]);
   const [activeStationId, setActiveStationId] = useState<string>(currentStationId);
   const [loading, setLoading] = useState(true);

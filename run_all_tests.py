@@ -13,6 +13,7 @@ TEST_MODULES = [
     ("10-Link Causal Chain & 15 Canonical Domains Suite", "backend.tests.test_causal_chain"),
     ("Master Technical Architecture & Specification Suite (7 Tests)", "backend.tests.test_master_architecture"),
     ("Smart Automation Closed-Loop & Evaluator Suite (12 Tests)", "backend.tests.test_smart_automation"),
+    ("Zero-Trust Operational Authority & Security Matrix (7 Tests)", "backend.tests.test_operational_authority"),
     ("Data Engineering Core & ML Acceptance Suite (70 Tests)", "LLM.tests.test_master_data_pipeline")
 ]
 

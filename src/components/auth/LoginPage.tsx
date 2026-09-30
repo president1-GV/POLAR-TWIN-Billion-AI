@@ -220,42 +220,51 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onReturnHo
                   ONE-CLICK
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 text-xs">
                 <button
                   type="button"
                   disabled={isSubmitting}
-                  onClick={() => handleQuickPreset('OPERATOR')}
+                  onClick={() => handleQuickPreset('DUTY_OPERATOR')}
                   className="p-2.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
-                  <p className="font-bold text-cyan-700 dark:text-cyan-300 text-[11px] group-hover:text-cyan-600 dark:group-hover:text-cyan-200">Duty Operator</p>
+                  <p className="font-bold text-cyan-700 dark:text-cyan-300 text-[11px] group-hover:text-cyan-600 dark:group-hover:text-cyan-200">1. Duty Operator</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">V. Sharma (Bharati)</p>
                 </button>
                 <button
                   type="button"
                   disabled={isSubmitting}
-                  onClick={() => handleQuickPreset('ENGINEER')}
+                  onClick={() => handleQuickPreset('BASE_ENGINEER')}
                   className="p-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
-                  <p className="font-bold text-amber-700 dark:text-amber-300 text-[11px] group-hover:text-amber-600 dark:group-hover:text-amber-200">Base Engineer</p>
+                  <p className="font-bold text-amber-700 dark:text-amber-300 text-[11px] group-hover:text-amber-600 dark:group-hover:text-amber-200">2. Base Engineer</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">A. Deshmukh (Bharati)</p>
                 </button>
                 <button
                   type="button"
                   disabled={isSubmitting}
-                  onClick={() => handleQuickPreset('SUPERVISOR')}
+                  onClick={() => handleQuickPreset('EXPEDITION_CMDR')}
                   className="p-2.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
-                  <p className="font-bold text-purple-700 dark:text-purple-300 text-[11px] group-hover:text-purple-600 dark:group-hover:text-purple-200">Expedition Cmdr</p>
+                  <p className="font-bold text-purple-700 dark:text-purple-300 text-[11px] group-hover:text-purple-600 dark:group-hover:text-purple-200">3. Expedition Cmdr</p>
                   <p className="text-[9px] text-polar-text-muted font-medium">Col. R. Nair (MFA: 123456)</p>
                 </button>
                 <button
                   type="button"
                   disabled={isSubmitting}
-                  onClick={() => handleQuickPreset('ADMIN')}
-                  className="p-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
+                  onClick={() => handleQuickPreset('MISSION_CONTROL')}
+                  className="p-2.5 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer"
                 >
-                  <p className="font-bold text-rose-700 dark:text-rose-300 text-[11px] group-hover:text-rose-600 dark:group-hover:text-rose-200">Mission Control</p>
-                  <p className="text-[9px] text-polar-text-muted font-medium">NCPOR Admin (Root)</p>
+                  <p className="font-bold text-blue-700 dark:text-blue-300 text-[11px] group-hover:text-blue-600 dark:group-hover:text-blue-200">4. Mission Control</p>
+                  <p className="text-[9px] text-polar-text-muted font-medium">K. Raman (MFA: 123456)</p>
+                </button>
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                  onClick={() => handleQuickPreset('ADMIN')}
+                  className="p-2.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/40 text-left transition-colors group shadow-sm disabled:opacity-60 cursor-pointer sm:col-span-2 lg:col-span-2"
+                >
+                  <p className="font-bold text-rose-700 dark:text-rose-300 text-[11px] group-hover:text-rose-600 dark:group-hover:text-rose-200">5. Platform Admin</p>
+                  <p className="text-[9px] text-polar-text-muted font-medium">NCPOR Mission Control Admin (MFA: 123456)</p>
                 </button>
               </div>
             </div>
