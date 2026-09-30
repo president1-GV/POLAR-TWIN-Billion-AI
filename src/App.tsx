@@ -212,7 +212,7 @@ export const App: React.FC = () => {
     return (
       <LandingPage 
         onSignIn={() => setCurrentScreen('login')} 
-        onEnterCommandCenter={() => setCurrentScreen('command-center')}
+        onEnterCommandCenter={() => setCurrentScreen('login')}
       />
     );
   }
