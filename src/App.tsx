@@ -17,6 +17,7 @@ import { AdminMissionControl } from './features/admin/AdminMissionControl';
 import { StationOfficersPortal } from './features/officers/StationOfficersPortal';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { LoginPage } from './components/auth/LoginPage';
+import { LandingPage } from './features/landing/LandingPage';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { LinkStatus, Alert } from './types';
 import { api } from './services/api';
@@ -43,7 +44,16 @@ export const App: React.FC = () => {
     }
   };
 
-  const [currentScreen, setCurrentScreen] = useState<ScreenId>('command-center');
+  const [currentScreen, setCurrentScreen] = useState<ScreenId>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const requestedScreen = params.get('screen');
+      if (requestedScreen && requestedScreen !== 'landing') {
+        return requestedScreen as ScreenId;
+      }
+    }
+    return 'landing';
+  });
   const [selectedOfficerId, setSelectedOfficerId] = useState<string>('commander');
   const [linkStatus, setLinkStatus] = useState<LinkStatus>('ONLINE');
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -198,11 +208,20 @@ export const App: React.FC = () => {
 
   const unreadCount = alerts.filter((a) => a.status === 'ACTIVE').length;
 
+  if (currentScreen === 'landing') {
+    return (
+      <LandingPage 
+        onSignIn={() => setCurrentScreen('login')} 
+        onEnterCommandCenter={() => setCurrentScreen('command-center')}
+      />
+    );
+  }
+
   if (currentScreen === 'login') {
     return (
       <LoginPage 
         onLoginSuccess={() => setCurrentScreen('command-center')} 
-        onReturnHome={() => setCurrentScreen('command-center')}
+        onReturnHome={() => setCurrentScreen('landing')}
       />
     );
   }

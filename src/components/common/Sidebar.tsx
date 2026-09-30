@@ -20,6 +20,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 export type ScreenId = 
+  | 'landing'
   | 'command-center'
   | 'digital-twin'
   | 'energy'

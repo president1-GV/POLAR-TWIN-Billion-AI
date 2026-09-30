@@ -117,7 +117,11 @@ export const Header: React.FC<HeaderProps> = ({
         {/* LEFT: Branding & First-Class Station Context */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Brand Identity arranged cleanly inside dedicated professional border */}
-          <div className="flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0">
+          <div 
+            onClick={() => onNavigate?.('landing')}
+            title="Return to POLAR-TWIN AI Platform Overview & Specifications"
+            className="flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0 cursor-pointer"
+          >
             <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-sm ring-1 ring-polar-cyan/25 shrink-0 overflow-hidden">
               <img 
                 src={polarTwinIcon} 
