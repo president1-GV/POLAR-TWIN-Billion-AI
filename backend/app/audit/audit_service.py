@@ -69,9 +69,26 @@ class ImmutableAuditService:
         if len(self._local_buffer) > 2000:
             self._local_buffer.pop(0)
 
+        db_details = dict(sanitized_details)
+        if sanitized_before:
+            db_details["before_state"] = sanitized_before
+        if sanitized_after:
+            db_details["after_state"] = sanitized_after
+
+        db_payload = {
+            "id": event_id,
+            "user_id": event.user_id,
+            "role": event.role,
+            "station_id": event.station_id or "GLOBAL",
+            "action": event.action,
+            "details": db_details,
+            "client_ip": event.client_ip or "127.0.0.1",
+            "timestamp": now_iso
+        }
+
         # Persist to Supabase audit_logs
         try:
-            supabase_client.insert_row("audit_logs", record)
+            supabase_client.insert_row("audit_logs", db_payload)
         except Exception:
             pass
 

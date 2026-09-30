@@ -11,6 +11,7 @@ TEST_MODULES = [
     ("Rugged Edge Store-and-Forward Replay & CRC32", "backend.tests.test_edge_offline"),
     ("Full-Stack Master System Integration Suite (17 Tests)", "backend.tests.test_full_system_integration"),
     ("10-Link Causal Chain & 15 Canonical Domains Suite", "backend.tests.test_causal_chain"),
+    ("Master Technical Architecture & Specification Suite (7 Tests)", "backend.tests.test_master_architecture"),
     ("Data Engineering Core & ML Acceptance Suite (70 Tests)", "LLM.tests.test_master_data_pipeline")
 ]
 
