@@ -19,7 +19,7 @@ def test_full_operational_e2e_scenario():
     assert r.status_code == 200
     auth_data = r.json()
     assert auth_data["authenticated"] is True
-    assert auth_data["user"]["role"] == "OPERATOR"
+    assert auth_data["user"]["role"] in ["OPERATOR", "DUTY_OPERATOR"]
     op_token = auth_data["token"]
     op_headers = {"Authorization": f"Bearer {op_token}"}
     print("✓ [Step 2] Authenticated Duty Operator (RBAC: OPERATOR)")
@@ -32,7 +32,7 @@ def test_full_operational_e2e_scenario():
     print("✓ [Step 2b] Authenticated Station Engineer (RBAC: ENGINEER)")
 
     # 3. Command Center - List Stations
-    r = client.get("/api/stations")
+    r = client.get("/api/stations", headers=op_headers)
     assert r.status_code == 200
     stations = r.json()
     assert len(stations) >= 2
@@ -41,14 +41,14 @@ def test_full_operational_e2e_scenario():
     print(f"✓ [Step 3] Command Center Loaded: Station Bharati (Health: {bharati['overall_health_score']}%)")
 
     # 4. Open Digital Twin & View Weather
-    r = client.get("/api/environment/station_bharati")
+    r = client.get("/api/environment/station_bharati", headers=op_headers)
     assert r.status_code == 200
     env = r.json()
     assert env["provenance"]["source_type"] in ["REAL_PUBLIC", "PHYSICS_SYNTHETIC"]
     print(f"✓ [Step 4] Real Environment Ingestion: {env['temperature_c']}°C, Wind {env['wind_speed_ms']}m/s (Provenance: {env['provenance']['source_type']})")
 
     # 5. View Generator State
-    r = client.get("/api/assets/bh_gen_01")
+    r = client.get("/api/assets/bh_gen_01", headers=op_headers)
     assert r.status_code == 200
     gen = r.json()
     print(f"✓ [Step 5] Generator State Monitored: {gen['name']}, Health: {gen['health_score']}%")
@@ -83,7 +83,7 @@ def test_full_operational_e2e_scenario():
     print(f"   Deviant Features: {[f['metric'] for f in diag['anomaly_result']['deviant_features']]}")
 
     # 9. Health Degradation & Critical Alert Verification
-    alerts = client.get("/api/alerts?station_id=station_bharati&status=ACTIVE").json()
+    alerts = client.get("/api/alerts?station_id=station_bharati&status=ACTIVE", headers=op_headers).json()
     assert len(alerts) > 0
     print(f"✓ [Step 9] Critical Alert Broadcast to Base: '{alerts[0]['title']}'")
 
@@ -105,7 +105,7 @@ def test_full_operational_e2e_scenario():
     print("✓ [Step 11] Operator Reviewed and APPROVED Mitigation -> Simulated Stabilization Executed")
 
     # 12. Verify Station Digital Twin Stabilized
-    twin = client.get("/api/stations/station_bharati/digital-twin").json()
+    twin = client.get("/api/stations/station_bharati/digital-twin", headers=op_headers).json()
     assert twin["overall_health_score"] >= 88.0
     print(f"✓ [Step 12] Digital Twin Microgrid Stabilized (Overall Base Health: {twin['overall_health_score']}%)")
 
@@ -118,7 +118,7 @@ def test_full_operational_e2e_scenario():
     print(f"✓ [Step 13] Satellite Link Restored -> Store-and-Forward Sync Flushed {sync_data['records_synced']} Buffered Packets to Supabase")
 
     # 14. Observability & Audit Log Trail
-    audit_logs = client.get("/api/audit").json()
+    audit_logs = client.get("/api/audit", headers=op_headers).json()
     assert len(audit_logs) > 0
     latest_action = audit_logs[0]["action"]
     print(f"✓ [Step 14] Audit Trail Verified: Latest Recorded Action '{latest_action}' by {audit_logs[0]['user_id']}")

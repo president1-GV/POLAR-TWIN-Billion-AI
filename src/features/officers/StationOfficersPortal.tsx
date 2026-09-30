@@ -4,7 +4,7 @@
 // Detailed Interactive Consoles for Commander, Chief Engineer, Duty Officer, and Science Analyst
 // ============================================================================
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Shield,
   ShieldCheck,
@@ -32,7 +32,10 @@ import {
   ChevronRight,
   Database,
   ArrowRight,
-  Check
+  Check,
+  Globe,
+  Satellite,
+  ArrowLeftRight
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { PolarRole, getRoleMeta } from '../../services/rbac';
@@ -46,7 +49,18 @@ interface StationOfficersPortalProps {
   onNavigateToScreen: (screenId: any) => void;
 }
 
-export type OfficerKey = 'commander' | 'engineer' | 'operator' | 'analyst';
+export type OfficerKey = 'commander' | 'engineer' | 'operator' | 'analyst' | 'mission_control';
+
+const normalizeOfficerKey = (id?: string): OfficerKey => {
+  if (!id) return 'commander';
+  const lower = id.toLowerCase();
+  if (lower.includes('control') || lower.includes('mission') || lower.includes('raman')) return 'mission_control';
+  if (lower.includes('eng') || lower.includes('deshmukh') || lower.includes('base_engineer')) return 'engineer';
+  if (lower.includes('op') || lower.includes('sharma') || lower.includes('verma') || lower.includes('duty_operator')) return 'operator';
+  if (lower.includes('analyst') || lower.includes('sci') || lower.includes('patel')) return 'analyst';
+  if (lower.includes('cmdr') || lower.includes('command') || lower.includes('nair') || lower.includes('expedition_cmdr')) return 'commander';
+  return 'commander';
+};
 
 export const StationOfficersPortal: React.FC<StationOfficersPortalProps> = ({
   initialOfficerId = 'commander',
@@ -56,12 +70,13 @@ export const StationOfficersPortal: React.FC<StationOfficersPortalProps> = ({
   onNavigateToScreen,
 }) => {
   const { role, switchRole } = useAuth();
-  const [selectedOfficer, setSelectedOfficer] = useState<OfficerKey>(() => {
-    if (initialOfficerId === 'engineer') return 'engineer';
-    if (initialOfficerId === 'operator') return 'operator';
-    if (initialOfficerId === 'analyst') return 'analyst';
-    return 'commander';
-  });
+  const [selectedOfficer, setSelectedOfficer] = useState<OfficerKey>(() => normalizeOfficerKey(initialOfficerId));
+
+  useEffect(() => {
+    if (initialOfficerId) {
+      setSelectedOfficer(normalizeOfficerKey(initialOfficerId));
+    }
+  }, [initialOfficerId]);
 
   const [notification, setNotification] = useState<{ msg: string; type: 'success' | 'warn' | 'info' } | null>(null);
 
@@ -185,9 +200,21 @@ export const StationOfficersPortal: React.FC<StationOfficersPortalProps> = ({
       color: '#10B981',
       badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/40',
     },
+    {
+      key: 'mission_control' as OfficerKey,
+      id: 'controller.raman',
+      name: 'K. Raman',
+      title: 'Mission Flight Controller',
+      role: 'MISSION_CONTROL' as PolarRole,
+      badge: 'LVL-4 FLIGHT',
+      station: 'NCPOR Goa & Antarctic Satellite Command',
+      tagline: 'Dual-Station Satellite Uplink, Fleet Logistics & Cross-Station Telemetry',
+      color: '#06B6D4',
+      badgeClass: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/40',
+    },
   ];
 
-  const currentOfficerMeta = officers.find((o) => o.key === selectedOfficer)!;
+  const currentOfficerMeta = officers.find((o) => o.key === selectedOfficer) || officers[0];
   const isOfficerActiveRole = role === currentOfficerMeta.role;
 
   return (
@@ -243,7 +270,7 @@ export const StationOfficersPortal: React.FC<StationOfficersPortalProps> = ({
         </div>
 
         {/* Officer Selection Tabs Strip */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-5 pt-4 border-t border-polar-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2.5 mt-5 pt-4 border-t border-polar-border">
           {officers.map((off) => {
             const isSelected = selectedOfficer === off.key;
             const isRoleMatched = role === off.role;
@@ -906,6 +933,205 @@ export const StationOfficersPortal: React.FC<StationOfficersPortalProps> = ({
                     Official Ministry of Earth Sciences open AWS telemetry ingest directly tied to global climate models.
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ------------------------------------------------------------- */}
+        {/* OFFICER 5: MISSION FLIGHT CONTROLLER (K. Raman) CONSOLE       */}
+        {/* ------------------------------------------------------------- */}
+        {selectedOfficer === 'mission_control' && (
+          <div className="space-y-6 pt-2">
+            {/* Dual-Station Synchronous Telemetry Comparison */}
+            <div className="p-4 rounded-xl bg-polar-base border border-polar-border space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-polar-border pb-3">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-cyan-400" />
+                  <h3 className="font-bold text-xs uppercase tracking-wide text-polar-text-primary">
+                    DUAL-STATION REAL-TIME OPERATIONAL COMPARATOR (BHARATI VS MAITRI)
+                  </h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/60 border border-cyan-500/40 px-2 py-0.5 rounded">
+                    INTER-STATION TELEMETRY BUS ACTIVE
+                  </span>
+                  <button
+                    onClick={() => {
+                      onSelectStation(currentStationId === 'station_bharati' ? 'station_maitri' : 'station_bharati');
+                      showToast(`Switched active station context to ${currentStationId === 'station_bharati' ? 'Maitri' : 'Bharati'}`, 'info');
+                    }}
+                    className="px-2.5 py-1 rounded bg-polar-card hover:bg-polar-hover border border-polar-border text-[10px] text-cyan-300 font-bold transition-colors flex items-center gap-1 shadow-sm"
+                  >
+                    <ArrowLeftRight className="w-3 h-3 text-cyan-400" />
+                    <span>TOGGLE ACTIVE STATION CONTEXT</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Side-by-Side Station Matrix */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Bharati Station Summary Card */}
+                <div className={`p-4 rounded-lg border transition-all ${
+                  currentStationId === 'station_bharati'
+                    ? 'bg-polar-surface/90 border-cyan-500/50 shadow-md ring-1 ring-cyan-500/30'
+                    : 'bg-polar-surface/50 border-polar-border'
+                }`}>
+                  <div className="flex items-center justify-between mb-3 border-b border-polar-border pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="font-bold text-xs text-polar-text-primary uppercase">BHARATI RESEARCH BASE</span>
+                    </div>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                      69° 24′ S, 76° 11′ E
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5 text-[11px]">
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Microgrid Power</span>
+                      <span className="font-bold text-cyan-400">185.0 kW</span>
+                      <span className="text-[9px] text-polar-text-muted block">Genset-01 + Solar PV</span>
+                    </div>
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Polar Fuel Reserve</span>
+                      <span className="font-bold text-amber-400">92,400 L (84%)</span>
+                      <span className="text-[9px] text-polar-text-muted block">248 Days Autonomy</span>
+                    </div>
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Habitat Envelope</span>
+                      <span className="font-bold text-emerald-400">+20.8°C / 988 hPa</span>
+                      <span className="text-[9px] text-polar-text-muted block">Life Support: OPTIMAL</span>
+                    </div>
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Complement</span>
+                      <span className="font-bold text-polar-text-primary">18 / 25 Personnel</span>
+                      <span className="text-[9px] text-polar-text-muted block">Shift Bravo On-Duty</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Maitri Station Summary Card */}
+                <div className={`p-4 rounded-lg border transition-all ${
+                  currentStationId === 'station_maitri'
+                    ? 'bg-polar-surface/90 border-cyan-500/50 shadow-md ring-1 ring-cyan-500/30'
+                    : 'bg-polar-surface/50 border-polar-border'
+                }`}>
+                  <div className="flex items-center justify-between mb-3 border-b border-polar-border pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="font-bold text-xs text-polar-text-primary uppercase">MAITRI RESEARCH BASE</span>
+                    </div>
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/30">
+                      70° 46′ S, 11° 44′ E
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2.5 text-[11px]">
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Microgrid Power</span>
+                      <span className="font-bold text-cyan-400">160.0 kW</span>
+                      <span className="text-[9px] text-polar-text-muted block">Genset-01 + Wind Rotors</span>
+                    </div>
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Polar Fuel Reserve</span>
+                      <span className="font-bold text-amber-400">74,200 L (78%)</span>
+                      <span className="text-[9px] text-polar-text-muted block">194 Days Autonomy</span>
+                    </div>
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Habitat Thermal</span>
+                      <span className="font-bold text-emerald-400">+19.5°C / Hydronic</span>
+                      <span className="text-[9px] text-polar-text-muted block">Lake Pump: RUNNING</span>
+                    </div>
+                    <div className="p-2 rounded bg-polar-base border border-polar-border">
+                      <span className="text-[10px] text-polar-text-muted uppercase block">Complement</span>
+                      <span className="font-bold text-polar-text-primary">22 / 25 Personnel</span>
+                      <span className="text-[9px] text-polar-text-muted block">Geomag Science Run</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Satellite Constellation Uplink & Synchronous Edge Telemetry */}
+            <div className="p-4 rounded-xl bg-polar-base border border-polar-border space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-polar-border pb-3">
+                <div className="flex items-center gap-2">
+                  <Satellite className="w-4 h-4 text-cyan-400" />
+                  <h3 className="font-bold text-xs uppercase tracking-wide text-polar-text-primary">
+                    POLAR-ORBIT & GEO SATELLITE COMMUNICATIONS GATEWAY
+                  </h3>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      await api.triggerEdgeSync();
+                      showToast('Triggered synchronous satellite telemetry uplink synchronization.', 'success');
+                    } catch (e) {
+                      showToast('Uplink synchronization completed with local ring buffer.', 'info');
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>FORCE SATELLITE SYNC NOW</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs">
+                <div className="p-3 rounded-lg bg-polar-surface border border-polar-border space-y-1">
+                  <span className="text-[10px] text-polar-text-muted uppercase">PRIMARY TRANSPONDER</span>
+                  <p className="font-mono font-bold text-sm text-cyan-400">GSAT-11 (74° E)</p>
+                  <p className="text-[10px] text-polar-text-muted">C-Band Antarctic transponder</p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-polar-surface border border-polar-border space-y-1">
+                  <span className="text-[10px] text-polar-text-muted uppercase">CARRIER / NOISE (C/N0)</span>
+                  <p className="font-mono font-bold text-sm text-emerald-400">48.2 dB-Hz</p>
+                  <p className="text-[10px] text-polar-text-muted">Link margin: +6.4 dB (EXCELLENT)</p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-polar-surface border border-polar-border space-y-1">
+                  <span className="text-[10px] text-polar-text-muted uppercase">ROUND-TRIP LATENCY</span>
+                  <p className="font-mono font-bold text-sm text-amber-400">640 ms (GEO)</p>
+                  <p className="text-[10px] text-polar-text-muted">Jitter: &lt; 14ms | Loss: 0.02%</p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-polar-surface border border-polar-border space-y-1">
+                  <span className="text-[10px] text-polar-text-muted uppercase">EDGE SYNC BUFFER</span>
+                  <p className="font-mono font-bold text-sm text-polar-text-primary">18 PACKETS QUEUED</p>
+                  <p className="text-[10px] text-polar-text-muted">CRC32 + HMAC Authenticated</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Tactical Navigation to Digital Twin & Admin */}
+            <div className="p-4 rounded-xl bg-polar-base border border-polar-border flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="space-y-1">
+                <span className="text-xs font-bold text-polar-text-primary uppercase flex items-center gap-1.5">
+                  <Radio className="w-4 h-4 text-cyan-400" />
+                  REMOTE HIGH-LEVEL OPERATIONAL COORDINATION
+                </span>
+                <p className="text-[11px] text-polar-text-muted">
+                  Mission Control coordinates dual-station logistics, satellite passes, and cross-station emergency mutual aid.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => onNavigateToScreen('digital-twin')}
+                  className="px-3.5 py-2 rounded-lg bg-polar-elevated hover:bg-polar-hover border border-polar-border text-cyan-300 text-xs font-bold transition-all flex items-center gap-1.5"
+                >
+                  <Layers className="w-4 h-4 text-cyan-400" />
+                  <span>3D DIGITAL TWIN INSPECTION</span>
+                </button>
+                <button
+                  onClick={onNavigateToAdmin}
+                  className="px-3.5 py-2 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-300 text-xs font-bold transition-all flex items-center gap-1.5"
+                >
+                  <ShieldAlert className="w-4 h-4 text-rose-400" />
+                  <span>ADMIN GOVERNANCE</span>
+                </button>
               </div>
             </div>
           </div>

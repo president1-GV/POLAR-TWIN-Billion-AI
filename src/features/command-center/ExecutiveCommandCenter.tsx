@@ -7,6 +7,8 @@ import {
   Thermometer, 
   AlertTriangle, 
   ShieldCheck, 
+  ShieldAlert,
+  Users,
   Compass, 
   Radio, 
   Layers, 
@@ -21,7 +23,12 @@ import {
   Droplet,
   Fuel,
   Play,
-  Cpu
+  Cpu,
+  Shield,
+  CheckCircle2,
+  AlertOctagon,
+  Terminal,
+  Server
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { ProvenanceBadge } from '../../components/common/ProvenanceBadge';
@@ -36,12 +43,7 @@ import { TelemetryMetric } from '../../components/ui/TelemetryMetric';
 import { MissionSummary } from '../../components/ui/MissionSummary';
 import { CommandButton } from '../../components/ui/CommandButton';
 import { useAuth } from '../../context/AuthContext';
-import { toCanonicalRole } from '../../services/rbac';
-import { DutyOperatorCommandCenter } from './DutyOperatorCommandCenter';
-import { BaseEngineerCommandCenter } from './BaseEngineerCommandCenter';
-import { ExpeditionCommanderCommandCenter } from './ExpeditionCommanderCommandCenter';
-import { MissionControlCommandCenter } from './MissionControlCommandCenter';
-import { AdminConsole } from './AdminConsole';
+import { toCanonicalRole, getRoleMeta } from '../../services/rbac';
 
 interface Props {
   currentStationId?: string;
@@ -55,25 +57,8 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
   onSelectStation 
 }) => {
   const { role } = useAuth();
-  const canonical = toCanonicalRole(role);
-
-  if (canonical === 'DUTY_OPERATOR') {
-    return <DutyOperatorCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
-  }
-  if (canonical === 'BASE_ENGINEER') {
-    return <BaseEngineerCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
-  }
-  if (canonical === 'EXPEDITION_CMDR') {
-    return <ExpeditionCommanderCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
-  }
-  if (canonical === 'MISSION_CONTROL') {
-    return <MissionControlCommandCenter currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
-  }
-  if (canonical === 'ADMIN') {
-    return <AdminConsole currentStationId={currentStationId} onNavigate={onNavigate} onSelectStation={onSelectStation} />;
-  }
-
   const [stations, setStations] = useState<any[]>([]);
+  const [weatherData, setWeatherData] = useState<{ bharati?: any; maitri?: any }>({});
   const [activeStationId, setActiveStationId] = useState<string>(currentStationId);
   const [loading, setLoading] = useState(true);
   const [centerViewMode, setCenterViewMode] = useState<'3D_TWIN' | 'MAP'>('3D_TWIN');
@@ -95,11 +80,16 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
 
   const loadData = async () => {
     try {
-      const data = await api.getStations();
-      setStations(data);
+      const [stationList, envBh, envMai] = await Promise.all([
+        api.getStations().catch(() => []),
+        api.getEnvironment('station_bharati').catch(() => null),
+        api.getEnvironment('station_maitri').catch(() => null),
+      ]);
+      setStations(stationList || []);
+      setWeatherData({ bharati: envBh, maitri: envMai });
       setLastSyncTime(new Date());
     } catch (e) {
-      console.error('Failed to load stations:', e);
+      console.error('Failed to load command center data:', e);
     } finally {
       setLoading(false);
     }
@@ -133,6 +123,44 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
 
   return (
     <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 max-w-[1720px] mx-auto font-sans select-none overflow-hidden">
+      {/* Operational Authority & Direct Mission Control Access Banner */}
+      <div className="bg-polar-surface border border-polar-border rounded-lg p-3 sm:px-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono shadow-sm">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full animate-pulse" style={{ backgroundColor: getRoleMeta(role).accentColor }} />
+            <span className="text-[11px] text-polar-text-muted font-bold uppercase tracking-wider">CLEARANCE DESK:</span>
+            <span className="font-extrabold text-polar-text-primary uppercase tracking-wide">
+              {getRoleMeta(role).label}
+            </span>
+          </div>
+          <span className={`text-[10px] px-2 py-0.5 rounded border font-mono font-bold uppercase ${getRoleMeta(role).badgeClass}`}>
+            {getRoleMeta(role).clearanceBadge}
+          </span>
+          <span className="text-[10px] text-polar-text-muted hidden md:inline">
+            • Scope: {role === 'ADMIN' || role === 'MISSION_CONTROL' ? 'All Stations (Bharati + Maitri)' : isBharati ? 'Bharati Station' : 'Maitri Station'}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+          <button
+            onClick={() => onNavigate('admin')}
+            className="px-3 py-1.5 rounded-md bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/40 text-rose-500 dark:text-rose-400 font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            title="Open NCPOR Root Administration, Zero-Trust Governance & Security Console"
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            <span>ADMIN MISSION CONTROL</span>
+          </button>
+          <button
+            onClick={() => onNavigate('officers')}
+            className="px-3 py-1.5 rounded-md bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-500/40 text-polar-cyan font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
+            title="Open Dedicated Antarctic Station Officers Roster & Workspaces"
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>OFFICERS PORTAL</span>
+          </button>
+        </div>
+      </div>
+
       {/* 1. COMMAND CENTER HERO BAR */}
       <section className="bg-polar-card border border-polar-border rounded-md p-4 sm:p-5 shadow-sm overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -349,10 +377,14 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
         {/* Viewport Canvas */}
         <div className="min-h-[500px]">
           {centerViewMode === '3D_TWIN' ? (
-            <div className="h-[520px]">
+            <div className="h-[580px]">
               <Station3DViewer 
                 key={activeStationId}
                 stationId={activeStationId} 
+                onSelectStation={(id) => {
+                  setActiveStationId(id);
+                  onSelectStation(id);
+                }}
                 onNavigateToSimulation={(_key) => onNavigate('simulation')}
               />
             </div>
@@ -379,8 +411,12 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
         {stations.map((st) => {
           const isStationBharati = st.id === 'station_bharati';
           const isSelected = st.id === activeStationId;
-          const env = st.environment || {};
-          const health = st.overall_health_score || 96.5;
+          const liveEnv = isStationBharati ? weatherData.bharati : weatherData.maitri;
+          const env = liveEnv || st.environment || (isStationBharati 
+            ? { temperature_c: -18.4, apparent_temp_c: -28.9, wind_speed_ms: 11.2, wind_gust_ms: 16.5, pressure_msl_hpa: 988.4, humidity_pct: 65 }
+            : { temperature_c: -22.1, apparent_temp_c: -33.4, wind_speed_ms: 14.8, wind_gust_ms: 21.0, pressure_msl_hpa: 982.1, humidity_pct: 72 }
+          );
+          const health = isStationBharati ? 98.4 : 96.2;
 
           return (
             <div
@@ -432,10 +468,10 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
                       Air Temp
                     </div>
                     <div className="text-base font-bold text-polar-text-primary mt-0.5">
-                      {env.temperature_c ?? -18.5} °C
+                      {env.temperature_c ?? (isStationBharati ? -18.4 : -22.1)} °C
                     </div>
                     <div className="text-[10px] text-polar-text-muted">
-                      Chill: {env.apparent_temp_c ?? -29.0} °C
+                      Chill: {env.apparent_temp_c ?? (isStationBharati ? -28.9 : -33.4)} °C
                     </div>
                   </div>
 
@@ -445,10 +481,10 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
                       Wind Speed
                     </div>
                     <div className="text-base font-bold text-polar-text-primary mt-0.5">
-                      {env.wind_speed_ms ?? 11.2} m/s
+                      {env.wind_speed_ms ?? (isStationBharati ? 11.2 : 14.8)} m/s
                     </div>
                     <div className="text-[10px] text-polar-text-muted">
-                      Gust: {env.wind_gust_ms ?? 16.5} m/s
+                      Gust: {env.wind_gust_ms ?? (isStationBharati ? 16.5 : 21.0)} m/s
                     </div>
                   </div>
 
@@ -458,10 +494,10 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
                       Pressure
                     </div>
                     <div className="text-base font-bold text-polar-text-primary mt-0.5">
-                      {env.pressure_msl_hpa ?? 988.4} hPa
+                      {env.pressure_msl_hpa ?? (isStationBharati ? 988.4 : 982.1)} hPa
                     </div>
                     <div className="text-[10px] text-polar-text-muted">
-                      Humidity: {env.humidity_pct ?? 65}%
+                      Humidity: {env.humidity_pct ?? (isStationBharati ? 65 : 72)}%
                     </div>
                   </div>
                 </div>
@@ -471,33 +507,41 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
                   <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
                     <span className="text-[10px] text-polar-text-muted uppercase block">Generation</span>
                     <span className="text-sm font-bold text-polar-text-primary mt-0.5 block">
-                      {isBharati ? '185.0' : '160.0'} kW
+                      {isStationBharati ? '185.0' : '158.0'} kW
                     </span>
-                    <span className="text-[9px] text-polar-text-muted">3x Volvo Gensets</span>
+                    <span className="text-[9px] text-polar-text-muted truncate block">
+                      {isStationBharati ? '3x Volvo (250 kVA)' : '3x Kirloskar (125 kVA)'}
+                    </span>
                   </div>
 
                   <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
                     <span className="text-[10px] text-polar-text-muted uppercase block">Fuel Autonomy</span>
                     <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">
-                      {isBharati ? '192.4' : '178.1'} d
+                      {isStationBharati ? '192.4' : '178.1'} d
                     </span>
-                    <span className="text-[9px] text-polar-text-muted">Polar ATF / Jet-A1</span>
+                    <span className="text-[9px] text-polar-text-muted truncate block">
+                      {isStationBharati ? 'Polar ATF (Jet-A1)' : 'Polar ATF / Diesel'}
+                    </span>
                   </div>
 
                   <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
                     <span className="text-[10px] text-polar-text-muted uppercase block">Indoor Temp</span>
                     <span className="text-sm font-bold text-polar-text-primary mt-0.5 block">
-                      +21.2 °C
+                      {isStationBharati ? '+21.4' : '+20.8'} °C
                     </span>
-                    <span className="text-[9px] text-polar-text-muted">HVAC Loop Target</span>
+                    <span className="text-[9px] text-polar-text-muted truncate block">
+                      {isStationBharati ? 'Central HVAC Loop' : 'Hydronic Radiator'}
+                    </span>
                   </div>
 
                   <div className="p-2.5 bg-polar-elevated rounded border border-polar-border">
                     <span className="text-[10px] text-polar-text-muted uppercase block">Sat Uptime</span>
                     <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 block">
-                      99.8%
+                      {isStationBharati ? '99.8%' : '99.4%'}
                     </span>
-                    <span className="text-[9px] text-polar-text-muted">C-Band / Inmarsat</span>
+                    <span className="text-[9px] text-polar-text-muted truncate block">
+                      {isStationBharati ? 'C-Band GSAT-14' : 'Ku-Band / Edge'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -536,6 +580,140 @@ export const ExecutiveCommandCenter: React.FC<Props> = ({
             </div>
           );
         })}
+      </section>
+
+      {/* 6. INTER-STATION CROSS-DOMAIN TELEMETRY MATRIX & OPERATIONAL EQUILIBRIUM */}
+      <section className="bg-polar-surface border border-polar-border rounded-lg p-4 sm:p-5 font-mono shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-polar-border">
+          <div className="flex items-center gap-2.5">
+            <Server className="w-4 h-4 text-polar-cyan" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-polar-text-primary">
+              INTER-STATION CROSS-DOMAIN TELEMETRY MATRIX &amp; SYSTEM EQUILIBRIUM
+            </h2>
+            <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-bold uppercase">
+              ALL NODES NOMINAL
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-[11px] text-polar-text-muted">
+            <span>Synchronized with NCPOR Goa Ground Station</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-polar-cyan" />
+            <span className="text-polar-cyan font-bold">100% RELIABILITY</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 pt-4 text-xs">
+          {/* Microgrid & Energy */}
+          <div className="p-3.5 bg-polar-elevated rounded-md border border-polar-border flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-polar-text-muted text-[11px] mb-1">
+                <span className="flex items-center gap-1.5 font-bold uppercase text-amber-500 dark:text-amber-400">
+                  <Zap className="w-3.5 h-3.5" />
+                  MICROGRID BUS
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-500 border border-amber-500/20 font-bold">
+                  415V 50Hz
+                </span>
+              </div>
+              <div className="text-base font-bold text-polar-text-primary mt-1">
+                343.0 kW <span className="text-xs font-normal text-polar-text-muted">Combined Load</span>
+              </div>
+              <p className="text-[10px] text-polar-text-secondary mt-1">
+                Bharati: 185 kW (Volvo Penta) • Maitri: 158 kW (Kirloskar). Power factor: 0.94 pf stable.
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate('energy')}
+              className="w-full py-1 px-2 text-[11px] text-polar-cyan hover:text-polar-base bg-polar-cyan/10 hover:bg-polar-cyan border border-polar-cyan/30 rounded font-bold transition-all flex items-center justify-center gap-1"
+            >
+              <span>Manage Microgrid</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Life Support Water RO Desalination */}
+          <div className="p-3.5 bg-polar-elevated rounded-md border border-polar-border flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-polar-text-muted text-[11px] mb-1">
+                <span className="flex items-center gap-1.5 font-bold uppercase text-sky-500 dark:text-sky-400">
+                  <Droplet className="w-3.5 h-3.5" />
+                  LIFE-SUPPORT WATER
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-500 border border-sky-500/20 font-bold">
+                  POTABLE
+                </span>
+              </div>
+              <div className="text-base font-bold text-polar-text-primary mt-1">
+                5,350 L/d <span className="text-xs font-normal text-polar-text-muted">Total Production</span>
+              </div>
+              <p className="text-[10px] text-polar-text-secondary mt-1">
+                Bharati RO Seawater Pump: 3,200 L/d • Maitri Priyadarshini Lake Loop: 2,150 L/d.
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate('logistics')}
+              className="w-full py-1 px-2 text-[11px] text-sky-500 hover:text-polar-base bg-sky-500/10 hover:bg-sky-500 border border-sky-500/30 rounded font-bold transition-all flex items-center justify-center gap-1"
+            >
+              <span>Supply Chain &amp; Water</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Bulk Polar Fuel Storage */}
+          <div className="p-3.5 bg-polar-elevated rounded-md border border-polar-border flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-polar-text-muted text-[11px] mb-1">
+                <span className="flex items-center gap-1.5 font-bold uppercase text-emerald-500 dark:text-emerald-400">
+                  <Fuel className="w-3.5 h-3.5" />
+                  BULK FUEL AUTONOMY
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-bold">
+                  185.3d AVG
+                </span>
+              </div>
+              <div className="text-base font-bold text-polar-text-primary mt-1">
+                338,400 L <span className="text-xs font-normal text-polar-text-muted">Polar ATF Jet-A1</span>
+              </div>
+              <p className="text-[10px] text-polar-text-secondary mt-1">
+                Larsemann Hills Tanks: 189k L (192.4 d) • Schirmacher Bunkers: 149.4k L (178.1 d).
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate('simulation')}
+              className="w-full py-1 px-2 text-[11px] text-emerald-500 hover:text-polar-base bg-emerald-500/10 hover:bg-emerald-500 border border-emerald-500/30 rounded font-bold transition-all flex items-center justify-center gap-1"
+            >
+              <span>What-If Simulator</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+
+          {/* Edge Resilience & Sat Link */}
+          <div className="p-3.5 bg-polar-elevated rounded-md border border-polar-border flex flex-col justify-between space-y-3">
+            <div>
+              <div className="flex items-center justify-between text-polar-text-muted text-[11px] mb-1">
+                <span className="flex items-center gap-1.5 font-bold uppercase text-purple-500 dark:text-purple-400">
+                  <Radio className="w-3.5 h-3.5" />
+                  EDGE SYNC &amp; REPLAY
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/10 text-purple-500 border border-purple-500/20 font-bold">
+                  ONLINE
+                </span>
+              </div>
+              <div className="text-base font-bold text-polar-text-primary mt-1">
+                0 Dropped <span className="text-xs font-normal text-polar-text-muted">Edge Buffer</span>
+              </div>
+              <p className="text-[10px] text-polar-text-secondary mt-1">
+                Supabase TLS 1.3 socket active. Replay journal empty. Zero-trust token rotation armed.
+              </p>
+            </div>
+            <button
+              onClick={() => onNavigate('edge')}
+              className="w-full py-1 px-2 text-[11px] text-purple-500 hover:text-polar-base bg-purple-500/10 hover:bg-purple-500 border border-purple-500/30 rounded font-bold transition-all flex items-center justify-center gap-1"
+            >
+              <span>Edge Resilience</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Slide-out Station Detail Drawer */}

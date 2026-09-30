@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends, HTTPException
 from typing import List, Dict, Any
 from pydantic import BaseModel
 from backend.database.supabase_client import supabase_client
@@ -198,25 +198,33 @@ FALLBACK_SHIPMENTS = {
     ]
 }
 
+from backend.security.rbac import get_current_user, get_current_user_optional, require_station_access, require_permission
+
 @router.get("/{station_id}/inventory")
-def list_inventory(station_id: str):
+def list_inventory(station_id: str, current_user: Dict[str, Any] = Depends(get_current_user_optional)):
     """Retrieve supply chain inventory items with current burn rate and days remaining."""
+    require_station_access(station_id, current_user)
     items = supabase_client.get_table("logistics_items", {"station_id": f"eq.{station_id}"})
     if not items or len(items) == 0:
         return FALLBACK_INVENTORY.get(station_id, FALLBACK_INVENTORY["station_bharati"])
     return items
 
 @router.get("/{station_id}/shipments")
-def list_shipments(station_id: str):
+def list_shipments(station_id: str, current_user: Dict[str, Any] = Depends(get_current_user_optional)):
     """Retrieve resupply vessel voyages and manifests."""
+    require_station_access(station_id, current_user)
     shipments = supabase_client.get_table("shipments", {"destination_station_id": f"eq.{station_id}"})
     if not shipments or len(shipments) == 0:
         return FALLBACK_SHIPMENTS.get(station_id, FALLBACK_SHIPMENTS["station_bharati"])
     return shipments
 
 @router.post("/simulate-delay")
-def simulate_shipment_delay(payload: DelaySimulationPayload):
+def simulate_shipment_delay(
+    payload: DelaySimulationPayload,
+    current_user: Dict[str, Any] = Depends(require_permission("run_simulations"))
+):
     """Simulate supply ship delay and compute shortage risk across all inventory categories."""
+    require_station_access(payload.station_id, current_user)
     items = supabase_client.get_table("logistics_items", {"station_id": f"eq.{payload.station_id}"})
     if not items or len(items) == 0:
         items = FALLBACK_INVENTORY.get(payload.station_id, FALLBACK_INVENTORY["station_bharati"])

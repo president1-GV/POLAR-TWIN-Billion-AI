@@ -30,6 +30,7 @@ import { useTheme } from '../../context/ThemeContext';
 
 interface Props {
   stationId: string;
+  onSelectStation?: (stationId: string) => void;
   onNavigateToSimulation?: (scenarioKey?: string) => void;
 }
 
@@ -130,7 +131,7 @@ function resolveInteractiveAsset(assetId: string, stationId: string, currentAsse
   };
 }
 
-export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimulation }) => {
+export const Station3DViewer: React.FC<Props> = ({ stationId, onSelectStation, onNavigateToSimulation }) => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
   const mountRef = useRef<HTMLDivElement>(null);
@@ -195,6 +196,8 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
 
   // Load Station Assets from Supabase / API
   useEffect(() => {
+    setSelectedAsset(null);
+    setAssets([]);
     loadAssets();
   }, [stationId]);
 
@@ -204,7 +207,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       const data = await api.getStationAssets(stationId);
       setAssets(data);
       if (data.length > 0) {
-        setSelectedAsset(data[0]);
+        const isBharati = stationId === 'station_bharati';
+        const primaryAsset = data.find(a => isBharati ? a.id === 'bh_gen_01' : a.id === 'ma_gen_01') || data[0];
+        setSelectedAsset(primaryAsset);
       }
     } catch (e) {
       console.error('Failed to load assets for 3D viewer:', e);
@@ -388,7 +393,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
 
     // 6. Dependency Flow Overlay
     const flowOverlay = new DependencyFlowOverlay(scene, stationId);
-    flowOverlay.setVisible(flowVisible);
+    flowOverlay.setVisible(visualMode === 'DEPENDENCY');
     flowOverlayRef.current = flowOverlay;
 
     // 7. Measurement Tool
@@ -578,9 +583,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       // Restore beacon materials
       if (bharatiBuilderRef.current) bharatiBuilderRef.current.updateBeacons();
       if (maitriBuilderRef.current) maitriBuilderRef.current.updateBeacons();
-      // Flow overlay visibility matches flowVisible
+      // In REALISTIC PBR mode, flow tubes remain hidden so pure PBR surfaces and lighting shine
       if (flowOverlayRef.current) {
-        flowOverlayRef.current.setVisible(flowVisible);
+        flowOverlayRef.current.setVisible(false);
         flowOverlayRef.current.setHighlightedAsset(null);
       }
     } 
@@ -589,6 +594,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       // Static background structure gets subdued backdrop contrast for high pop
       sceneRef.current.traverse(obj => {
         if (obj instanceof THREE.Mesh) {
+          if (obj.material === mats.missionLogoBadge || obj.userData?.isLogo || obj.material === mats.insulatedGlass) {
+            return;
+          }
           const assetId = obj.userData?.assetId;
           if (assetId) {
             // Find live asset state
@@ -608,7 +616,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
         }
       });
       if (flowOverlayRef.current) {
-        flowOverlayRef.current.setVisible(flowVisible);
+        flowOverlayRef.current.setVisible(false);
       }
     }
     else if (visualMode === 'DEPENDENCY') {
@@ -652,6 +660,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
           obj.material = mats.wireframeEngineering;
         }
       });
+      if (flowOverlayRef.current) {
+        flowOverlayRef.current.setVisible(false);
+      }
     }
     else if (visualMode === 'THERMAL') {
       // 5. Thermal False-Color IR Mode
@@ -664,6 +675,9 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
           else if (obj !== environmentRef.current?.terrainMesh && obj !== environmentRef.current?.iceMesh) obj.material = mats.thermalNormal;
         }
       });
+      if (flowOverlayRef.current) {
+        flowOverlayRef.current.setVisible(false);
+      }
     }
   }, [visualMode, assets, stationId, flowVisible, selectedAsset]);
 
@@ -686,8 +700,14 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
 
   // Synchronize Dependency Flow Lines Visibility
   useEffect(() => {
-    if (flowOverlayRef.current) flowOverlayRef.current.setVisible(flowVisible);
-  }, [flowVisible]);
+    if (flowOverlayRef.current) {
+      if (visualMode === 'DEPENDENCY') {
+        flowOverlayRef.current.setVisible(flowVisible);
+      } else {
+        flowOverlayRef.current.setVisible(false);
+      }
+    }
+  }, [flowVisible, visualMode]);
 
   // Synchronize Human Scale Avatar Visibility
   useEffect(() => {
@@ -731,6 +751,8 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     setVisualMode(mode);
     if (mode === 'DEPENDENCY') {
       setFlowVisible(true);
+    } else {
+      setFlowVisible(false);
     }
   }, []);
 
@@ -745,6 +767,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       {/* Top Left HUD Station Telemetry Overlay */}
       <DigitalTwinHUD
         stationId={stationId}
+        onSelectStation={onSelectStation}
         visualMode={visualMode}
         lightingViewMode={lightingViewMode}
         onLightingViewModeChange={setLightingViewMode}
@@ -761,7 +784,7 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       />
 
       {/* Dedicated Dependency Flow Legend HUD */}
-      {visualMode === 'DEPENDENCY' && (
+      {visualMode === 'DEPENDENCY' && !selectedAsset && (
         <DependencyFlowLegend
           stationId={stationId}
           selectedAsset={selectedAsset}

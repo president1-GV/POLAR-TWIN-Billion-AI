@@ -140,7 +140,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         if (selectedRole === 'ADMIN') {
           onNavigate('admin');
         } else {
-          onNavigate('command-center');
+          onNavigate('officers', selectedRole.toLowerCase());
         }
       }
     } catch (err) {
@@ -154,12 +154,10 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
     e.preventDefault();
     e.stopPropagation();
     if (onNavigate) {
-      if (activeMeta.id === 'ADMIN') {
+      if (activeMeta.id === 'ADMIN' || activeMeta.canonicalId === 'ADMIN') {
         onNavigate('admin');
-      } else if (['COMMANDER', 'ENGINEER', 'OPERATOR', 'ANALYST'].includes(activeMeta.id)) {
-        onNavigate('officers', activeMeta.id.toLowerCase());
       } else {
-        onNavigate('command-center');
+        onNavigate('officers', activeMeta.canonicalId.toLowerCase());
       }
     } else {
       setIsOpen((prev) => !prev);
@@ -238,12 +236,10 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
               onClick={() => {
                 setIsOpen(false);
                 if (onNavigate) {
-                  if (activeMeta.id === 'ADMIN') {
+                  if (activeMeta.id === 'ADMIN' || activeMeta.canonicalId === 'ADMIN') {
                     onNavigate('admin');
-                  } else if (['COMMANDER', 'ENGINEER', 'OPERATOR', 'ANALYST'].includes(activeMeta.id)) {
-                    onNavigate('officers', activeMeta.id.toLowerCase());
                   } else {
-                    onNavigate('command-center');
+                    onNavigate('officers', activeMeta.canonicalId.toLowerCase());
                   }
                 }
               }}

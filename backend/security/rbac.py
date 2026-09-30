@@ -234,6 +234,26 @@ def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[str, A
 
     return session_payload
 
+def get_current_user_optional(authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """
+    FastAPI dependency to extract and verify session token if present.
+    If no authorization header is provided, returns a default read-only VIEWER context.
+    If an authorization header is provided, it must be valid or 401 is raised.
+    """
+    if not authorization:
+        return {
+            "sub": "usr_viewer_guest",
+            "username": "viewer.guest",
+            "role": "VIEWER",
+            "canonical_role": "VIEWER",
+            "station": "GLOBAL",
+            "station_scope": ["station_bharati", "station_maitri"],
+            "domain_scope": DOMAIN_SCOPES.get("VIEWER", []),
+            "operational_authority": "OBSERVATION_ONLY",
+            "is_impersonating": False
+        }
+    return get_current_user(authorization)
+
 def require_permission(perm: str):
     """
     Dependency factory checking role permissions server-side.

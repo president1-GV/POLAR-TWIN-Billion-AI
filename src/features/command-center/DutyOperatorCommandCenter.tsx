@@ -345,7 +345,9 @@ export const DutyOperatorCommandCenter: React.FC<Props> = ({
         </div>
         <div className="h-96 rounded overflow-hidden border border-polar-border">
           <Station3DViewer 
+            key={currentStationId}
             stationId={currentStationId}
+            onSelectStation={onSelectStation}
             onNavigateToSimulation={() => onNavigate('simulation')}
           />
         </div>

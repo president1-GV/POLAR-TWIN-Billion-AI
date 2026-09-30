@@ -24,6 +24,7 @@ import { useTheme } from '../../../context/ThemeContext';
 
 interface Props {
   stationId: string;
+  onSelectStation?: (stationId: string) => void;
   visualMode: VisualMode;
   lightingViewMode?: LightingViewMode;
   onLightingViewModeChange?: (mode: LightingViewMode) => void;
@@ -41,6 +42,7 @@ interface Props {
 
 export const DigitalTwinHUD: React.FC<Props> = ({
   stationId,
+  onSelectStation,
   visualMode,
   lightingViewMode = 'OPERATIONAL',
   onLightingViewModeChange,
@@ -99,9 +101,33 @@ export const DigitalTwinHUD: React.FC<Props> = ({
               className="w-11 h-11 rounded-full object-contain border border-polar-cyan/60 shadow-md ring-2 ring-polar-cyan/20 shrink-0" 
             />
             <div>
-              <h1 className="text-sm font-bold text-polar-text-primary tracking-wide">
-                {isBharati ? 'BHARATI ANTARCTIC STATION' : 'MAITRI ANTARCTIC STATION'}
-              </h1>
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-sm font-bold text-polar-text-primary tracking-wide">
+                  {isBharati ? 'BHARATI ANTARCTIC STATION' : 'MAITRI ANTARCTIC STATION'}
+                </h1>
+                {onSelectStation && (
+                  <div className="flex items-center bg-polar-card rounded-md p-0.5 border border-polar-border text-[9px] font-bold shrink-0">
+                    <button
+                      onClick={() => onSelectStation('station_bharati')}
+                      title="Switch to Bharati Station (Larsemann Hills)"
+                      className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                        isBharati ? 'bg-polar-cyan text-slate-950 font-extrabold shadow-sm' : 'text-polar-text-muted hover:text-polar-text-primary'
+                      }`}
+                    >
+                      BHARATI
+                    </button>
+                    <button
+                      onClick={() => onSelectStation('station_maitri')}
+                      title="Switch to Maitri Station (Schirmacher Oasis)"
+                      className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                        !isBharati ? 'bg-polar-cyan text-slate-950 font-extrabold shadow-sm' : 'text-polar-text-muted hover:text-polar-text-primary'
+                      }`}
+                    >
+                      MAITRI
+                    </button>
+                  </div>
+                )}
+              </div>
               <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-polar-text-secondary mt-0.5">
                 <span className="flex items-center gap-1 font-mono">
                   <Compass className="w-3 h-3 text-polar-cyan" />

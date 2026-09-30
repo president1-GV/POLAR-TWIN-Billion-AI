@@ -8,6 +8,7 @@ from backend.ai.predictive_maintenance import predictive_maintenance
 from backend.digital_twin.state_engine import digital_twin_engine
 from backend.security.rbac import (
     get_current_user,
+    get_current_user_optional,
     require_permission,
     require_station_access
 )
@@ -25,17 +26,21 @@ class TelemetryUpdatePayload(BaseModel):
     status: Optional[str] = Field(None, pattern="^(NORMAL|WATCH|WARNING|CRITICAL|FAILED|OFFLINE)$")
 
 @router.get("/station/{station_id}")
-def list_station_assets(station_id: str):
-    """Retrieve all physical assets for a station."""
+def list_station_assets(station_id: str, current_user: Dict[str, Any] = Depends(get_current_user_optional)):
+    """Retrieve all physical assets for a station with BOLA station verification."""
+    require_station_access(station_id, current_user)
     return supabase_client.get_table("station_assets", {"station_id": f"eq.{station_id}"})
 
 @router.get("/{asset_id}")
-def get_asset_detail(asset_id: str):
+def get_asset_detail(asset_id: str, current_user: Dict[str, Any] = Depends(get_current_user_optional)):
     """Retrieve asset details, live predictive maintenance, and AI diagnostic score."""
     assets = supabase_client.get_table("station_assets", {"id": f"eq.{asset_id}"})
     if not assets or len(assets) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Asset not found")
     asset = assets[0]
+    station_id = asset.get("station_id", "station_bharati")
+    require_station_access(station_id, current_user)
+
     curr_state = asset.get("current_state", {}) or {}
 
     # Run AI anomaly & predictive maintenance on current telemetry
@@ -50,8 +55,16 @@ def get_asset_detail(asset_id: str):
     }
 
 @router.get("/{asset_id}/consequences")
-def evaluate_asset_consequences(asset_id: str, ambient_temp_c: float = -20.0):
+def evaluate_asset_consequences(
+    asset_id: str,
+    ambient_temp_c: float = -20.0,
+    current_user: Dict[str, Any] = Depends(get_current_user_optional)
+):
     """Evaluate downstream cascading consequences if this specific asset fails."""
+    assets = supabase_client.get_table("station_assets", {"id": f"eq.{asset_id}"})
+    if assets and len(assets) > 0:
+        station_id = assets[0].get("station_id", "station_bharati")
+        require_station_access(station_id, current_user)
     return asset_graph.calculate_downstream_impact(asset_id, ambient_temp_c)
 
 @router.post("/{asset_id}/telemetry")

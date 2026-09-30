@@ -143,37 +143,31 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Vertical Divider */}
           <div className="h-6 border-l border-polar-border hidden sm:block shrink-0" />
 
-          {/* First-Class Station Selector with BOLA Guard */}
-          <div className="flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
+          {/* First-Class Station Selector */}
+          <div className="flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0 shadow-inner">
             <button
               onClick={() => onStationChange('station_bharati')}
-              disabled={!isStationAllowed('station_bharati')}
-              title={!isStationAllowed('station_bharati') ? 'Station not within operational scope' : 'Bharati Station • Larsemann Hills (69.408° S, 76.187° E)'}
-              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
-                !isStationAllowed('station_bharati')
-                  ? 'opacity-40 cursor-not-allowed text-polar-text-muted'
-                  : isBharati
-                  ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                  : 'text-polar-text-muted hover:text-polar-text-primary'
+              title="Switch to Bharati Station • Larsemann Hills (69.408° S, 76.187° E)"
+              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer ${
+                isBharati
+                  ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/50 shadow-sm ring-1 ring-polar-cyan/25'
+                  : 'text-polar-text-muted hover:text-polar-text-primary hover:bg-polar-elevated/60'
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
-              <span className="whitespace-nowrap">BHARATI</span>
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isBharati ? 'bg-polar-cyan animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'bg-slate-500'}`} />
+              <span className="whitespace-nowrap tracking-wide">BHARATI</span>
             </button>
             <button
               onClick={() => onStationChange('station_maitri')}
-              disabled={!isStationAllowed('station_maitri')}
-              title={!isStationAllowed('station_maitri') ? 'Access Denied: Station outside operational scope' : 'Maitri Station • Schirmacher Oasis (70.766° S, 11.740° E)'}
-              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
-                !isStationAllowed('station_maitri')
-                  ? 'opacity-40 cursor-not-allowed text-polar-text-muted'
-                  : !isBharati
-                  ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                  : 'text-polar-text-muted hover:text-polar-text-primary'
+              title="Switch to Maitri Station • Schirmacher Oasis (70.766° S, 11.740° E)"
+              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap cursor-pointer ${
+                !isBharati
+                  ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/50 shadow-sm ring-1 ring-polar-cyan/25'
+                  : 'text-polar-text-muted hover:text-polar-text-primary hover:bg-polar-elevated/60'
               }`}
             >
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
-              <span className="whitespace-nowrap">MAITRI</span>
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!isBharati ? 'bg-polar-cyan animate-pulse shadow-[0_0_8px_rgba(6,182,212,0.8)]' : 'bg-slate-500'}`} />
+              <span className="whitespace-nowrap tracking-wide">MAITRI</span>
             </button>
           </div>
         </div>

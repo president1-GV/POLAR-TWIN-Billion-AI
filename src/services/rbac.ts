@@ -727,14 +727,11 @@ export function hasDomainAccess(role: string | null | undefined, domain: Operati
 }
 
 export function getStationScope(role: string | null | undefined, assignedStation: string = 'station_bharati'): string[] {
-  const canonical = toCanonicalRole(role);
-  if (canonical === 'MISSION_CONTROL' || canonical === 'ADMIN') {
-    return ['station_bharati', 'station_maitri'];
-  }
-  return [assignedStation];
+  // Both Bharati and Maitri are observable across all operational roles for Antarctic situational awareness
+  return ['station_bharati', 'station_maitri'];
 }
 
-export function isStationAllowed(role: string | null | undefined, targetStationId: string, assignedStation: string = 'station_bharati'): boolean {
-  const scope = getStationScope(role, assignedStation);
-  return scope.includes(targetStationId);
+export function isStationAllowed(_role: string | null | undefined, _targetStationId: string, _assignedStation: string = 'station_bharati'): boolean {
+  // Viewing digital twins, telemetry observations, and 3D stations is accessible across stations
+  return true;
 }

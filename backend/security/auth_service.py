@@ -17,9 +17,10 @@ USER_DATABASE: Dict[str, Dict[str, Any]] = {}
 
 def _init_users():
     raw_users = [
-        {"username": "operator.sharma", "name": "V. Sharma", "role": "OPERATOR", "station": "station_bharati", "pwd": "PolarOps@2026!"},
-        {"username": "engineer.deshmukh", "name": "A. Deshmukh", "role": "ENGINEER", "station": "station_bharati", "pwd": "AntarcticEng#1"},
-        {"username": "commander.nair", "name": "Col. R. Nair", "role": "SUPERVISOR", "station": "station_bharati", "pwd": "BaseCommander$9"},
+        {"username": "operator.sharma", "name": "V. Sharma", "role": "DUTY_OPERATOR", "station": "station_bharati", "pwd": "PolarOps@2026!"},
+        {"username": "operator.verma", "name": "S. Verma", "role": "DUTY_OPERATOR", "station": "station_maitri", "pwd": "MaitriOps@2026!"},
+        {"username": "engineer.deshmukh", "name": "A. Deshmukh", "role": "BASE_ENGINEER", "station": "station_bharati", "pwd": "AntarcticEng#1"},
+        {"username": "commander.nair", "name": "Col. R. Nair", "role": "EXPEDITION_CMDR", "station": "station_bharati", "pwd": "BaseCommander$9"},
         {"username": "controller.raman", "name": "K. Raman (Flight Controller)", "role": "MISSION_CONTROL", "station": "GLOBAL", "pwd": "MissionCtrl#2026"},
         {"username": "analyst.patel", "name": "Dr. K. Patel", "role": "ANALYST", "station": "station_maitri", "pwd": "PolarData*2026"},
         {"username": "admin.ncpor", "name": "NCPOR Mission Control Admin", "role": "ADMIN", "station": "GLOBAL", "pwd": "NcporMissionControl!2026"},

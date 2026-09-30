@@ -25,7 +25,24 @@ import { PolarRole } from './services/rbac';
 
 export const App: React.FC = () => {
   const { role, switchRole, isAuthenticated, user } = useAuth();
-  const [currentStationId, setCurrentStationId] = useState<string>('station_bharati');
+  const [currentStationId, setCurrentStationId] = useState<string>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('polar_twin_selected_station');
+      if (saved === 'station_bharati' || saved === 'station_maitri') {
+        return saved;
+      }
+    }
+    return 'station_bharati';
+  });
+
+  const handleStationChange = (stationId: string) => {
+    const validStationId = stationId === 'station_maitri' ? 'station_maitri' : 'station_bharati';
+    setCurrentStationId(validStationId);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('polar_twin_selected_station', validStationId);
+    }
+  };
+
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('command-center');
   const [selectedOfficerId, setSelectedOfficerId] = useState<string>('commander');
   const [linkStatus, setLinkStatus] = useState<LinkStatus>('ONLINE');
@@ -195,7 +212,7 @@ export const App: React.FC = () => {
       {/* Header */}
       <Header
         currentStationId={currentStationId}
-        onStationChange={setCurrentStationId}
+        onStationChange={handleStationChange}
         linkStatus={linkStatus}
         onLinkToggle={handleLinkToggle}
         unreadAlertsCount={unreadCount}
@@ -217,7 +234,7 @@ export const App: React.FC = () => {
             {currentScreen === 'admin' && (
               <AdminMissionControl
                 currentStationId={currentStationId}
-                onSelectStation={setCurrentStationId}
+                onSelectStation={handleStationChange}
                 onNavigateToOfficers={(officerId) => {
                   if (officerId) setSelectedOfficerId(officerId);
                   setCurrentScreen('officers');
@@ -230,7 +247,7 @@ export const App: React.FC = () => {
               <StationOfficersPortal
                 initialOfficerId={selectedOfficerId}
                 currentStationId={currentStationId}
-                onSelectStation={setCurrentStationId}
+                onSelectStation={handleStationChange}
                 onNavigateToAdmin={() => setCurrentScreen('admin')}
                 onNavigateToScreen={setCurrentScreen}
               />
@@ -240,14 +257,16 @@ export const App: React.FC = () => {
               <ExecutiveCommandCenter
                 currentStationId={currentStationId}
                 onNavigate={setCurrentScreen}
-                onSelectStation={setCurrentStationId}
+                onSelectStation={handleStationChange}
               />
             )}
 
             {currentScreen === 'digital-twin' && (
               <div className="h-[calc(100vh-4rem)] w-full overflow-hidden">
                 <Station3DViewer 
+                  key={currentStationId}
                   stationId={currentStationId} 
+                  onSelectStation={handleStationChange}
                   onNavigateToSimulation={(_scenarioKey) => setCurrentScreen('simulation')}
                 />
               </div>

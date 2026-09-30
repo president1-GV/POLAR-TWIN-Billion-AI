@@ -64,24 +64,32 @@ def evaluate_automation_pipeline(req: AutomationEvaluateRequest):
         )
 
 
+from backend.security.rbac import get_current_user
+
 @router.post("/approve", summary="Human-in-the-Loop Operator Action Approval")
-def approve_automation_action(req: ActionApprovalRequest):
+def approve_automation_action(
+    req: ActionApprovalRequest,
+    current_user: Optional[Dict[str, Any]] = Depends(get_current_user)
+):
     """
     Authorized operator approves a recommended action.
     Transitions: ACTION_PENDING -> SIMULATING -> VERIFYING -> COMPLETED -> AUDITED.
-    Enforces server-side authorization.
+    Enforces server-side identity derivation and authorization.
     """
-    if not can_user_execute(req.operator_role, "approve_consequential_actions"):
+    operator_role = current_user.get("role", req.operator_role) if current_user else req.operator_role
+    operator_username = current_user.get("username", req.operator_username) if current_user else req.operator_username
+
+    if not can_user_execute(operator_role, "approve_consequential_actions"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"User role '{req.operator_role}' is not authorized to approve consequential operational actions."
+            detail=f"User role '{operator_role}' is not authorized to approve consequential operational actions."
         )
 
     try:
         result = automation_engine.approve_action(
             action_id=req.action_id,
-            operator_username=req.operator_username,
-            operator_role=req.operator_role,
+            operator_username=operator_username,
+            operator_role=operator_role,
             parameter_override=req.parameter_override
         )
         return result
@@ -94,21 +102,28 @@ def approve_automation_action(req: ActionApprovalRequest):
 
 
 @router.post("/reject", summary="Operator Rejects Action Recommendation")
-def reject_automation_action(req: ActionRejectRequest):
+def reject_automation_action(
+    req: ActionRejectRequest,
+    current_user: Optional[Dict[str, Any]] = Depends(get_current_user)
+):
     """
     Operator rejects recommendation with operational reason.
+    Enforces server-side identity derivation.
     """
-    if not can_user_execute(req.operator_role, "reject_action"):
+    operator_role = current_user.get("role", req.operator_role) if current_user else req.operator_role
+    operator_username = current_user.get("username", req.operator_username) if current_user else req.operator_username
+
+    if not can_user_execute(operator_role, "reject_action"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"User role '{req.operator_role}' is not authorized to reject actions."
+            detail=f"User role '{operator_role}' is not authorized to reject actions."
         )
 
     try:
         result = automation_engine.reject_action(
             action_id=req.action_id,
-            operator_username=req.operator_username,
-            operator_role=req.operator_role,
+            operator_username=operator_username,
+            operator_role=operator_role,
             reason=req.reason
         )
         return result

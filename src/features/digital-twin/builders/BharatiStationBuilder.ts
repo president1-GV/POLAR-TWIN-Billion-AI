@@ -1167,7 +1167,15 @@ export class BharatiStationBuilder {
   }
 
   public dispose(): void {
-    // Clear references
+    if (this.group.parent) {
+      this.group.parent.remove(this.group);
+    }
+    this.group.traverse(child => {
+      if (child instanceof THREE.Mesh) {
+        if (child.geometry) child.geometry.dispose();
+      }
+    });
+    this.group.clear();
     this.interactiveMap.clear();
   }
 }

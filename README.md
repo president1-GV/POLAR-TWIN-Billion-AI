@@ -136,7 +136,9 @@ Every component of POLAR-TWIN Billion AI is built on a modern, robust, and mathe
 | Component | Method / Algorithm | Mathematical & Operational Specification |
 | :--- | :--- | :--- |
 | **Multivariate Anomaly Detection** | Mahalanobis Distance Metric ($D_M$) | Detects multidimensional drift in rotating equipment by computing: $$D_M = \sqrt{(\mathbf{x} - \boldsymbol{\mu})^T \boldsymbol{\Sigma}^{-1} (\mathbf{x} - \boldsymbol{\mu})}$$ over feature vectors: $\mathbf{x} = \begin{bmatrix} T_{\text{exhaust}} & \text{vibration} & \text{load}\% & P_{\text{oil}} & F_{\text{fuel}} \end{bmatrix}^T$. An anomaly is formally flagged when $D_M > 3.0$. |
+| **Statistical Machine Learning** | `scikit-learn` (v1.5+) / Covariance Estimators | Robust covariance matrix inversion ($\boldsymbol{\Sigma}^{-1}$), empirical covariance calculation with Ledoit-Wolf shrinkage for low-sample polar operating regimes. |
 | **Explainable Feature Attribution** | Component Z-Score Attribution | Disassembles multivariate anomaly triggers into human-interpretable feature attributions with exact statistical deviations (e.g. `vibration: +3.42σ elevated`, `exhaust_temp: +3.12σ elevated`). |
+| **Microgrid Optimal Dispatch** | Google OR-Tools MILP (SCIP / CBC) | Mixed-Integer Linear Programming solving hourly cost minimization: $$\min \sum_{t} \left(c_{\text{fuel}} \cdot F_{\text{burn}}(t) + c_{\text{deg}} \cdot P_{\text{bess}}(t)\right)$$ subject to spinning reserve, minimum genset loading (40%), and battery state-of-charge constraints. |
 | **Energy & Electrical Forecasting** | Holt-Winters Exponential Smoothing | Triple exponential smoothing algorithm incorporating diurnal solar insolation patterns and ambient temperature correlations to forecast 24-hour station power demand. |
 | **Predictive Maintenance** | Weibull Reliability Modeling | Computes Remaining Useful Life (RUL in operating hours) and mechanical degradation velocity based on ISO-10816 vibration severity and thermal fatigue cycles. |
 | **Contingency Cascade Engine** | Directed Causal Dependency Graph | Evaluates upstream-to-downstream failure propagation across microgrid breakers, HVAC loops, and Reverse Osmosis pipelines during machinery trip incidents. |
@@ -194,78 +196,85 @@ Every component of POLAR-TWIN Billion AI is built on a modern, robust, and mathe
 
 ---
 
-## 3. Operational Clearance Hierarchy (RBAC / ABAC)
+## 3. Operational Clearance Hierarchy & Authority Model (RBAC / ABAC)
 
-POLAR-TWIN Billion AI enforces a defense-grade 5-level Zero-Trust clearance hierarchy with strict operational role boundaries:
+POLAR-TWIN Billion AI enforces a defense-grade 5-level Zero-Trust clearance hierarchy with strict operational role boundaries and server-verified authority:
 
 ```text
-                  CLEARANCE LEVEL HIERARCHY
-                             │
-     ┌───────────────────────┴───────────────────────┐
-     │  LEVEL-5: MISSION CONTROL ROOT ADMINISTRATOR  │
-     │  • Scope: Global Multi-Station Master Control │
-     │  • Capabilities: Full Overrides, RLS, Audit   │
-     └───────────────────────┬───────────────────────┘
-                             │
-     ┌───────────────────────┴───────────────────────┐
-     │  LEVEL-4: EXPEDITION COMMANDER (NCPOR)        │
-     │  • Scope: Bharati & Maitri Station Command    │
-     │  • Capabilities: Inter-Station Allocation     │
-     └───────────────────────┬───────────────────────┘
-                             │
-     ┌───────────────────────┴───────────────────────┐
-     │  LEVEL-3: BASE CHIEF ENGINEER                 │
-     │  • Scope: Station Machinery & Energy Microgrid│
-     │  • Capabilities: HVAC Tuning, Genset Sync     │
-     └───────────────────────┬───────────────────────┘
-                             │
-     ┌───────────────────────┴───────────────────────┐
-     │  LEVEL-2: OPERATIONS DUTY OFFICER & SCIENTIST │
-     │  • Scope: 24/7 Watch Shift & Scientific Ingest│
-     │  • Capabilities: Alert Ack, Edge Buffer Sync  │
-     └───────────────────────┬───────────────────────┘
-                             │
-     ┌───────────────────────┴───────────────────────┐
-     │  LEVEL-1: SCIENTIFIC OBSERVER / VIEWER        │
-     │  • Scope: Read-Only Scientific Telemetry      │
-     │  • Capabilities: View 3D Twin & Weather Data  │
-     └───────────────────────────────────────────────┘
+AUTHENTICATED IDENTITY ──► ROLE ──► AUTHORITY ──► STATION SCOPE ──► DATA ACCESS ──► COMMAND ACCESS ──► AUDIT
+
+                                CLEARANCE & AUTHORITY HIERARCHY
+                                               │
+               ┌───────────────────────────────┴───────────────────────────────┐
+               │  LEVEL-5: ADMIN (Platform Administration & Root Governance)   │
+               │  • Platform, RLS policies, RBAC, credentials, full audit log  │
+               └───────────────────────────────┬───────────────────────────────┘
+                                               │
+               ┌───────────────────────────────┴───────────────────────────────┐
+               │  LEVEL-4: EXPEDITION_CMDR (Expedition Tactical Command)       │
+               │  • Inter-station readiness, mission execution, fuel & alerts │
+               └───────────────────────────────┬───────────────────────────────┘
+                                               │
+               ┌───────────────────────────────┴───────────────────────────────┐
+               │  LEVEL-4: MISSION_CONTROL (Central Remote Oversight)          │
+               │  • Dual-station comparator, satellite telemetry, edge sync    │
+               └───────────────────────────────┬───────────────────────────────┘
+                                               │
+               ┌───────────────────────────────┴───────────────────────────────┐
+               │  LEVEL-3: BASE_ENGINEER (Station Infrastructure & Energy)     │
+               │  • Microgrid, HVAC, RO plant, predictive maintenance, boilers │
+               └───────────────────────────────┬───────────────────────────────┘
+                                               │
+               ┌───────────────────────────────┴───────────────────────────────┐
+               │  LEVEL-2: DUTY_OPERATOR (Station Monitoring & Watch Shifts)   │
+               │  • 24/7 Antarctic watch, SCADA alerts, shift journals, safety │
+               └───────────────────────────────────────────────────────────────┘
 ```
+
+> **OPERATIONAL AUTHORITY $\neq$ PLATFORM ADMINISTRATION**  
+> `MISSION_CONTROL` and `EXPEDITION_CMDR` hold high-level operational command authority across both stations, coordinating field missions, grid balances, and emergency mutual aid. `ADMIN` governs platform security, Supabase RLS policies, credential vaults, and system auditability. Neither role supersedes the other outside its domain; every action across every role is cryptographically logged to an immutable ledger.
 
 ### Active Officer Dossiers & Workspaces
 
-1. **Root Administrator** (`admin.ncpor` | **Clearance: LVL-5 ROOT**)  
+1. **Platform Root Administrator** (`admin.ncpor` | **Role: `ADMIN`** | **Clearance: LVL-5 ROOT**)  
    *Rank*: Director of Mission Systems (NCPOR HQ / Goa Orbit Link)  
    *Scope*: Global Multi-Station Root Authority  
-   *Dedicated Workspace*: **Admin Mission Control Console**  
+   *Dedicated Workspace*: **Admin Mission Control Console (`/admin`)**  
    *Operational Controls*: Supabase cluster health ping, database schema inspection, active personnel credential overrides, zero-trust defense policy toggles, emergency station red alert, edge satellite buffer quarantine, session key rotation, and forensic audit export.
 
-2. **Expedition Commander** (`commander.nair` | **Clearance: LVL-4 CMDR**)  
+2. **Expedition Commander** (`commander.nair` | **Role: `EXPEDITION_CMDR`** | **Clearance: LVL-4 CMDR**)  
    *Personnel*: Col. R. Nair (Call-sign: `POLAR-LEADER`)  
    *Rank*: 45th Indian Scientific Expedition to Antarctica (ISEA) Commander  
-   *Scope*: Inter-Station Command (Bharati Lead & Maitri Oversight)  
-   *Dedicated Workspace*: **Commander Tactical Command Console**  
+   *Scope*: Inter-Station Tactical Command (Bharati Lead & Maitri Oversight)  
+   *Dedicated Workspace*: **Commander Tactical Command Console (`/officers`)**  
    *Operational Controls*: Inter-station fuel and water reallocation protocol (Bharati 142.8d vs Maitri 118.4d reserves), expedition readiness and crew morale monitoring, encrypted tactical directives broadcast terminal, and What-If contingency scenario authorization.
 
-3. **Base Chief Engineer** (`engineer.deshmukh` | **Clearance: LVL-3 TECH**)  
+3. **Mission Flight Controller** (`controller.raman` | **Role: `MISSION_CONTROL`** | **Clearance: LVL-4 FLIGHT**)  
+   *Personnel*: K. Raman (Call-sign: `ANTARCTIC-CONTROL`)  
+   *Rank*: Flight & Satellite Operations Controller (NCPOR / Master Control Facility)  
+   *Scope*: Dual-Station Satellite Uplink, Fleet Logistics & Cross-Station Telemetry  
+   *Dedicated Workspace*: **Mission Flight Controller Console (`/officers`)**  
+   *Operational Controls*: Dual-station synchronous comparator (Bharati vs Maitri microgrid, fuel, habitat envelope, personnel complement), GSAT-11 / Inmarsat ground link status, satellite pass scheduler, forced edge telemetry queue synchronization, and cross-station mutual aid coordination.
+
+4. **Base Chief Engineer** (`engineer.deshmukh` | **Role: `BASE_ENGINEER`** | **Clearance: LVL-3 TECH**)  
    *Personnel*: Anand Deshmukh (Call-sign: `ICE-CHIEF`)  
    *Rank*: Station Base Chief Engineer  
    *Scope*: Bharati Base Machinery, Microgrids & Life Support  
-   *Dedicated Workspace*: **Engineering Operations Console**  
+   *Dedicated Workspace*: **Engineering Operations Console (`/officers`)**  
    *Operational Controls*: Coupled closed-loop HVAC thermal heating controls ($+18^\circ\text{C}$ to $+23^\circ\text{C}$ setpoint adjustment at $-28.5^\circ\text{C}$ ambient cold), heat exchanger purge cycle execution, microgrid generator load balancing (Genset 01, Aux Genset 02 synchronization, solar PV peak-shaving, BESS 200 kWh battery inverter diagnostics), and Reverse Osmosis (RO) potable water plant monitoring.
 
-4. **Operations Duty Officer** (`operator.sharma` | **Clearance: LVL-2 DUTY**)  
-   *Personnel*: Vikram Sharma (Call-sign: `WATCH-BHARATI`)  
+5. **Operations Duty Officer** (`operator.sharma` / `operator.verma` | **Role: `DUTY_OPERATOR`** | **Clearance: LVL-2 DUTY**)  
+   *Personnel*: Vikram Sharma / Operator Verma (Call-sign: `WATCH-BHARATI` / `WATCH-MAITRI`)  
    *Rank*: Station Operations Duty Officer  
-   *Scope*: 24/7 Antarctic Watch, SCADA Telemetry & Sat-Link  
-   *Dedicated Workspace*: **Duty Operations Watch Console**  
+   *Scope*: 24/7 Station Watch, SCADA Telemetry & Sat-Link (Station-Scoped)  
+   *Dedicated Workspace*: **Duty Operations Watch Console (`/officers`)**  
    *Operational Controls*: Active watch shift management (Shift Bravo 08:00 - 16:00 UTC), rapid alert acknowledgement and triage desk, satellite store-and-forward edge buffer queue monitor, and live shift journal logbook.
 
-5. **Science & Meteorology Officer** (`analyst.patel` | **Clearance: LVL-2 SCI**)  
+6. **Science & Meteorology Officer** (`analyst.patel` | **Clearance: LVL-2 SCI**)  
    *Personnel*: Dr. Kavita Patel (Call-sign: `AURORA-SCIENCE`)  
    *Rank*: Senior Scientific Investigator  
    *Scope*: Atmospheric Physics, Cryosphere & Seismology (Maitri Base)  
-   *Dedicated Workspace*: **Science Observatory Console**  
+   *Dedicated Workspace*: **Science Observatory Console (`/officers`)**  
    *Operational Controls*: Meteorological observatory telemetry (Surface Ozone Spectrometer at 284 Dobson Units, Geomagnetic Fluxgate at 42,180 nT, UV Radiation Index, Barometric Pressure), Lake Priyadarshini limnological depth sampling, and NCPOR research dataset SHA-256 bitwise provenance integrity verification.
 
 ---

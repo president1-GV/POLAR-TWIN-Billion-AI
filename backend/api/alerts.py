@@ -6,6 +6,7 @@ import json
 from backend.database.supabase_client import supabase_client
 from backend.security.rbac import (
     get_current_user,
+    get_current_user_optional,
     require_permission,
     require_station_access
 )
@@ -18,11 +19,25 @@ class AlertActionPayload(BaseModel):
     notes: Optional[str] = None
 
 @router.get("")
-def list_alerts(station_id: Optional[str] = None, status_filter: Optional[str] = None, limit: int = 50):
-    """Retrieve operational alerts filtered by station or status."""
+def list_alerts(
+    station_id: Optional[str] = None,
+    status_filter: Optional[str] = None,
+    limit: int = 50,
+    current_user: Dict[str, Any] = Depends(get_current_user_optional)
+):
+    """
+    Retrieve operational alerts filtered by station and status.
+    Enforces server-side station scoping per verified operational identity.
+    """
+    effective_station = station_id
+    if effective_station:
+        require_station_access(effective_station, current_user)
+    elif current_user.get("canonical_role") not in ["ADMIN", "MISSION_CONTROL"]:
+        effective_station = current_user.get("station", "station_bharati")
+
     params: Dict[str, str] = {"order": "created_at.desc", "limit": str(limit)}
-    if station_id:
-        params["station_id"] = f"eq.{station_id}"
+    if effective_station and effective_station != "GLOBAL":
+        params["station_id"] = f"eq.{effective_station}"
     if status_filter:
         params["status"] = f"eq.{status_filter}"
     return supabase_client.get_table("alerts", params)

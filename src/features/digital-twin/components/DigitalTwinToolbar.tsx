@@ -79,9 +79,9 @@ export const DigitalTwinToolbar: React.FC<Props> = ({
   ];
 
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 p-1.5 bg-polar-surface/90 border border-polar-border rounded-xl shadow-2xl backdrop-blur-md font-mono select-none text-xs">
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 p-1.5 bg-polar-surface border border-polar-border rounded-xl shadow-2xl font-mono select-none text-xs">
       {/* Mode Switcher Group */}
-      <div className="flex items-center gap-1 bg-polar-card/80 p-1 rounded-lg border border-polar-border">
+      <div className="flex items-center gap-1 bg-polar-card p-1 rounded-lg border border-polar-border">
         {modes.map(m => {
           const Icon = m.icon;
           const isActive = visualMode === m.id;
@@ -90,10 +90,10 @@ export const DigitalTwinToolbar: React.FC<Props> = ({
               key={m.id}
               onClick={() => onVisualModeChange(m.id)}
               title={`Switch to ${m.label} Mode`}
-              className={`px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition-all text-[11px] font-semibold ${
+              className={`px-2.5 py-1.5 rounded-md flex items-center gap-1.5 transition-all text-[11px] font-bold ${
                 isActive
-                  ? 'bg-polar-cyan/20 text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                  : 'text-polar-text-secondary hover:text-polar-text-primary hover:bg-polar-hover'
+                  ? 'bg-polar-cyan/20 text-polar-cyan border border-polar-cyan/50 shadow-sm'
+                  : 'text-polar-text-primary hover:text-polar-cyan hover:bg-polar-hover'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />

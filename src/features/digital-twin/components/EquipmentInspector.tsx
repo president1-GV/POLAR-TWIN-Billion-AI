@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StationAsset } from '../../../types';
 import { ProvenanceBadge } from '../../../components/common/ProvenanceBadge';
 import { StatusBadge } from '../../../components/ui/StatusBadge';
+import { DependencyGraph } from '../../../components/ui/DependencyGraph';
 import { getAssetSpatialSpec } from '../geospatial/GeoReferenceEngine';
 import { 
   X, 
@@ -277,7 +278,7 @@ const ASSET_RELATIONS: Record<string, { upstream: Array<{ id: string; name: stri
   },
 };
 
-type InspectorTab = 'OVERVIEW' | 'SPATIAL' | 'TELEMETRY' | 'PROGNOSTICS';
+type InspectorTab = 'OVERVIEW' | 'DEPENDENCY' | 'SPATIAL' | 'TELEMETRY' | 'PROGNOSTICS';
 
 export const EquipmentInspector: React.FC<Props> = ({
   asset,
@@ -300,7 +301,7 @@ export const EquipmentInspector: React.FC<Props> = ({
     'text-amber-400 bg-amber-500/10 border-amber-500/30';
 
   return (
-    <div className="absolute top-4 right-4 bottom-4 w-[28rem] bg-polar-surface/95 border border-polar-border rounded-xl shadow-2xl flex flex-col z-30 overflow-hidden backdrop-blur-md font-mono select-none">
+    <div className="absolute top-4 right-4 bottom-4 w-[28rem] max-w-[calc(100vw-2rem)] bg-polar-surface border border-polar-border rounded-xl shadow-2xl flex flex-col z-30 overflow-hidden font-mono select-none">
       {/* Header with Asset Code, Name, Provenance and Controls */}
       <div className="p-3.5 bg-polar-card border-b border-polar-border">
         <div className="flex items-center justify-between">
@@ -361,10 +362,10 @@ export const EquipmentInspector: React.FC<Props> = ({
         </div>
 
         {/* 14-Dimension Navigation Tabs */}
-        <div className="grid grid-cols-4 gap-1 mt-3 bg-polar-surface p-1 rounded-lg border border-polar-border text-[10px]">
+        <div className="grid grid-cols-5 gap-1 mt-3 bg-polar-surface p-1 rounded-lg border border-polar-border text-[9px] sm:text-[10px]">
           <button
             onClick={() => setActiveTab('OVERVIEW')}
-            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+            className={`py-1 px-1 rounded font-bold transition-colors text-center ${
               activeTab === 'OVERVIEW'
                 ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
                 : 'text-polar-text-secondary hover:text-polar-text-primary'
@@ -373,8 +374,18 @@ export const EquipmentInspector: React.FC<Props> = ({
             STATUS
           </button>
           <button
+            onClick={() => setActiveTab('DEPENDENCY')}
+            className={`py-1 px-1 rounded font-bold transition-colors text-center ${
+              activeTab === 'DEPENDENCY'
+                ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
+                : 'text-polar-text-secondary hover:text-polar-text-primary'
+            }`}
+          >
+            TOPOLOGY
+          </button>
+          <button
             onClick={() => setActiveTab('SPATIAL')}
-            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+            className={`py-1 px-1 rounded font-bold transition-colors text-center ${
               activeTab === 'SPATIAL'
                 ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
                 : 'text-polar-text-secondary hover:text-polar-text-primary'
@@ -384,7 +395,7 @@ export const EquipmentInspector: React.FC<Props> = ({
           </button>
           <button
             onClick={() => setActiveTab('TELEMETRY')}
-            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+            className={`py-1 px-1 rounded font-bold transition-colors text-center ${
               activeTab === 'TELEMETRY'
                 ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
                 : 'text-polar-text-secondary hover:text-polar-text-primary'
@@ -394,13 +405,13 @@ export const EquipmentInspector: React.FC<Props> = ({
           </button>
           <button
             onClick={() => setActiveTab('PROGNOSTICS')}
-            className={`py-1 px-1.5 rounded font-bold transition-colors text-center ${
+            className={`py-1 px-1 rounded font-bold transition-colors text-center ${
               activeTab === 'PROGNOSTICS'
                 ? 'bg-polar-cyan/15 text-polar-cyan border border-polar-cyan/30'
                 : 'text-polar-text-secondary hover:text-polar-text-primary'
             }`}
           >
-            SOP & RISK
+            RISK
           </button>
         </div>
       </div>
@@ -527,7 +538,20 @@ export const EquipmentInspector: React.FC<Props> = ({
           </div>
         )}
 
-        {/* TAB 2: SPATIAL & PHYSICAL SPECIFICATIONS */}
+        {/* TAB 2: COUPLED DEPENDENCY TOPOLOGY */}
+        {activeTab === 'DEPENDENCY' && (
+          <div className="space-y-3">
+            <DependencyGraph
+              currentAssetId={asset.id}
+              currentAssetName={spatialSpec?.name || asset.name}
+              upstream={relations.upstream}
+              downstream={relations.downstream}
+              onSelectAsset={(assetId) => onSelectRelatedAsset && onSelectRelatedAsset(assetId)}
+            />
+          </div>
+        )}
+
+        {/* TAB 3: SPATIAL & PHYSICAL SPECIFICATIONS */}
         {activeTab === 'SPATIAL' && (
           <div className="space-y-3">
             {/* Dimension 3: Geodetic & Engineering Coordinate Reference */}
