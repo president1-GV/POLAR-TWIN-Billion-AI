@@ -23,6 +23,8 @@ import { WhatIfSimulationModal } from './components/WhatIfSimulationModal';
 import { GeolocationValidationModal } from './components/GeolocationValidationModal';
 import { CausalChainModal } from './components/CausalChainModal';
 import { DigitalTwinHUD } from './components/DigitalTwinHUD';
+import { DependencyFlowLegend } from './components/DependencyFlowLegend';
+import { TelemetryModeHUD } from './components/TelemetryModeHUD';
 import { TwinAssetLabel } from '../../components/ui/TwinAssetLabel';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -374,6 +376,16 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
       interactiveMap = maitri.interactiveMap;
     }
 
+    // 5.5 Cache authentic PBR materials across all meshes for flawless visual mode restoration
+    scene.traverse(obj => {
+      if (obj instanceof THREE.Mesh) {
+        if (!obj.userData) obj.userData = {};
+        if (!obj.userData.originalMaterial) {
+          obj.userData.originalMaterial = obj.material;
+        }
+      }
+    });
+
     // 6. Dependency Flow Overlay
     const flowOverlay = new DependencyFlowOverlay(scene, stationId);
     flowOverlay.setVisible(flowVisible);
@@ -551,32 +563,116 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     };
   }, [stationId, assets]);
 
-  // Synchronize Visual Modes across Materials
+  // Synchronize Visual Modes across Materials and Overlays
   useEffect(() => {
     if (!materialsRef.current || !sceneRef.current) return;
     const mats = materialsRef.current;
 
-    sceneRef.current.traverse(obj => {
-      if (obj instanceof THREE.Mesh) {
-        if (visualMode === 'ENGINEERING') {
-          obj.material = mats.wireframeEngineering;
-        } else if (visualMode === 'THERMAL') {
-          // False-color temperature map based on object role
-          const aId = obj.userData?.assetId;
-          if (aId?.includes('gen') || aId?.includes('boiler')) obj.material = mats.thermalHot;
-          else if (aId?.includes('hvac')) obj.material = mats.thermalWarm;
-          else if (aId?.includes('water') || aId?.includes('fuel')) obj.material = mats.thermalCold;
-          else obj.material = mats.thermalNormal;
-        }
-      }
-    });
-
     if (visualMode === 'REALISTIC') {
-      // Restore standard materials via beacon update
+      // 1. Fully restore all authentic PBR materials
+      sceneRef.current.traverse(obj => {
+        if (obj instanceof THREE.Mesh && obj.userData?.originalMaterial) {
+          obj.material = obj.userData.originalMaterial;
+        }
+      });
+      // Restore beacon materials
       if (bharatiBuilderRef.current) bharatiBuilderRef.current.updateBeacons();
       if (maitriBuilderRef.current) maitriBuilderRef.current.updateBeacons();
+      // Flow overlay visibility matches flowVisible
+      if (flowOverlayRef.current) {
+        flowOverlayRef.current.setVisible(flowVisible);
+        flowOverlayRef.current.setHighlightedAsset(null);
+      }
+    } 
+    else if (visualMode === 'TELEMETRY') {
+      // 2. Telemetry Mode: Recolor interactive machinery by live operational status
+      // Static background structure gets subdued backdrop contrast for high pop
+      sceneRef.current.traverse(obj => {
+        if (obj instanceof THREE.Mesh) {
+          const assetId = obj.userData?.assetId;
+          if (assetId) {
+            // Find live asset state
+            const asset = resolveInteractiveAsset(assetId, stationId, assets);
+            const status = asset?.status || 'NORMAL';
+            if (status === 'NORMAL') obj.material = mats.statusNormal;
+            else if (status === 'WATCH' || status === 'WARNING') obj.material = mats.statusWarning;
+            else if (status === 'CRITICAL' || status === 'FAILED') obj.material = mats.statusCritical;
+            else if (status === 'OFFLINE') obj.material = mats.statusOffline;
+            else obj.material = mats.statusNormal;
+          } else {
+            // Static architecture gets dimmed high-contrast telemetry backdrop
+            if (obj !== environmentRef.current?.terrainMesh && obj !== environmentRef.current?.iceMesh && obj.userData?.originalMaterial) {
+              obj.material = mats.telemetryBackdrop;
+            }
+          }
+        }
+      });
+      if (flowOverlayRef.current) {
+        flowOverlayRef.current.setVisible(flowVisible);
+      }
     }
-  }, [visualMode]);
+    else if (visualMode === 'DEPENDENCY') {
+      // 3. Dependency Mode: Turn on flow lines & make buildings ghost/x-ray so internal/external networks are visible
+      if (flowOverlayRef.current) {
+        flowOverlayRef.current.setVisible(true);
+        flowOverlayRef.current.setHighlightedAsset(selectedAsset ? selectedAsset.id : null);
+      }
+
+      sceneRef.current.traverse(obj => {
+        if (obj instanceof THREE.Mesh) {
+          const assetId = obj.userData?.assetId;
+          if (assetId) {
+            // Highlight nodes connected to flow lines
+            if (assetId.includes('fuel')) {
+              obj.material = mats.statusWarning; // Amber fuel highlight
+            } else if (assetId.includes('gen') || assetId.includes('pdb') || assetId.includes('solar') || assetId.includes('bess') || assetId.includes('wind')) {
+              obj.material = mats.flowHighlighted; // Cyan electrical highlight
+            } else if (assetId.includes('water') || assetId.includes('pump') || assetId.includes('res') || assetId.includes('RO')) {
+              obj.material = mats.roMembraneVessel; // Water blue highlight
+            } else if (assetId.includes('hvac') || assetId.includes('boiler') || assetId.includes('BLR')) {
+              obj.material = mats.thermalWarm; // Heating orange highlight
+            } else if (assetId.includes('comms') || assetId.includes('sat') || assetId.includes('SAT')) {
+              obj.material = mats.antennaSteel; // Comms violet/steel highlight
+            } else {
+              obj.material = mats.ghostTranslucent;
+            }
+          } else if (obj.userData?.originalMaterial) {
+            // Non-asset structures (building exterior envelope, stilts, roofs) become ghost translucent
+            if (obj !== environmentRef.current?.terrainMesh && obj !== environmentRef.current?.iceMesh) {
+              obj.material = mats.ghostTranslucent;
+            }
+          }
+        }
+      });
+    }
+    else if (visualMode === 'ENGINEERING') {
+      // 4. Engineering Wireframe Mode
+      sceneRef.current.traverse(obj => {
+        if (obj instanceof THREE.Mesh && obj !== environmentRef.current?.terrainMesh && obj !== environmentRef.current?.iceMesh) {
+          obj.material = mats.wireframeEngineering;
+        }
+      });
+    }
+    else if (visualMode === 'THERMAL') {
+      // 5. Thermal False-Color IR Mode
+      sceneRef.current.traverse(obj => {
+        if (obj instanceof THREE.Mesh) {
+          const aId = obj.userData?.assetId;
+          if (aId?.includes('gen') || aId?.includes('boiler') || aId?.includes('BLR')) obj.material = mats.thermalHot;
+          else if (aId?.includes('hvac') || aId?.includes('solar') || aId?.includes('bess')) obj.material = mats.thermalWarm;
+          else if (aId?.includes('water') || aId?.includes('fuel') || aId?.includes('pump')) obj.material = mats.thermalCold;
+          else if (obj !== environmentRef.current?.terrainMesh && obj !== environmentRef.current?.iceMesh) obj.material = mats.thermalNormal;
+        }
+      });
+    }
+  }, [visualMode, assets, stationId, flowVisible, selectedAsset]);
+
+  // Update Dependency Flow tracing when selected asset changes in DEPENDENCY mode
+  useEffect(() => {
+    if (flowOverlayRef.current && visualMode === 'DEPENDENCY') {
+      flowOverlayRef.current.setHighlightedAsset(selectedAsset ? selectedAsset.id : null);
+    }
+  }, [selectedAsset, visualMode]);
 
   // Synchronize Grid Visibility
   useEffect(() => {
@@ -631,6 +727,13 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
     handleCameraPreset('RESET');
   };
 
+  const handleVisualModeChange = useCallback((mode: VisualMode) => {
+    setVisualMode(mode);
+    if (mode === 'DEPENDENCY') {
+      setFlowVisible(true);
+    }
+  }, []);
+
   return (
     <div className="relative w-full h-full min-h-[480px] bg-polar-base overflow-hidden flex font-mono select-none">
       {/* 3D WebGL Canvas Mount */}
@@ -657,10 +760,30 @@ export const Station3DViewer: React.FC<Props> = ({ stationId, onNavigateToSimula
         generationKw={stationId === 'station_bharati' ? 185.0 : 160.0}
       />
 
+      {/* Dedicated Dependency Flow Legend HUD */}
+      {visualMode === 'DEPENDENCY' && (
+        <DependencyFlowLegend
+          stationId={stationId}
+          selectedAsset={selectedAsset}
+          onClearSelection={() => setSelectedAsset(null)}
+          onSelectAsset={handleFocusAsset}
+        />
+      )}
+
+      {/* Dedicated Telemetry HUD */}
+      {visualMode === 'TELEMETRY' && (
+        <TelemetryModeHUD
+          stationId={stationId}
+          assets={assets}
+          selectedAssetId={selectedAsset?.id}
+          onSelectAsset={handleFocusAsset}
+        />
+      )}
+
       {/* Floating Bottom Control Toolbar */}
       <DigitalTwinToolbar
         visualMode={visualMode}
-        onVisualModeChange={setVisualMode}
+        onVisualModeChange={handleVisualModeChange}
         onCameraPreset={handleCameraPreset}
         gridVisible={gridVisible}
         onToggleGrid={() => setGridVisible(!gridVisible)}
