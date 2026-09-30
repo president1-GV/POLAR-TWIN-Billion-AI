@@ -17,6 +17,7 @@ import { SecurityModal } from './SecurityModal';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { RoleSelector } from './RoleSelector';
 import { ScreenId } from './Sidebar';
+import { useAuth } from '../../context/AuthContext';
 import polarTwinIcon from '../../assets/polar-twin-icon.png';
 
 interface HeaderProps {
@@ -46,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenStationDrawer,
   onOpenLogin,
 }) => {
+  const { user, role, isImpersonating, impersonatedBy, stopImpersonating, isStationAllowed } = useAuth();
   const [utcTime, setUtcTime] = useState('');
   const [isSecurityOpen, setIsSecurityOpen] = useState(false);
 
@@ -88,64 +90,93 @@ export const Header: React.FC<HeaderProps> = ({
   const isBharati = currentStationId === 'station_bharati';
 
   return (
-    <header className="h-16 bg-polar-surface border-b border-polar-border px-2 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between sticky top-0 z-40 select-none shadow-sm font-mono transition-colors w-full max-w-full overflow-hidden">
-      {/* LEFT: Branding & First-Class Station Context */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        {/* Brand Identity arranged cleanly inside dedicated professional border */}
-        <div className="flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-sm ring-1 ring-polar-cyan/25 shrink-0 overflow-hidden">
-            <img 
-              src={polarTwinIcon} 
-              alt="POLAR-TWIN Mission Logo" 
-              className="w-full h-full object-contain" 
-            />
+    <div className="sticky top-0 z-40 w-full select-none font-mono">
+      {/* Persistent Red Impersonation Alert Banner */}
+      {isImpersonating && (
+        <div className="bg-rose-600 text-white text-xs px-3 sm:px-4 py-1.5 flex items-center justify-between shadow-lg border-b border-rose-500/80">
+          <div className="flex items-center gap-2 overflow-hidden">
+            <span className="w-2.5 h-2.5 rounded-full bg-white shrink-0 animate-ping" />
+            <span className="font-extrabold tracking-wider whitespace-nowrap">⚠️ SECURITY AUDIT ACTIVE:</span>
+            <span className="bg-black/30 px-2 py-0.5 rounded font-mono font-bold text-rose-100 truncate">
+              IMPERSONATING: {user?.display_name || user?.username} [{role}]
+            </span>
+            <span className="text-[11px] text-rose-200 hidden md:inline truncate">
+              (Station: {user?.station_id} | Initiator: {impersonatedBy || 'admin.ncpor'})
+            </span>
           </div>
-          <div className="flex flex-col justify-center shrink-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap leading-none">
-              <span className="font-extrabold text-sm sm:text-base tracking-wider text-polar-text-primary whitespace-nowrap inline-flex items-center">
-                POLAR<span className="text-polar-cyan">&#8209;TWIN</span>
-              </span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono font-bold tracking-wider uppercase shrink-0">
-                NCPOR
-              </span>
+          <button
+            onClick={() => stopImpersonating()}
+            className="ml-3 bg-white hover:bg-rose-100 text-rose-800 text-[11px] font-black px-3 py-1 rounded shadow-sm transition-colors cursor-pointer shrink-0 uppercase tracking-wider active:scale-95"
+          >
+            STOP IMPERSONATION
+          </button>
+        </div>
+      )}
+
+      <header className="h-16 bg-polar-surface border-b border-polar-border px-2 sm:px-3 lg:px-4 xl:px-6 flex items-center justify-between shadow-sm transition-colors w-full max-w-full overflow-hidden">
+        {/* LEFT: Branding & First-Class Station Context */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          {/* Brand Identity arranged cleanly inside dedicated professional border */}
+          <div className="flex items-center gap-2 sm:gap-2.5 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-lg bg-polar-base/90 border border-polar-border hover:border-polar-border-active transition-colors shadow-sm shrink-0">
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-polar-elevated border border-polar-cyan/60 flex items-center justify-center p-0.5 shadow-sm ring-1 ring-polar-cyan/25 shrink-0 overflow-hidden">
+              <img 
+                src={polarTwinIcon} 
+                alt="POLAR-TWIN Mission Logo" 
+                className="w-full h-full object-contain" 
+              />
             </div>
-            <p className="text-[10px] text-polar-text-muted tracking-tight font-sans whitespace-nowrap mt-1 hidden sm:block">
-              Indian Antarctic Operations
-            </p>
+            <div className="flex flex-col justify-center shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 whitespace-nowrap leading-none">
+                <span className="font-extrabold text-sm sm:text-base tracking-wider text-polar-text-primary whitespace-nowrap inline-flex items-center">
+                  POLAR<span className="text-polar-cyan">&#8209;TWIN</span>
+                </span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 font-mono font-bold tracking-wider uppercase shrink-0">
+                  NCPOR
+                </span>
+              </div>
+              <p className="text-[10px] text-polar-text-muted tracking-tight font-sans whitespace-nowrap mt-1 hidden sm:block">
+                Indian Antarctic Operations
+              </p>
+            </div>
+          </div>
+
+          {/* Vertical Divider */}
+          <div className="h-6 border-l border-polar-border hidden sm:block shrink-0" />
+
+          {/* First-Class Station Selector with BOLA Guard */}
+          <div className="flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
+            <button
+              onClick={() => onStationChange('station_bharati')}
+              disabled={!isStationAllowed('station_bharati')}
+              title={!isStationAllowed('station_bharati') ? 'Station not within operational scope' : 'Bharati Station • Larsemann Hills (69.408° S, 76.187° E)'}
+              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
+                !isStationAllowed('station_bharati')
+                  ? 'opacity-40 cursor-not-allowed text-polar-text-muted'
+                  : isBharati
+                  ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
+                  : 'text-polar-text-muted hover:text-polar-text-primary'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
+              <span className="whitespace-nowrap">BHARATI</span>
+            </button>
+            <button
+              onClick={() => onStationChange('station_maitri')}
+              disabled={!isStationAllowed('station_maitri')}
+              title={!isStationAllowed('station_maitri') ? 'Access Denied: Station outside operational scope' : 'Maitri Station • Schirmacher Oasis (70.766° S, 11.740° E)'}
+              className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
+                !isStationAllowed('station_maitri')
+                  ? 'opacity-40 cursor-not-allowed text-polar-text-muted'
+                  : !isBharati
+                  ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
+                  : 'text-polar-text-muted hover:text-polar-text-primary'
+              }`}
+            >
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
+              <span className="whitespace-nowrap">MAITRI</span>
+            </button>
           </div>
         </div>
-
-        {/* Vertical Divider */}
-        <div className="h-6 border-l border-polar-border hidden sm:block shrink-0" />
-
-        {/* First-Class Station Selector */}
-        <div className="flex items-center bg-polar-base rounded-lg p-0.5 border border-polar-border shrink-0">
-          <button
-            onClick={() => onStationChange('station_bharati')}
-            title="Bharati Station • Larsemann Hills (69.408° S, 76.187° E)"
-            className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
-              isBharati
-                ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                : 'text-polar-text-muted hover:text-polar-text-primary'
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
-            <span className="whitespace-nowrap">BHARATI</span>
-          </button>
-          <button
-            onClick={() => onStationChange('station_maitri')}
-            title="Maitri Station • Schirmacher Oasis (70.766° S, 11.740° E)"
-            className={`px-2 sm:px-2.5 py-1 rounded-md text-xs font-bold transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
-              !isBharati
-                ? 'bg-polar-elevated text-polar-cyan border border-polar-cyan/40 shadow-sm'
-                : 'text-polar-text-muted hover:text-polar-text-primary'
-            }`}
-          >
-            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${!isBharati ? 'bg-polar-cyan animate-pulse' : 'bg-slate-500'}`} />
-            <span className="whitespace-nowrap">MAITRI</span>
-          </button>
-        </div>
-      </div>
 
       {/* CENTER: Compact Operational State Indicator */}
       <div className="hidden 2xl:flex items-center shrink-0">
@@ -243,5 +274,6 @@ export const Header: React.FC<HeaderProps> = ({
         onRoleChange={onRoleChange}
       />
     </header>
+  </div>
   );
 };
