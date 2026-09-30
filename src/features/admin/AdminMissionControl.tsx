@@ -42,6 +42,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { ALL_ROLES, getRoleMeta, PolarRole } from '../../services/rbac';
 import { ROLE_CREDENTIALS, api, getSessionAuth } from '../../services/api';
+import polarTwinIcon from '../../assets/polar-twin-icon.png';
+import polarTwinLogo from '../../assets/polar-twin-logo.jpg';
 
 interface AdminMissionControlProps {
   currentStationId: string;
@@ -64,6 +66,7 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
   const [auditFilterRole, setAuditFilterRole] = useState<string>('ALL');
   const [auditSearchQuery, setAuditSearchQuery] = useState<string>('');
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'warn' | 'info'; message: string } | null>(null);
+  const [showLogoModal, setShowLogoModal] = useState(false);
 
   // Security Policy Toggles (Zero-Trust Defense Matrix)
   const [securityPolicies, setSecurityPolicies] = useState({
@@ -397,8 +400,16 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400">
-                <ShieldAlert className="w-5 h-5 text-rose-400" />
+              <div 
+                onClick={() => setShowLogoModal(true)}
+                title="Click to view full POLAR-TWIN Mission Crest"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-polar-elevated border border-rose-500/40 hover:border-cyan-400/60 p-0.5 flex items-center justify-center shadow-md ring-1 ring-rose-500/20 hover:ring-cyan-500/30 shrink-0 overflow-hidden cursor-pointer transition-all hover:scale-105"
+              >
+                <img 
+                  src={polarTwinIcon} 
+                  alt="POLAR-TWIN Mission Crest" 
+                  className="w-full h-full object-contain drop-shadow" 
+                />
               </div>
               <h1 className="text-lg sm:text-xl font-extrabold text-polar-text-primary tracking-wide uppercase">
                 NCPOR MISSION CONTROL — ROOT ADMINISTRATION & GOVERNANCE
@@ -1017,6 +1028,57 @@ export const AdminMissionControl: React.FC<AdminMissionControlProps> = ({
           </table>
         </div>
       </div>
+
+      {/* POLAR-TWIN Mission Logo Emblem Dialog Modal */}
+      {showLogoModal && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setShowLogoModal(false)}
+        >
+          <div 
+            className="bg-polar-surface border border-polar-border rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-polar-border">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-md overflow-hidden bg-polar-elevated p-0.5 border border-polar-cyan/40">
+                  <img src={polarTwinIcon} alt="Logo" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="text-sm font-bold text-polar-text-primary tracking-wide uppercase font-mono">
+                  POLAR-TWIN Mission Emblem
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowLogoModal(false)}
+                className="p-1 rounded-lg text-polar-text-muted hover:text-polar-text-primary hover:bg-polar-elevated transition-colors"
+                title="Close"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="rounded-xl overflow-hidden border border-polar-border bg-black/40 p-2 shadow-inner">
+              <img 
+                src={polarTwinLogo} 
+                alt="POLAR-TWIN Full Mission Logo" 
+                className="w-full h-auto object-contain rounded-lg"
+              />
+            </div>
+
+            <div className="text-center font-mono space-y-1">
+              <p className="text-xs font-bold text-polar-cyan uppercase tracking-wider">
+                Digital Twin for Remote Antarctic Station Operations
+              </p>
+              <p className="text-[11px] text-polar-text-muted font-bold">
+                OBSERVE • PREDICT • SIMULATE • DECIDE
+              </p>
+              <p className="text-[10px] text-polar-text-muted/80">
+                Bharati Station & Maitri Station — NCPOR / MoES, Govt. of India
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
