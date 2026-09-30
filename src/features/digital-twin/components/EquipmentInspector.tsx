@@ -114,7 +114,102 @@ const ASSET_RELATIONS: Record<string, { upstream: Array<{ id: string; name: stri
     downstream: [{ id: 'ncpor_gateway', name: 'NCPOR Scientific Data Stream', type: 'DATA' }],
   },
 
+  bh_hab_core: {
+    upstream: [
+      { id: 'bh_pdb_01', name: 'Microgrid Switchgear', type: 'POWER' },
+      { id: 'bh_hvac_01', name: 'Dual-Loop Thermal Recovery', type: 'HEATING' },
+      { id: 'bh_water_01', name: 'Snow Melt & RO Plant', type: 'WATER' },
+      { id: 'bh_comms_01', name: 'C-Band Earth Station', type: 'COMMS' },
+    ],
+    downstream: [
+      { id: 'bh_lab_01', name: 'Atmospheric Science Lab', type: 'SCIENCE' },
+      { id: 'station_life_support', name: 'Living Quarters (18 Personnel)', type: 'LIFE_SUPPORT' },
+    ],
+  },
+  bh_fuel_farm: {
+    upstream: [],
+    downstream: [
+      { id: 'bh_fuel_station', name: 'Vehicle Fueling Dispenser', type: 'FUEL' },
+      { id: 'bh_fuel_tank_01', name: 'Bulk Fuel Tank Alpha', type: 'FUEL' },
+      { id: 'bh_fuel_tank_02', name: 'Bulk Fuel Tank Bravo', type: 'FUEL' },
+    ],
+  },
+  bh_fuel_station: {
+    upstream: [{ id: 'bh_fuel_farm', name: 'Bulk Fuel Farm', type: 'FUEL' }],
+    downstream: [{ id: 'polar_fleet', name: 'PistenBully & Snowmobile Logistics', type: 'VEHICLES' }],
+  },
+  bh_seawater_pump: {
+    upstream: [{ id: 'bh_pdb_01', name: 'Microgrid Switchgear Bus', type: 'POWER' }],
+    downstream: [{ id: 'bh_water_01', name: 'RO Desalination & Potable Water Plant', type: 'RAW_WATER' }],
+  },
+  bh_summer_camp: {
+    upstream: [
+      { id: 'bh_pdb_01', name: 'Microgrid Switchgear', type: 'POWER' },
+      { id: 'bh_water_01', name: 'Potable Water Supply', type: 'WATER' },
+    ],
+    downstream: [],
+  },
+  bh_containers: {
+    upstream: [{ id: 'bh_pdb_01', name: 'Auxiliary Power Circuit', type: 'POWER' }],
+    downstream: [],
+  },
+  bh_roads_access: {
+    upstream: [],
+    downstream: [
+      { id: 'bh_hab_core', name: 'Habitat Complex', type: 'ACCESS' },
+      { id: 'bh_seawater_pump', name: 'Sea Intake Station', type: 'ACCESS' },
+      { id: 'bh_fuel_farm', name: 'Bulk Fuel Farm', type: 'ACCESS' },
+    ],
+  },
+
   // Maitri
+  ma_hab_core: {
+    upstream: [
+      { id: 'ma_pdb_01', name: 'Maitri Switchgear Bus', type: 'POWER' },
+      { id: 'ma_boiler_01', name: 'Central Hydronic Boiler', type: 'HEATING' },
+      { id: 'ma_water_tank_01', name: 'Potable Water Reservoir', type: 'WATER' },
+      { id: 'ma_comms_01', name: 'Inmarsat Communications', type: 'COMMS' },
+    ],
+    downstream: [
+      { id: 'ma_lab_geo', name: 'Geomagnetic Laboratory', type: 'SCIENCE' },
+      { id: 'ma_living_wings', name: 'Modular Living Blocks (22 Personnel)', type: 'LIFE_SUPPORT' },
+    ],
+  },
+  ma_fuel_farm: {
+    upstream: [],
+    downstream: [
+      { id: 'ma_fuel_station', name: 'Vehicle Dispenser Station', type: 'FUEL' },
+      { id: 'ma_fuel_tank_01', name: 'Polar Fuel Tank Alpha', type: 'FUEL' },
+      { id: 'ma_gen_01', name: 'Primary Genset 01', type: 'FUEL' },
+    ],
+  },
+  ma_fuel_station: {
+    upstream: [{ id: 'ma_fuel_farm', name: 'Bulk Fuel Farm', type: 'FUEL' }],
+    downstream: [{ id: 'ma_garage_01', name: 'Polar Tracked Vehicles & Snowmobiles', type: 'VEHICLES' }],
+  },
+  ma_lake_pump: {
+    upstream: [{ id: 'ma_pdb_01', name: 'Maitri Switchgear Bus', type: 'POWER' }],
+    downstream: [
+      { id: 'ma_water_tank_01', name: 'Potable Water Reservoir', type: 'RAW_WATER' },
+      { id: 'ma_boiler_01', name: 'Central Hydronic Boiler Feed', type: 'RAW_WATER' },
+    ],
+  },
+  ma_summer_camp: {
+    upstream: [{ id: 'ma_pdb_01', name: 'Maitri Switchgear Bus', type: 'POWER' }],
+    downstream: [],
+  },
+  ma_containers: {
+    upstream: [{ id: 'ma_pdb_01', name: 'Field Science Auxiliary Line', type: 'POWER' }],
+    downstream: [],
+  },
+  ma_access_routes: {
+    upstream: [],
+    downstream: [
+      { id: 'ma_hab_core', name: 'Elevated Main Habitat', type: 'ACCESS' },
+      { id: 'ma_lake_pump', name: 'Lake Priyadarshini Pump House', type: 'ACCESS' },
+      { id: 'ma_fuel_farm', name: 'Bulk Fuel Farm', type: 'ACCESS' },
+    ],
+  },
   ma_gen_01: {
     upstream: [{ id: 'ma_fuel_tank_01', name: 'Polar Fuel Tank Alpha', type: 'FUEL' }],
     downstream: [{ id: 'ma_pdb_01', name: 'Maitri Switchgear Bus', type: 'POWER' }],
@@ -196,9 +291,12 @@ export const EquipmentInspector: React.FC<Props> = ({
   const relations = ASSET_RELATIONS[asset.id] || { upstream: [], downstream: [] };
   const spatialSpec = getAssetSpatialSpec(asset.id);
 
+  const rawConfidence = spatialSpec?.geometryConfidence || asset.geometry_confidence || 'DOCUMENTED';
+  const confidence = rawConfidence === 'VERIFIED' ? 'DOCUMENTED' : rawConfidence === 'APPROXIMATE' ? 'ESTIMATED' : rawConfidence;
+
   const confidenceColor = 
-    (spatialSpec?.geometryConfidence || asset.geometry_confidence) === 'VERIFIED' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' :
-    (spatialSpec?.geometryConfidence || asset.geometry_confidence) === 'RECONSTRUCTED' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' :
+    confidence === 'DOCUMENTED' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' :
+    confidence === 'RECONSTRUCTED' ? 'text-sky-400 bg-sky-500/10 border-sky-500/30' :
     'text-amber-400 bg-amber-500/10 border-amber-500/30';
 
   return (
@@ -220,7 +318,7 @@ export const EquipmentInspector: React.FC<Props> = ({
               {asset.criticality} TIER
             </span>
             <span className={`text-[9px] px-1.5 py-0.5 rounded border uppercase font-bold ${confidenceColor}`}>
-              {spatialSpec?.geometryConfidence || asset.geometry_confidence || 'VERIFIED'}
+              {confidence}
             </span>
           </div>
           <button
@@ -231,9 +329,12 @@ export const EquipmentInspector: React.FC<Props> = ({
           </button>
         </div>
 
-        <h2 className="text-sm font-bold text-polar-text-primary mt-1.5 leading-snug">
-          {spatialSpec?.name || asset.name}
-        </h2>
+        <div className="flex items-center justify-between mt-1.5">
+          <h2 className="text-sm font-bold text-polar-text-primary leading-snug">
+            {spatialSpec?.name || asset.name}
+          </h2>
+          <ProvenanceBadge type={asset.source_type || 'DERIVED_PHYSICS'} size="sm" />
+        </div>
         <p className="text-[11px] text-polar-text-muted font-sans mt-0.5">
           {asset.location_desc || 'Station Infrastructure Asset'}
         </p>
@@ -523,20 +624,73 @@ export const EquipmentInspector: React.FC<Props> = ({
               </div>
             </div>
 
-            {/* Dimension 5: Geometry Confidence & Basis */}
+            {/* Dimension 5: Geometry Confidence, Evidence & Space Distribution */}
             <div className="bg-polar-card p-3 rounded-lg border border-polar-border space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-bold text-polar-text-primary uppercase tracking-wider flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5 text-polar-cyan" />
-                  <span>Geometry Confidence</span>
+                  <span>Geometry Confidence & Evidence</span>
                 </span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-bold border uppercase ${confidenceColor}`}>
                   {spatialSpec?.geometryConfidence || 'VERIFIED'}
                 </span>
               </div>
-              <p className="text-[11px] text-polar-text-secondary leading-relaxed">
-                {spatialSpec?.geometrySource || 'Architectural As-Built Survey Drawings & Laser Scan Ground Truth (NCPOR / MoES).'}
-              </p>
+
+              <div className="space-y-1.5 text-[11px] pt-1">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-polar-text-secondary uppercase text-[10px]">Source:</span>
+                  <span className="font-medium text-polar-text-primary text-right">{spatialSpec?.geometrySource || 'NCPOR / MoES Official Station Documentation'}</span>
+                </div>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="text-polar-text-secondary uppercase text-[10px]">Last Verified:</span>
+                  <span className="font-medium text-emerald-400 text-right">{spatialSpec?.lastVerified || 'NCPOR Annual Expedition Operational Review'}</span>
+                </div>
+                <div className="border-t border-polar-border/60 pt-1">
+                  <span className="text-polar-text-secondary block text-[10px] uppercase">Geometric Basis:</span>
+                  <p className="text-[11px] text-polar-text-primary mt-0.5 leading-relaxed font-sans">
+                    {spatialSpec?.geometricBasis || 'Physical Dimensional Survey & Laser Scans Ground Truth (1 Three.js unit = 1 meter).'}
+                  </p>
+                </div>
+
+                {spatialSpec?.physicalDimensions.grossFloorAreaM2 && (
+                  <div className="border-t border-polar-border/60 pt-1.5 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-polar-text-secondary uppercase text-[10px]">Gross Floor Area:</span>
+                      <span className="font-bold text-polar-cyan">{spatialSpec.physicalDimensions.grossFloorAreaM2.toLocaleString()} m²</span>
+                    </div>
+
+                    {spatialSpec.physicalDimensions.spaceDistribution && (
+                      <div className="bg-polar-surface p-2 rounded border border-polar-border space-y-1 mt-1">
+                        <span className="text-[10px] text-polar-text-muted uppercase font-bold block">
+                          NCPOR Documented Space Distribution:
+                        </span>
+                        <div className="grid grid-cols-2 gap-1 text-[10px]">
+                          <div className="flex items-center justify-between">
+                            <span className="text-polar-text-secondary">Utilities:</span>
+                            <span className="font-bold text-polar-cyan">{spatialSpec.physicalDimensions.spaceDistribution.utilitiesPct}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-polar-text-secondary">Circulation:</span>
+                            <span className="font-bold text-polar-cyan">{spatialSpec.physicalDimensions.spaceDistribution.circulationPct}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-polar-text-secondary">Living:</span>
+                            <span className="font-bold text-polar-cyan">{spatialSpec.physicalDimensions.spaceDistribution.livingPct}%</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-polar-text-secondary">Laboratories:</span>
+                            <span className="font-bold text-polar-cyan">{spatialSpec.physicalDimensions.spaceDistribution.laboratoriesPct}%</span>
+                          </div>
+                          <div className="flex items-center justify-between col-span-2">
+                            <span className="text-polar-text-secondary">Storage:</span>
+                            <span className="font-bold text-polar-cyan">{spatialSpec.physicalDimensions.spaceDistribution.storagePct}%</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}

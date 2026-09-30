@@ -16,6 +16,11 @@ export class BharatiStationBuilder {
     this.buildEnergyHub();
     this.buildWaterTreatmentPlant();
     this.buildBulkFuelFarm();
+    this.buildFuelStation();
+    this.buildSeaWaterPumpHouse();
+    this.buildSummerCamp();
+    this.buildContainerizedModules();
+    this.buildRoadsAndAccessPaths();
     this.buildSatelliteComms();
     this.buildScienceLab();
     this.buildLogisticsAndVehicles();
@@ -54,8 +59,9 @@ export class BharatiStationBuilder {
 
   /**
    * 1. Main Bharati Aerodynamic Habitat Structure
-   * Documented footprint: ~48m-50m length × ~24m-26m width, ~2,162 m² gross floor area
+   * Documented baseline: 30 m × 50 m footprint, ~2,162 m² gross floor area
    * 3-tiered aerodynamic vacuum-insulated envelope elevated 3.6m on 24 heavy tubular steel pilotis
+   * NCPOR space breakdown: 43% utilities, 23% circulation, 15% living, 12% laboratories, 7% storage
    */
   private buildMainHabitatBlock(): void {
     const habGroup = new THREE.Group();
@@ -63,14 +69,14 @@ export class BharatiStationBuilder {
 
     // 24 Heavy Tubular Steel Stilts in a 6 × 4 structural grid (Larsemann Hills permafrost bedrock)
     const stiltHeight = 3.6;
-    const xColumns = [-18.75, -11.25, -3.75, 3.75, 11.25, 18.75];
-    const zRows = [-9.0, -3.0, 3.0, 9.0];
+    const xColumns = [-20.0, -12.0, -4.0, 4.0, 12.0, 20.0];
+    const zRows = [-11.0, -3.7, 3.7, 11.0];
 
     xColumns.forEach(x => {
       zRows.forEach(z => {
         // Reinforced concrete foundation pad anchored to bedrock
         const pad = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.85, 0.95, 0.45, 12),
+          new THREE.CylinderGeometry(0.95, 1.1, 0.45, 14),
           this.materials.structuralSteel
         );
         pad.position.set(x, 0.225, z);
@@ -79,7 +85,7 @@ export class BharatiStationBuilder {
 
         // Heavy tubular steel column (pilot)
         const stilt = new THREE.Mesh(
-          new THREE.CylinderGeometry(0.35, 0.35, stiltHeight, 16),
+          new THREE.CylinderGeometry(0.38, 0.38, stiltHeight, 16),
           this.materials.steelStilts
         );
         stilt.position.set(x, stiltHeight / 2 + 0.3, z);
@@ -88,50 +94,50 @@ export class BharatiStationBuilder {
         habGroup.add(stilt);
 
         // Diagonal anti-sway wind brace
-        if (x < 18.75) {
+        if (x < 20.0) {
           const brace = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.12, 0.12, 8.2, 8),
+            new THREE.CylinderGeometry(0.12, 0.12, 8.8, 8),
             this.materials.steelStilts
           );
-          brace.position.set(x + 3.75, stiltHeight / 2 + 0.3, z);
-          brace.rotation.z = Math.PI / 7;
+          brace.position.set(x + 4.0, stiltHeight / 2 + 0.3, z);
+          brace.rotation.z = Math.PI / 7.2;
           habGroup.add(brace);
         }
       });
     });
 
-    // Heavy Underfloor Structural Steel Truss Grid (46m × 0.8m × 25m)
+    // Heavy Underfloor Structural Steel Truss Grid (49m × 0.8m × 29m)
     const trussGrid = new THREE.Mesh(
-      new THREE.BoxGeometry(46, 0.8, 25),
+      new THREE.BoxGeometry(49, 0.8, 29),
       this.materials.structuralSteel
     );
     trussGrid.position.set(0, stiltHeight + 0.4, 0);
     trussGrid.castShadow = true;
     habGroup.add(trussGrid);
 
-    // Main 3-Tier Aerodynamic Enclosure (44m length × 9.0m height × 24m width)
+    // Main 3-Tier Aerodynamic Enclosure (47m length × 9.6m height × 28.5m width)
     const mainHull = new THREE.Mesh(
-      new THREE.BoxGeometry(44, 9.0, 24),
+      new THREE.BoxGeometry(47, 9.6, 28.5),
       this.materials.bharatiHull
     );
-    mainHull.position.set(0, stiltHeight + 4.9, 0);
+    mainHull.position.set(0, stiltHeight + 5.2, 0);
     mainHull.castShadow = true;
     mainHull.receiveShadow = true;
     habGroup.add(mainHull);
 
     // Aerodynamic Windward Chamfer Nose (North/East facing prevailing katabatic winds)
-    const noseGeo = new THREE.CylinderGeometry(12, 12, 9.0, 24, 1, false, -Math.PI / 2, Math.PI);
+    const noseGeo = new THREE.CylinderGeometry(14.25, 14.25, 9.6, 24, 1, false, -Math.PI / 2, Math.PI);
     const nose = new THREE.Mesh(noseGeo, this.materials.bharatiHull);
-    nose.position.set(22, stiltHeight + 4.9, 0);
+    nose.position.set(23.5, stiltHeight + 5.2, 0);
     nose.castShadow = true;
     habGroup.add(nose);
 
     // Upper Observation Deck Facade Accent (Level 2 & Terrace)
     const roofDeck = new THREE.Mesh(
-      new THREE.BoxGeometry(43, 0.5, 23),
+      new THREE.BoxGeometry(48.5, 0.5, 28.5),
       this.materials.bharatiHullAccent
     );
-    roofDeck.position.set(0, stiltHeight + 9.65, 0);
+    roofDeck.position.set(0, stiltHeight + 10.25, 0);
     habGroup.add(roofDeck);
 
     // Register Main Aerodynamic Habitat Core for Direct Raycast Interaction
@@ -140,21 +146,21 @@ export class BharatiStationBuilder {
     this.registerInteractive('bh_hab_core', roofDeck);
 
     // Panoramic Double-Glazed Observation Windows (facing ocean ice at +Z)
-    for (let x = -18; x <= 18; x += 3.2) {
-      // Upper Level 2 Windows
+    for (let x = -21; x <= 21; x += 3.5) {
+      // Upper Level 2 Windows (Laboratories & Living)
       const winL2 = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.4, 1.8),
+        new THREE.PlaneGeometry(2.6, 1.8),
         this.materials.insulatedGlass
       );
-      winL2.position.set(x, stiltHeight + 6.8, 12.05);
+      winL2.position.set(x, stiltHeight + 7.2, 14.3);
       habGroup.add(winL2);
 
-      // Lower Level 1 Windows
+      // Lower Level 1 Windows (Circulation & Living)
       const winL1 = new THREE.Mesh(
-        new THREE.PlaneGeometry(2.4, 1.4),
+        new THREE.PlaneGeometry(2.6, 1.4),
         this.materials.insulatedGlass
       );
-      winL1.position.set(x, stiltHeight + 3.2, 12.05);
+      winL1.position.set(x, stiltHeight + 3.4, 14.3);
       habGroup.add(winL1);
     }
 
@@ -585,7 +591,230 @@ export class BharatiStationBuilder {
       fuelGroup.add(tankObj);
     });
 
+    this.registerInteractive('bh_fuel_farm', fuelGroup);
     this.group.add(fuelGroup);
+  }
+
+  /**
+   * 4b. Bharati Polar Vehicle Fueling Station & Dispenser (BH-FUEL-STAT)
+   */
+  private buildFuelStation(): void {
+    const statGroup = new THREE.Group();
+    statGroup.name = 'BHARATI_FUEL_STATION';
+    statGroup.position.set(28, 0, 18);
+
+    // Concrete Service Pad
+    const pad = new THREE.Mesh(
+      new THREE.BoxGeometry(8.0, 0.4, 6.0),
+      this.materials.structuralSteel
+    );
+    pad.position.y = 0.2;
+    pad.receiveShadow = true;
+    statGroup.add(pad);
+
+    // Weather-Protected Steel Canopy Roof
+    const canopy = new THREE.Mesh(
+      new THREE.BoxGeometry(8.4, 0.35, 6.4),
+      this.materials.bharatiHullAccent
+    );
+    canopy.position.y = 3.8;
+    canopy.castShadow = true;
+    statGroup.add(canopy);
+
+    // 4 Tubular Support Columns
+    const colCoords = [
+      [-3.6, -2.6], [-3.6, 2.6], [3.6, -2.6], [3.6, 2.6]
+    ];
+    colCoords.forEach(([cx, cz]) => {
+      const col = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12, 0.12, 3.6, 12),
+        this.materials.steelStilts
+      );
+      col.position.set(cx, 2.0, cz);
+      col.castShadow = true;
+      statGroup.add(col);
+    });
+
+    // High-Flow Polar Fuel Dispenser Unit
+    const dispenser = new THREE.Mesh(
+      new THREE.BoxGeometry(1.6, 2.2, 1.0),
+      this.materials.statusWarning
+    );
+    dispenser.position.set(0, 1.3, 0);
+    dispenser.castShadow = true;
+    statGroup.add(dispenser);
+
+    // Hose Booms and Grounding Reel
+    const hoseBoom = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.04, 2.2, 8),
+      this.materials.structuralSteel
+    );
+    hoseBoom.rotation.z = Math.PI / 4;
+    hoseBoom.position.set(0.6, 2.8, 0);
+    statGroup.add(hoseBoom);
+
+    this.registerInteractive('bh_fuel_station', statGroup);
+    this.group.add(statGroup);
+  }
+
+  /**
+   * 4c. Sea-Water Intake Pump House (Thala Fjord / Quilty Bay Shoreline) (BH-SW-PUMP)
+   */
+  private buildSeaWaterPumpHouse(): void {
+    const pumpGroup = new THREE.Group();
+    pumpGroup.name = 'SEAWATER_PUMP_HOUSE';
+    pumpGroup.position.set(-38, -1.5, -48);
+
+    // Bedrock Marine Anchor Footing Pad
+    const anchorPad = new THREE.Mesh(
+      new THREE.CylinderGeometry(4.8, 5.2, 0.6, 16),
+      this.materials.structuralSteel
+    );
+    anchorPad.position.y = 0.3;
+    anchorPad.receiveShadow = true;
+    pumpGroup.add(anchorPad);
+
+    // Heavily Insulated Marine GRP Pump Enclosure (8.5m × 5.5m × 3.4m)
+    const building = new THREE.Mesh(
+      new THREE.BoxGeometry(8.5, 3.4, 5.5),
+      this.materials.bharatiHull
+    );
+    building.position.y = 2.0;
+    building.castShadow = true;
+    building.receiveShadow = true;
+    pumpGroup.add(building);
+
+    // Marine Service Intake Pipe Manifold extending into coastal depression
+    const intakeLine = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.32, 0.32, 16.0, 12),
+      this.materials.machineryCast
+    );
+    intakeLine.rotation.z = Math.PI / 2.3;
+    intakeLine.position.set(-6.0, 0.2, 0);
+    pumpGroup.add(intakeLine);
+
+    // Heat-Traced Delivery Line rising up to Station RO Plant
+    const deliveryLine = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.24, 0.24, 38.0, 12),
+      this.materials.pipeBlue
+    );
+    deliveryLine.rotation.x = Math.PI / 2.5;
+    deliveryLine.position.set(0, 3.5, 18.0);
+    pumpGroup.add(deliveryLine);
+
+    // Status beacon
+    const beacon = new THREE.Mesh(
+      new THREE.SphereGeometry(0.25, 12, 12),
+      this.getStatusMaterial('bh_seawater_pump')
+    );
+    beacon.position.set(0, 4.0, 0);
+    pumpGroup.add(beacon);
+
+    this.registerInteractive('bh_seawater_pump', pumpGroup);
+    this.group.add(pumpGroup);
+  }
+
+  /**
+   * 4d. Bharati Summer Camp Containerized Living Modules (BH-SUMMER-CAMP)
+   */
+  private buildSummerCamp(): void {
+    const campGroup = new THREE.Group();
+    campGroup.name = 'BHARATI_SUMMER_CAMP';
+    campGroup.position.set(32, 1.2, -18);
+
+    // 4 Interconnected 20ft/40ft Insulated Container Modules
+    const moduleOffsets = [
+      { x: -6, z: 0 }, { x: 0, z: 0 }, { x: 6, z: 0 }, { x: 0, z: -5 }
+    ];
+
+    moduleOffsets.forEach((mo, idx) => {
+      const pod = new THREE.Mesh(
+        new THREE.BoxGeometry(5.8, 2.8, 2.6),
+        this.materials.maitriOrangeHull // High-visibility international orange for field camp
+      );
+      pod.position.set(mo.x, 1.4, mo.z);
+      pod.castShadow = true;
+      pod.receiveShadow = true;
+      campGroup.add(pod);
+
+      // Elevated Support Jack Posts
+      const post = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.12, 0.12, 1.2, 8),
+        this.materials.steelStilts
+      );
+      post.position.set(mo.x, 0.6, mo.z);
+      campGroup.add(post);
+
+      // Window
+      const win = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.0, 0.8),
+        this.materials.insulatedGlass
+      );
+      win.position.set(mo.x, 1.8, mo.z + 1.32);
+      campGroup.add(win);
+    });
+
+    this.registerInteractive('bh_summer_camp', campGroup);
+    this.group.add(campGroup);
+  }
+
+  /**
+   * 4e. Specialized Containerized Utility & Scientific Modules (BH-CONTAINERS)
+   */
+  private buildContainerizedModules(): void {
+    const contGroup = new THREE.Group();
+    contGroup.name = 'BHARATI_CONTAINER_UNITS';
+    contGroup.position.set(-24, 0.9, 22);
+
+    const configs = [
+      { x: -4, z: 0, rot: 0, label: 'Radio Science Pod' },
+      { x: 2, z: 0, rot: 0, label: 'Emergency Survival Shelter' },
+      { x: -1, z: 4, rot: Math.PI / 2, label: 'Spares Storage Pod' }
+    ];
+
+    configs.forEach(c => {
+      const container = new THREE.Mesh(
+        new THREE.BoxGeometry(6.0, 2.6, 2.4),
+        this.materials.containerRed
+      );
+      container.position.set(c.x, 1.3, c.z);
+      container.rotation.y = c.rot;
+      container.castShadow = true;
+      contGroup.add(container);
+    });
+
+    this.registerInteractive('bh_containers', contGroup);
+    this.group.add(contGroup);
+  }
+
+  /**
+   * 4f. Station Service Roads & Heavy Vehicle Access Paths (BH-ROADS)
+   */
+  private buildRoadsAndAccessPaths(): void {
+    const roadsGroup = new THREE.Group();
+    roadsGroup.name = 'BHARATI_ROADS_NETWORK';
+
+    // Primary Service Spine from Habitat to Fuel Farm & Helipad
+    const mainRoadGeo = new THREE.PlaneGeometry(6.0, 80.0);
+    const mainRoad = new THREE.Mesh(mainRoadGeo, this.materials.structuralSteel);
+    mainRoad.rotation.x = -Math.PI / 2;
+    mainRoad.position.set(16, 0.08, 4);
+    mainRoad.rotation.z = Math.PI / 6;
+    mainRoad.receiveShadow = true;
+    roadsGroup.add(mainRoad);
+
+    // Route markers along roadway
+    for (let s = -35; s <= 35; s += 10) {
+      const pole = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.04, 0.04, 2.4, 8),
+        this.materials.statusWarning
+      );
+      pole.position.set(16 + s * Math.cos(Math.PI / 6) + 3.2, 1.2, 4 + s * Math.sin(Math.PI / 6));
+      roadsGroup.add(pole);
+    }
+
+    this.registerInteractive('bh_roads_access', roadsGroup);
+    this.group.add(roadsGroup);
   }
 
   /**

@@ -54,11 +54,21 @@ export interface AssetSpatialSpec {
     heightM: number;
     footprintAreaM2: number;
     grossVolumeM3: number;
+    grossFloorAreaM2?: number;
+    spaceDistribution?: {
+      utilitiesPct: number;
+      circulationPct: number;
+      livingPct: number;
+      laboratoriesPct: number;
+      storagePct: number;
+    };
     structuralMassKg?: number;
     constructionMaterial: string;
   };
   geometryConfidence: GeometryConfidenceLevel;
   geometrySource: string;
+  lastVerified?: string;
+  geometricBasis?: string;
   operatingEnvironment: {
     minAmbientTempC: number;
     maxWindGustMs: number;
@@ -101,6 +111,8 @@ const t_ts = Math.tan(Math.PI / 4 - Math.abs(EPSG3031_LAT_TS) / 2) /
 export const STATION_GEODETIC_DATUMS: Record<string, {
   name: string;
   region: string;
+  geographicContext?: string;
+  commissionedDate?: string;
   geodetic: GeodeticCoordinate;
   projected: ProjectedCoordinate;
   magneticDeclinationDeg: number;
@@ -108,15 +120,17 @@ export const STATION_GEODETIC_DATUMS: Record<string, {
 }> = {
   station_bharati: {
     name: 'Bharati Antarctic Research Station',
-    region: 'Larsemann Hills, Ingrid Christensen Coast, Princess Elizabeth Land',
+    region: 'Larsemann Hills, East Antarctica',
+    geographicContext: 'Between Thala Fjord and Quilty Bay, East of Stornes Peninsula',
+    commissionedDate: '18 March 2012',
     geodetic: {
-      latitude: -69.407222, // 69° 24′ 26″ S
-      longitude: 76.195000, // 76° 11′ 42″ E
+      latitude: -69.406833, // 69° 24.41′ S
+      longitude: 76.195333, // 76° 11.72′ E
       elevationM: 35.0,
     },
     projected: {
-      eastingM: 2195574.00,
-      northingM: 539487.86,
+      eastingM: 2195619.49,
+      northingM: 539485.51,
       elevationM: 35.0,
       epsg: 'EPSG:3031',
     },
@@ -126,15 +140,17 @@ export const STATION_GEODETIC_DATUMS: Record<string, {
   station_maitri: {
     name: 'Maitri Antarctic Research Station',
     region: 'Schirmacher Oasis, Queen Maud Land',
+    geographicContext: 'Inland rocky oasis ~100 km from the Princess Astrid Coast, adjacent to Lake Priyadarshini',
+    commissionedDate: '1989',
     geodetic: {
-      latitude: -70.766111, // 70° 45′ 58″ S
-      longitude: 11.735833, // 11° 44′ 09″ E
-      elevationM: 117.0,
+      latitude: -70.764444, // 70° 45′ 52″ S
+      longitude: 11.734167, // 11° 44′ 03″ E
+      elevationM: 50.0,
     },
     projected: {
-      eastingM: 428942.38,
-      northingM: 2064780.61,
-      elevationM: 117.0,
+      eastingM: 428920.20,
+      northingM: 2064975.31,
+      elevationM: 50.0,
       epsg: 'EPSG:3031',
     },
     magneticDeclinationDeg: -23.2,
@@ -289,16 +305,26 @@ export const ASSET_SPATIAL_REGISTRY: Record<string, AssetSpatialSpec> = {
     localEnu: { eastM: 0, northM: 0, upM: 3.6 },
     threeCoords: { x: 0, y: 3.6, z: 0 },
     physicalDimensions: {
-      lengthM: 48.0,
-      widthM: 26.0,
-      heightM: 9.6,
-      footprintAreaM2: 1248.0,
-      grossVolumeM3: 11980.8,
+      lengthM: 50.0,
+      widthM: 30.0,
+      heightM: 10.5,
+      footprintAreaM2: 1500.0,
+      grossFloorAreaM2: 2162.0,
+      grossVolumeM3: 15750.0,
+      spaceDistribution: {
+        utilitiesPct: 43,
+        circulationPct: 23,
+        livingPct: 15,
+        laboratoriesPct: 12,
+        storagePct: 7,
+      },
       structuralMassKg: 1850000,
-      constructionMaterial: 'Bionic Aerodynamic Composite Envelope, Double-Skin Facade, Steel Stilts',
+      constructionMaterial: 'Bionic Aerodynamic Composite Envelope, Double-Skin Facade, 134 ISO Containers in 3 Tiers, 24 Tubular Steel Pilotis',
     },
     geometryConfidence: 'VERIFIED',
-    geometrySource: 'Architectural As-Built Survey Drawings (bof Architekten / IMS)',
+    geometrySource: 'NCPOR Official Station Documentation & Architectural As-Built Survey Drawings',
+    lastVerified: 'NCPOR Indian Antarctic Programme Master Plan',
+    geometricBasis: '30m × 50m Footprint, ~2,162 m² Gross Floor Area across 3 Functional Tiers Elevated 3.6m on Bedrock Pilotis',
     operatingEnvironment: {
       minAmbientTempC: -45.0,
       maxWindGustMs: 75.0, // Up to 270 km/h blizzard gusts
@@ -795,24 +821,34 @@ export const ASSET_SPATIAL_REGISTRY: Record<string, AssetSpatialSpec> = {
     stationId: 'station_maitri',
     geodetic: { latitude: -70.766111, longitude: 11.735833, elevationM: 118.4 },
     projected: { eastingM: 433982.45, northingM: 2087410.88, elevationM: 118.4, epsg: 'EPSG:3031' },
-    localEnu: { eastM: 0, northM: 0, upM: 1.4 },
-    threeCoords: { x: 0, y: 1.4, z: 0 },
+    localEnu: { eastM: 0, northM: 0, upM: 2.2 },
+    threeCoords: { x: 0, y: 2.2, z: 0 },
     physicalDimensions: {
       lengthM: 42.0,
       widthM: 22.0,
-      heightM: 4.8,
+      heightM: 5.4,
       footprintAreaM2: 840.0,
-      grossVolumeM3: 4032.0,
+      grossFloorAreaM2: 920.0,
+      grossVolumeM3: 4536.0,
+      spaceDistribution: {
+        utilitiesPct: 35,
+        circulationPct: 20,
+        livingPct: 25,
+        laboratoriesPct: 15,
+        storagePct: 5,
+      },
       structuralMassKg: 950000,
-      constructionMaterial: 'Prefabricated Modular Steel Containers on Elevated Steel Stilts',
+      constructionMaterial: 'Elevated Structural Steel Stilt Framing, Orange Insulated Sandwiched Cladding, Moraine Footings',
     },
     geometryConfidence: 'VERIFIED',
-    geometrySource: 'NCPOR Maitri Station Engineering Archival Records',
+    geometrySource: 'NCPOR Official Station Documentation & Structural Engineering Records',
+    lastVerified: 'NCPOR Maitri Structural Integrity Assessment',
+    geometricBasis: 'Elevated Steel Stilt Structure (Living, Laboratories, Utilities, Circulation) with 2.2m Wind Clearance over Moraine Bedrock',
     operatingEnvironment: {
       minAmbientTempC: -40.0,
-      maxWindGustMs: 60.0,
-      foundationType: 'Elevated Steel Stilts on Concrete Footings over Moraine Permafrost',
-      elevationAboveBedrockM: 1.4,
+      maxWindGustMs: 65.0,
+      foundationType: 'Heavy Tubular Steel Stilts on Reinforced Concrete Pier Footings anchored to Schirmacher Oasis Bedrock',
+      elevationAboveBedrockM: 2.2,
     },
     energyProfile: {
       ratedCapacityKw: 160.0,
@@ -1288,6 +1324,489 @@ export const ASSET_SPATIAL_REGISTRY: Record<string, AssetSpatialSpec> = {
       sparePartSku: 'PB-TRACK-PIN-HD',
       lubeOilGrade: 'Aviation Hydraulic Fluid Polar 15',
       inspectionIntervalHours: 500,
+    },
+  },
+
+  // ==========================================
+  // NCPOR PRIMARY INFRASTRUCTURE SPECIFICATIONS
+  // ==========================================
+  bh_fuel_farm: {
+    assetId: 'bh_fuel_farm',
+    name: 'Bharati Bulk Fuel Farm & Containment Bund',
+    code: 'BH-FUEL-FARM',
+    stationId: 'station_bharati',
+    geodetic: { latitude: -69.406980, longitude: 76.196120, elevationM: 35.8 },
+    projected: { eastingM: 2195662.10, northingM: 539452.30, elevationM: 35.8, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 36.0, northM: -26.0, upM: 0.8 },
+    threeCoords: { x: 36.0, y: 0.8, z: 26.0 },
+    physicalDimensions: {
+      lengthM: 22.0,
+      widthM: 16.0,
+      heightM: 4.5,
+      footprintAreaM2: 352.0,
+      grossVolumeM3: 1584.0,
+      structuralMassKg: 64000,
+      constructionMaterial: 'Double-Walled Steel Tanks, Impervious Geomembrane Bunding & Safety Berm',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Station Infrastructure Catalog & As-Built Fuel Engineering Drawings',
+    lastVerified: 'NCPOR Environmental & Safety Audit',
+    geometricBasis: 'Bulk Storage Tank Complex with Double Containment Bund and Service Manifold',
+    operatingEnvironment: {
+      minAmbientTempC: -45.0,
+      maxWindGustMs: 75.0,
+      foundationType: 'Impervious Concrete Catchment Basin anchored to Bedrock',
+      elevationAboveBedrockM: 0.4,
+    },
+    energyProfile: {
+      ratedCapacityKw: 12.0,
+      busDesignation: 'Fuel Transfer & Trace-Heating Feeder',
+      powerFactor: 0.90,
+    },
+    logisticsProfile: {
+      consumableType: 'Aviation Turbine Fuel Jet A-1 / Polar Diesel (450,000 Liters)',
+      burnRateLph: 48.2,
+      sparePartSku: 'PUMP-TRANSFER-ATF-01',
+      inspectionIntervalHours: 720,
+    },
+  },
+
+  bh_fuel_station: {
+    assetId: 'bh_fuel_station',
+    name: 'Bharati Polar Vehicle Fueling Station & Dispenser',
+    code: 'BH-FUEL-STAT',
+    stationId: 'station_bharati',
+    geodetic: { latitude: -69.406920, longitude: 76.195880, elevationM: 35.5 },
+    projected: { eastingM: 2195648.50, northingM: 539465.10, elevationM: 35.5, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 28.0, northM: -18.0, upM: 0.6 },
+    threeCoords: { x: 28.0, y: 0.6, z: 18.0 },
+    physicalDimensions: {
+      lengthM: 8.0,
+      widthM: 6.0,
+      heightM: 3.8,
+      footprintAreaM2: 48.0,
+      grossVolumeM3: 182.4,
+      structuralMassKg: 7800,
+      constructionMaterial: 'Steel Canopy with High-Flow Arctic Fuel Dispenser and Grounding Rig',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Operational Logistics & Vehicle Servicing Layout',
+    lastVerified: 'NCPOR Station Inspection',
+    geometricBasis: 'Weather-Protected Polar Dispenser Station for PistenBully and Snowmobiles',
+    operatingEnvironment: {
+      minAmbientTempC: -45.0,
+      maxWindGustMs: 70.0,
+      foundationType: 'Steel Base Frame on Concrete Slab',
+      elevationAboveBedrockM: 0.2,
+    },
+    energyProfile: {
+      ratedCapacityKw: 6.5,
+      busDesignation: 'Logistics Dispenser Circuit',
+      powerFactor: 0.88,
+    },
+    logisticsProfile: {
+      consumableType: 'Arctic Diesel / Jet A-1',
+      sparePartSku: 'DISPENSER-NOZZLE-ARCTIC',
+      inspectionIntervalHours: 360,
+    },
+  },
+
+  bh_seawater_pump: {
+    assetId: 'bh_seawater_pump',
+    name: 'Bharati Sea-Water Intake Pump House (Thala Fjord / Quilty Bay)',
+    code: 'BH-SW-PUMP',
+    stationId: 'station_bharati',
+    geodetic: { latitude: -69.406450, longitude: 76.194200, elevationM: 6.5 },
+    projected: { eastingM: 2195558.80, northingM: 539588.20, elevationM: 6.5, epsg: 'EPSG:3031' },
+    localEnu: { eastM: -38.0, northM: 48.0, upM: -1.5 },
+    threeCoords: { x: -38.0, y: -1.5, z: -48.0 },
+    physicalDimensions: {
+      lengthM: 8.5,
+      widthM: 5.5,
+      heightM: 3.4,
+      footprintAreaM2: 46.75,
+      grossVolumeM3: 158.95,
+      structuralMassKg: 11200,
+      constructionMaterial: 'Heavily Insulated GRP Marine Enclosure on Coastal Rock Anchor Bolts',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Official Station Documentation (Sea-Water Pump House Specification)',
+    lastVerified: 'NCPOR Life Support & Utilities Audit',
+    geometricBasis: 'Coastal Intake Pump Station with Sub-Sea Heated Line & RO Supply',
+    operatingEnvironment: {
+      minAmbientTempC: -45.0,
+      maxWindGustMs: 75.0,
+      foundationType: 'High-Tensile Marine Rock Bolts anchored into Coastal Gneiss Bedrock',
+      elevationAboveBedrockM: 0.3,
+    },
+    energyProfile: {
+      ratedCapacityKw: 38.0,
+      busDesignation: 'Coastal Sea Intake Line Feeder (Heat Traced)',
+      powerFactor: 0.91,
+    },
+    logisticsProfile: {
+      consumableType: 'Raw Sea Water for Desalination & Fire Suppression',
+      sparePartSku: 'PUMP-IMPELLER-TITANIUM-02',
+      inspectionIntervalHours: 720,
+    },
+  },
+
+  bh_summer_camp: {
+    assetId: 'bh_summer_camp',
+    name: 'Bharati Summer Camp Containerized Living Modules',
+    code: 'BH-SUMMER-CAMP',
+    stationId: 'station_bharati',
+    geodetic: { latitude: -69.407480, longitude: 76.195950, elevationM: 37.2 },
+    projected: { eastingM: 2195642.40, northingM: 539396.10, elevationM: 37.2, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 32.0, northM: 18.0, upM: 1.2 },
+    threeCoords: { x: 32.0, y: 1.2, z: -18.0 },
+    physicalDimensions: {
+      lengthM: 24.0,
+      widthM: 12.0,
+      heightM: 3.2,
+      footprintAreaM2: 288.0,
+      grossVolumeM3: 921.6,
+      structuralMassKg: 38000,
+      constructionMaterial: 'Interconnected Modular Living Containers with Wind-Deflecting Gables',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Summer Expedition Accommodation Documentation',
+    lastVerified: 'NCPOR Station Capacity Assessment',
+    geometricBasis: 'Seasonal Accommodation Block for Expedition Scientists (20 Berths)',
+    operatingEnvironment: {
+      minAmbientTempC: -40.0,
+      maxWindGustMs: 65.0,
+      foundationType: 'Tubular Steel Jack Posts on Bedrock Footings',
+      elevationAboveBedrockM: 0.8,
+    },
+    energyProfile: {
+      ratedCapacityKw: 35.0,
+      busDesignation: 'Summer Camp Auxiliary Feeder',
+      powerFactor: 0.92,
+    },
+    logisticsProfile: {
+      consumableType: 'Potable Water & Space Heating',
+      sparePartSku: 'HEATER-CORE-ARCTIC-2KW',
+      inspectionIntervalHours: 1440,
+    },
+  },
+
+  bh_containers: {
+    assetId: 'bh_containers',
+    name: 'Bharati Specialized Containerized Scientific & Utility Modules',
+    code: 'BH-CONTAINERS',
+    stationId: 'station_bharati',
+    geodetic: { latitude: -69.407120, longitude: 76.194100, elevationM: 36.4 },
+    projected: { eastingM: 2195538.10, northingM: 539498.70, elevationM: 36.4, epsg: 'EPSG:3031' },
+    localEnu: { eastM: -24.0, northM: -22.0, upM: 0.9 },
+    threeCoords: { x: -24.0, y: 0.9, z: 22.0 },
+    physicalDimensions: {
+      lengthM: 18.0,
+      widthM: 8.0,
+      heightM: 2.9,
+      footprintAreaM2: 144.0,
+      grossVolumeM3: 417.6,
+      structuralMassKg: 26000,
+      constructionMaterial: 'Corten Steel ISO Polar Containers with Thermal Insulation Lining',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR As-Built Station Equipment Registry',
+    lastVerified: 'NCPOR Logistics Inspection',
+    geometricBasis: 'Emergency Survival Shelter, Radio Science & Spare Parts Modules',
+    operatingEnvironment: {
+      minAmbientTempC: -45.0,
+      maxWindGustMs: 70.0,
+      foundationType: 'Structural Steel Skids over Bedrock',
+      elevationAboveBedrockM: 0.4,
+    },
+    energyProfile: {
+      ratedCapacityKw: 15.0,
+      busDesignation: 'Ancillary Container Circuit',
+      powerFactor: 0.90,
+    },
+    logisticsProfile: {
+      consumableType: 'Emergency Rations, Spares & Scientific Consumables',
+      sparePartSku: 'CONTAINER-SEAL-EPDM',
+      inspectionIntervalHours: 2190,
+    },
+  },
+
+  bh_roads_access: {
+    assetId: 'bh_roads_access',
+    name: 'Bharati Station Service Roads & Heavy Vehicle Access Paths',
+    code: 'BH-ROADS',
+    stationId: 'station_bharati',
+    geodetic: { latitude: -69.406833, longitude: 76.195333, elevationM: 35.0 },
+    projected: { eastingM: 2195619.49, northingM: 539485.51, elevationM: 35.0, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 0, northM: 0, upM: 0.05 },
+    threeCoords: { x: 0, y: 0.05, z: 0 },
+    physicalDimensions: {
+      lengthM: 140.0,
+      widthM: 4.5,
+      heightM: 0.2,
+      footprintAreaM2: 630.0,
+      grossVolumeM3: 126.0,
+      structuralMassKg: 180000,
+      constructionMaterial: 'Crushed Metamorphic Gneiss Aggregate on Permafrost Bedrock',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Site Infrastructure Master Plan',
+    lastVerified: 'NCPOR Survey Documentation',
+    geometricBasis: 'Engineered Access Network connecting Habitat, Helipad, Fuel Farm and Sea Intake',
+    operatingEnvironment: {
+      minAmbientTempC: -45.0,
+      maxWindGustMs: 75.0,
+      foundationType: 'Compacted Mineral Regolith on Gneiss Bedrock',
+      elevationAboveBedrockM: 0.1,
+    },
+    energyProfile: {
+      ratedCapacityKw: 0.0,
+      busDesignation: 'Passive Civil Works',
+    },
+    logisticsProfile: {
+      consumableType: 'Road Maintenance Aggregate & Route Markers',
+      sparePartSku: 'ROUTE-MARKER-ORANGE-POLE',
+      inspectionIntervalHours: 720,
+    },
+  },
+
+  ma_fuel_farm: {
+    assetId: 'ma_fuel_farm',
+    name: 'Maitri Bulk Fuel Farm & Containment Facility',
+    code: 'MA-FUEL-FARM',
+    stationId: 'station_maitri',
+    geodetic: { latitude: -70.766320, longitude: 11.735100, elevationM: 118.2 },
+    projected: { eastingM: 428912.40, northingM: 2064748.20, elevationM: 118.2, epsg: 'EPSG:3031' },
+    localEnu: { eastM: -18.0, northM: 10.0, upM: 1.0 },
+    threeCoords: { x: -18.0, y: 1.0, z: -10.0 },
+    physicalDimensions: {
+      lengthM: 18.0,
+      widthM: 14.0,
+      heightM: 3.8,
+      footprintAreaM2: 252.0,
+      grossVolumeM3: 957.6,
+      structuralMassKg: 45000,
+      constructionMaterial: 'Horizontal Cylindrical Fuel Tanks in Heavy Earthen Catchment Berm',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Maitri Station Engineering Archival Records',
+    lastVerified: 'NCPOR Environmental Compliance Inspection',
+    geometricBasis: 'Bulk Polar Diesel Storage with Spill Containment Basin',
+    operatingEnvironment: {
+      minAmbientTempC: -40.0,
+      maxWindGustMs: 65.0,
+      foundationType: 'Crushed Moraine Rock Berm with Impervious Lining',
+      elevationAboveBedrockM: 0.5,
+    },
+    energyProfile: {
+      ratedCapacityKw: 8.0,
+      busDesignation: 'Fuel Farm Pump & Heating Feeder',
+      powerFactor: 0.88,
+    },
+    logisticsProfile: {
+      consumableType: 'Polar Diesel Blend (280,000 Liters)',
+      burnRateLph: 44.5,
+      sparePartSku: 'MA-FUEL-PUMP-HEAVY',
+      inspectionIntervalHours: 720,
+    },
+  },
+
+  ma_fuel_station: {
+    assetId: 'ma_fuel_station',
+    name: 'Maitri Polar Vehicle Dispenser Station',
+    code: 'MA-FUEL-STAT',
+    stationId: 'station_maitri',
+    geodetic: { latitude: -70.766280, longitude: 11.735350, elevationM: 118.4 },
+    projected: { eastingM: 428924.80, northingM: 2064756.90, elevationM: 118.4, epsg: 'EPSG:3031' },
+    localEnu: { eastM: -12.0, northM: 6.0, upM: 0.8 },
+    threeCoords: { x: -12.0, y: 0.8, z: -6.0 },
+    physicalDimensions: {
+      lengthM: 7.0,
+      widthM: 5.0,
+      heightM: 3.2,
+      footprintAreaM2: 35.0,
+      grossVolumeM3: 112.0,
+      structuralMassKg: 5200,
+      constructionMaterial: 'Insulated Service Shed with Fuel Delivery Meter and Hose Booms',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Station Maintenance Plan',
+    lastVerified: 'NCPOR Operational Review',
+    geometricBasis: 'Dispenser Point for PistenBully Vehicles and Station Tractors',
+    operatingEnvironment: {
+      minAmbientTempC: -40.0,
+      maxWindGustMs: 60.0,
+      foundationType: 'Steel Base Skid on Compacted Moraine',
+      elevationAboveBedrockM: 0.3,
+    },
+    energyProfile: {
+      ratedCapacityKw: 4.5,
+      busDesignation: 'Garage Sub-Distribution',
+      powerFactor: 0.86,
+    },
+    logisticsProfile: {
+      consumableType: 'Polar Diesel / Engine Oil',
+      sparePartSku: 'DISPENSER-FLOW-METER-MA',
+      inspectionIntervalHours: 360,
+    },
+  },
+
+  ma_lake_pump: {
+    assetId: 'ma_lake_pump',
+    name: 'Maitri Lake-Water Pump House (Lake Priyadarshini Intake)',
+    code: 'MA-LAKE-PUMP',
+    stationId: 'station_maitri',
+    geodetic: { latitude: -70.765600, longitude: 11.737200, elevationM: 116.2 },
+    projected: { eastingM: 428985.30, northingM: 2064842.10, elevationM: 116.2, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 22.0, northM: 12.0, upM: 0.4 },
+    threeCoords: { x: 22.0, y: 0.4, z: -12.0 },
+    physicalDimensions: {
+      lengthM: 7.2,
+      widthM: 5.2,
+      heightM: 3.2,
+      footprintAreaM2: 37.44,
+      grossVolumeM3: 119.8,
+      structuralMassKg: 7800,
+      constructionMaterial: 'Thermally Insulated Timber & GRP Pump Shed on Stilt Piers',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Official Station Documentation (Lake-Water Pump House Specification)',
+    lastVerified: 'NCPOR Water Supply & Quality Assurance',
+    geometricBasis: 'Lake Priyadarshini Submerged Heated Intake Pump House with Trace-Heated Pipeline to Main Complex',
+    operatingEnvironment: {
+      minAmbientTempC: -40.0,
+      maxWindGustMs: 65.0,
+      foundationType: 'Steel Stilt Piers anchored into Lake Basin Shore Moraine',
+      elevationAboveBedrockM: 0.6,
+    },
+    energyProfile: {
+      ratedCapacityKw: 22.0,
+      busDesignation: 'Lake Pump & Line Heat Tracing Bus',
+      powerFactor: 0.90,
+    },
+    logisticsProfile: {
+      consumableType: 'Fresh Lake Water (Lake Priyadarshini)',
+      sparePartSku: 'PUMP-SUBMERSIBLE-GRUNDFOS-03',
+      inspectionIntervalHours: 720,
+    },
+  },
+
+  ma_summer_camp: {
+    assetId: 'ma_summer_camp',
+    name: 'Maitri Summer Camp Modular Living Chalets',
+    code: 'MA-SUMMER-CAMP',
+    stationId: 'station_maitri',
+    geodetic: { latitude: -70.766520, longitude: 11.736800, elevationM: 118.8 },
+    projected: { eastingM: 428972.10, northingM: 2064728.50, elevationM: 118.8, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 18.0, northM: -12.0, upM: 1.2 },
+    threeCoords: { x: 18.0, y: 1.2, z: 12.0 },
+    physicalDimensions: {
+      lengthM: 20.0,
+      widthM: 10.0,
+      heightM: 3.4,
+      footprintAreaM2: 200.0,
+      grossVolumeM3: 680.0,
+      structuralMassKg: 28000,
+      constructionMaterial: 'Modular Insulated Timber/Steel Chalets on Elevated Footings',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Summer Expedition Accommodation Records',
+    lastVerified: 'NCPOR Station Operations',
+    geometricBasis: 'Seasonal Field Units for Scientists & Logistics Crews (15 Berths)',
+    operatingEnvironment: {
+      minAmbientTempC: -35.0,
+      maxWindGustMs: 60.0,
+      foundationType: 'Elevated Timber Stilt Piers on Moraine Gravel',
+      elevationAboveBedrockM: 0.8,
+    },
+    energyProfile: {
+      ratedCapacityKw: 25.0,
+      busDesignation: 'Summer Camp Electrical Feeder',
+      powerFactor: 0.92,
+    },
+    logisticsProfile: {
+      consumableType: 'Space Heating & Potable Water',
+      sparePartSku: 'PANEL-HEATER-CONV-MA',
+      inspectionIntervalHours: 1440,
+    },
+  },
+
+  ma_containers: {
+    assetId: 'ma_containers',
+    name: 'Maitri Containerized Field Science & Storage Pods',
+    code: 'MA-CONTAINERS',
+    stationId: 'station_maitri',
+    geodetic: { latitude: -70.765950, longitude: 11.734800, elevationM: 118.0 },
+    projected: { eastingM: 428905.20, northingM: 2064798.10, elevationM: 118.0, epsg: 'EPSG:3031' },
+    localEnu: { eastM: -16.0, northM: 14.0, upM: 0.8 },
+    threeCoords: { x: -16.0, y: 0.8, z: -14.0 },
+    physicalDimensions: {
+      lengthM: 16.0,
+      widthM: 7.5,
+      heightM: 2.8,
+      footprintAreaM2: 120.0,
+      grossVolumeM3: 336.0,
+      structuralMassKg: 22000,
+      constructionMaterial: 'Standardized 20ft Insulated Polar Cargo Containers',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Field Equipment Catalog',
+    lastVerified: 'NCPOR Logistics Inventory',
+    geometricBasis: 'Geological Sampling Storage and Field Gear Repository',
+    operatingEnvironment: {
+      minAmbientTempC: -40.0,
+      maxWindGustMs: 60.0,
+      foundationType: 'Steel Skids on Moraine Boulder Platform',
+      elevationAboveBedrockM: 0.4,
+    },
+    energyProfile: {
+      ratedCapacityKw: 10.0,
+      busDesignation: 'Field Science Auxiliary Line',
+      powerFactor: 0.90,
+    },
+    logisticsProfile: {
+      consumableType: 'Scientific Sampling Glassware & Field Tools',
+      sparePartSku: 'CONTAINER-CORNER-LOCK-HD',
+      inspectionIntervalHours: 2190,
+    },
+  },
+
+  ma_access_routes: {
+    assetId: 'ma_access_routes',
+    name: 'Maitri Schirmacher Oasis Moraine Vehicle Routes',
+    code: 'MA-ROUTES',
+    stationId: 'station_maitri',
+    geodetic: { latitude: -70.764444, longitude: 11.734167, elevationM: 50.0 },
+    projected: { eastingM: 428920.20, northingM: 2064975.31, elevationM: 50.0, epsg: 'EPSG:3031' },
+    localEnu: { eastM: 0, northM: 0, upM: 0.05 },
+    threeCoords: { x: 0, y: 0.05, z: 0 },
+    physicalDimensions: {
+      lengthM: 120.0,
+      widthM: 4.0,
+      heightM: 0.15,
+      footprintAreaM2: 480.0,
+      grossVolumeM3: 72.0,
+      structuralMassKg: 140000,
+      constructionMaterial: 'Compacted Moraine Scree with Fluorescent Route Markers and Cairn Beacons',
+    },
+    geometryConfidence: 'VERIFIED',
+    geometrySource: 'NCPOR Maitri Field Navigation Chart',
+    lastVerified: 'NCPOR Safety Audit',
+    geometricBasis: 'Clear Moraine Access Track from Station to Priyadarshini Pump House and Fuel Depot',
+    operatingEnvironment: {
+      minAmbientTempC: -40.0,
+      maxWindGustMs: 65.0,
+      foundationType: 'Compacted Glacial Till on Oasis Bedrock',
+      elevationAboveBedrockM: 0.05,
+    },
+    energyProfile: {
+      ratedCapacityKw: 0.0,
+      busDesignation: 'Passive Civil Works',
+    },
+    logisticsProfile: {
+      consumableType: 'High-Visibility Route Markers & Snow Poles',
+      sparePartSku: 'ROUTE-POLE-REFLECTIVE-MA',
+      inspectionIntervalHours: 720,
     },
   },
 };

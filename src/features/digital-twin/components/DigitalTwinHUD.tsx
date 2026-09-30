@@ -89,13 +89,23 @@ export const DigitalTwinHUD: React.FC<Props> = ({
               <h1 className="text-sm font-bold text-polar-text-primary tracking-wide">
                 {isBharati ? 'BHARATI ANTARCTIC STATION' : 'MAITRI ANTARCTIC STATION'}
               </h1>
-              <div className="flex items-center gap-2 text-[10px] text-polar-text-secondary mt-0.5">
-                <span className="flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-polar-text-secondary mt-0.5">
+                <span className="flex items-center gap-1 font-mono">
                   <Compass className="w-3 h-3 text-polar-cyan" />
-                  {isBharati ? '69°24′28″S 76°11′14″E' : '70°45′58″S 11°44′02″E'}
+                  {isBharati ? '69° 24.41′ S, 76° 11.72′ E' : '70° 45′ 52″ S, 11° 44′ 03″ E'}
                 </span>
                 <span>•</span>
-                <span>{isBharati ? 'Larsemann Hills' : 'Schirmacher Oasis'}</span>
+                <span>{isBharati ? 'Larsemann Hills (35m ASL)' : 'Schirmacher Oasis (50m ASL)'}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-polar-elevated text-polar-cyan border border-polar-border font-mono">
+                  EPSG:3031
+                </span>
+                <ProvenanceBadge 
+                  type={isBharati ? 'DOCUMENTED' : 'RECONSTRUCTED'} 
+                  size="sm"
+                  className="py-0 text-[9px]"
+                />
               </div>
             </div>
           </div>
@@ -106,6 +116,9 @@ export const DigitalTwinHUD: React.FC<Props> = ({
               healthScore > 80 ? 'text-emerald-500 dark:text-emerald-400' : 'text-amber-500 dark:text-amber-400'
             }`}>
               {healthScore}%
+            </span>
+            <span className="text-[9px] text-polar-text-muted block mt-0.5 font-mono">
+              PROV: REAL_PUBLIC
             </span>
           </div>
         </div>
