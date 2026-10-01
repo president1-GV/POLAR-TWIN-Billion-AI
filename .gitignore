@@ -34,6 +34,8 @@ supabase/.temp/
 # IDE / OS
 .vscode/
 .idea/
+.gemini/
+GEMINI.md
 .DS_Store
 Thumbs.db
 
