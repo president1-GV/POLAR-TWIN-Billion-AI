@@ -1,6 +1,16 @@
 import { Station, StationAsset, EnvironmentObservation, Alert, LogisticsItem, Shipment, EdgeStatus } from '../types';
 
-const API_BASE = '/api';
+const RAW_BACKEND = (
+  (typeof window !== 'undefined' && (window as any).__POLAR_BACKEND_URL__) ||
+  import.meta.env.VITE_BACKEND_URL ||
+  import.meta.env.VITE_API_URL ||
+  ''
+).trim();
+
+export const API_BASE = RAW_BACKEND 
+  ? (RAW_BACKEND.endsWith('/api') ? RAW_BACKEND : `${RAW_BACKEND.replace(/\/$/, '')}/api`) 
+  : '/api';
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://fpoxnocbznagepusczkk.supabase.co';
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZwb3hub2Niem5hZ2VwdXNjemtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1NTMyNTMsImV4cCI6MjEwNjEyOTI1M30.Np8y0hopJxoTHHY587rKDhKB0Jk6m95SxoS8owCL6qY';
 
@@ -116,6 +126,14 @@ export function getSessionAuth() {
   return { token: activeSessionToken, user: activeSessionUser };
 }
 
+function getFullApiUrl(endpoint: string): string {
+  let cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  if (API_BASE.endsWith('/api') && cleanEndpoint.startsWith('/api/')) {
+    cleanEndpoint = cleanEndpoint.substring(4);
+  }
+  return `${API_BASE}${cleanEndpoint}`;
+}
+
 // Zero-Trust backend fetch helper injecting Bearer session token
 async function backendFetch(endpoint: string, options: RequestInit = {}): Promise<Response> {
   const headers: Record<string, string> = {
@@ -125,14 +143,15 @@ async function backendFetch(endpoint: string, options: RequestInit = {}): Promis
   if (activeSessionToken && !headers['Authorization']) {
     headers['Authorization'] = `Bearer ${activeSessionToken}`;
   }
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+
+  const targetUrl = getFullApiUrl(endpoint);
 
   // Resilient 6.0s timeout for seamless fallback when running on static deployments (e.g. GitHub Pages)
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 6000);
 
   try {
-    const res = await fetch(`${API_BASE}${cleanEndpoint}`, {
+    const res = await fetch(targetUrl, {
       ...options,
       headers,
       signal: options.signal || controller.signal,
@@ -148,6 +167,21 @@ async function backendFetch(endpoint: string, options: RequestInit = {}): Promis
 
 export const api = {
   // 0. Zero-Trust Identity & Session Management
+  async checkBackendHealth(): Promise<{ online: boolean; status: string; latency_ms: number; details?: any }> {
+    const t0 = performance.now();
+    try {
+      const res = await backendFetch('/health');
+      if (res.ok) {
+        const data = await res.json();
+        const latency_ms = Math.round(performance.now() - t0);
+        return { online: true, status: data.status || 'ONLINE', latency_ms, details: data };
+      }
+      return { online: false, status: `HTTP_${res.status}`, latency_ms: Math.round(performance.now() - t0) };
+    } catch (e: any) {
+      return { online: false, status: e?.message || 'OFFLINE', latency_ms: Math.round(performance.now() - t0) };
+    }
+  },
+
   async login(username: string, password?: string, mfa_code?: string): Promise<any> {
     try {
       const res = await backendFetch('/auth/login', {
@@ -159,7 +193,7 @@ export const api = {
         setSessionAuth(data.token, data.user);
         return data;
       }
-      if (res.status === 401 || res.status === 403) {
+      if (res.status === 401 || res.status === 403 || res.status === 429) {
         const contentType = res.headers.get('content-type') || '';
         if (contentType.includes('application/json')) {
           const err = await res.json().catch(() => null);
@@ -204,9 +238,8 @@ export const api = {
   async switchRole(role: string): Promise<any> {
     const creds = ROLE_CREDENTIALS[role] || ROLE_CREDENTIALS.OPERATOR;
     try {
-      const res = await fetch(`${API_BASE}/auth/login`, {
+      const res = await backendFetch('/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           username: creds.username,
           password: creds.password,

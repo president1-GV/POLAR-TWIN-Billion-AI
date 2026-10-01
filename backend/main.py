@@ -35,7 +35,12 @@ app.add_middleware(SecurityHeadersMiddleware)
 trusted_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:4173",
+    "http://127.0.0.1:4173",
     "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
     "https://president1-gv.github.io"
 ]
 custom_origins = os.getenv("ALLOWED_ORIGINS", "")
@@ -47,7 +52,7 @@ app.add_middleware(
     allow_origins=trusted_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With"],
+    allow_headers=["Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"],
 )
 
 # 3. Secure Error Handling: Never leak raw tracebacks or internal paths to clients

@@ -198,7 +198,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return { success: true };
           }
         } catch (backendErr: any) {
-          console.warn('Backend login attempt skipped or unreachable, proceeding to Supabase/air-gap roster:', backendErr?.message);
+          const msg = backendErr?.message || '';
+          const isNetworkError = 
+            backendErr?.name === 'AbortError' ||
+            msg.includes('Failed to fetch') ||
+            msg.includes('NetworkError') ||
+            msg.includes('BACKEND_UNAVAILABLE');
+
+          if (!isNetworkError && msg) {
+            // Live backend actively rejected credentials or rate-limited client
+            return { success: false, error: msg };
+          }
+          console.warn('Backend server offline or unreachable, proceeding to Supabase cloud / air-gap roster:', msg);
         }
 
         // 2. Direct Supabase Cloud Authentication (if anon key provided and email/password provided)
